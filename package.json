@@ -1,9 +1,9 @@
 {
-  "name": "@chatpta/validate",
-  "version": "3.0.28",
+  "name": "@onspark/validate",
+  "version": "0.0.1",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/chatpta/pkg-validate.git"
+    "url": "git+https://github.com/onspark/pkg-validate.git"
   },
   "description": "Validate data",
   "main": "index.js",
@@ -14,7 +14,7 @@
     "validate",
     "data"
   ],
-  "author": "Chatpta team",
+  "author": "OnSPARK team",
   "license": "ISC",
   "devDependencies": {
     "mocha": "10.2.0"
