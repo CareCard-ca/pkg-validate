@@ -1,0 +1,23 @@
+{
+  "name": "@chatpta/validate",
+  "version": "3.0.28",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/chatpta/pkg-validate.git"
+  },
+  "description": "Validate data",
+  "main": "index.js",
+  "scripts": {
+    "test": "export NODE_ENV=test && mocha --watch --recursive"
+  },
+  "keywords": [
+    "validate",
+    "data"
+  ],
+  "author": "Chatpta team",
+  "license": "ISC",
+  "devDependencies": {
+    "mocha": "10.2.0"
+  },
+  "dependencies": {}
+}
