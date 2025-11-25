@@ -46,6 +46,18 @@ describe( 'ValidateProperties test', function () {
             done();
         } );
 
+        it( 'searchString validate', function ( done ) {
+            const testObject_1 = { searchString: "1c76ea46-a212-4cc5-9031-a9a28d927c4c" };
+            const testObject_2 = { searchString: " claudpsnd@yahoo.ca " };
+
+            const validatedObject_1 = validateProperties.validateProperties( testObject_1 );
+            const validatedObject_2 = validateProperties.validateProperties( testObject_2 );
+
+            assert.deepStrictEqual( validatedObject_1, {}, 'Validation failed' );
+            assert.deepStrictEqual( validatedObject_2, testObject_2, 'Validation failed' );
+            done();
+        } );
+
         it( 'permission_string validate', function ( done ) {
             const testObject_1 = {
                 permission: {
