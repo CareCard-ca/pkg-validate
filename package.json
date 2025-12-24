@@ -1,6 +1,6 @@
 {
-  "name": "@carecard/validate-js",
-  "version": "1.0.0",
+  "name": "@carecard/validate",
+  "version": "2.0.1",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/CareCard-ca/pkg-validate.git"
@@ -14,7 +14,7 @@
     "validate",
     "data"
   ],
-  "author": "OnSPARK team",
+  "author": "CareCard team",
   "license": "ISC",
   "devDependencies": {
     "mocha": "11.7.5"
