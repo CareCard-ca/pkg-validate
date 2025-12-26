@@ -206,6 +206,9 @@ describe('AuthUtil test', function () {
         });
 
         it('isUsernameString returns true if input is username string false otherwise', function (done) {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+            const longUserName = chars.repeat(100);
+            assert.ok(!validate.isUsernameString(longUserName), "Long user name test failed");
             assert.ok(!validate.isUsernameString(goodString), 'Good string test failed');
             assert.ok(!validate.isUsernameString(badString), 'Bad string test failed');
             assert.ok(validate.isUsernameString('testUsername'), 'username validation failed');
