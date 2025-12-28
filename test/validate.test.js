@@ -176,12 +176,12 @@ describe('AuthUtil test', function () {
             const badPassword_4 = 'pnka*';
             const badPassword_5 = 'pnka*some654t#hinjgiuffdytrrtsdjj';
             const badPassword_6 = 'pnkad';
-            const goodPassword_1 = 'pankaj*';
+            const goodPassword_1 = 'pankaj*e';
             const goodPassword_2 = 'pank!aj67';
             const goodPassword_3 = 'some654t#hing#';
             const goodPassword_4 = '82625%82726';
             const goodPassword_5 = 'halsw3ol&*ler';
-            const goodPassword_6 = 'pnkaj*';
+            const goodPassword_6 = 'pnkaj*sd';
             const goodPassword_7 = 'pnkajchatpta';
             const goodPassword_8 = '!@#$%^&*';
 
