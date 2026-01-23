@@ -319,5 +319,30 @@ describe('AuthUtil test', function () {
             assert.ok(!validate.isCountryCodeString(bad), 'Bad country code failing');
             done();
         });
+
+        it('isValidDomainName returns true if valid domain name, false otherwise', function (done) {
+            const goodDomain1 = "example.com";
+            const goodDomain2 = "sub.example.com";
+            const goodDomain3 = "my-domain.org";
+            const goodDomain4 = "school.edu.in";
+            const badDomain1 = "example";
+            const badDomain2 = ".example.com";
+            const badDomain3 = "example.com-";
+            const badDomain4 = "-example.com";
+            const badDomain5 = "example..com";
+
+            assert.ok(validate.isValidDomainName(goodDomain1), 'Good domain test failed');
+            assert.ok(validate.isValidDomainName(goodDomain2), 'Good domain test failed');
+            assert.ok(validate.isValidDomainName(goodDomain3), 'Good domain test failed');
+            assert.ok(validate.isValidDomainName(goodDomain4), 'Good domain test failed');
+            assert.ok(!validate.isValidDomainName(badDomain1), 'Bad domain test failed');
+            assert.ok(!validate.isValidDomainName(badDomain2), 'Bad domain test failed');
+            assert.ok(!validate.isValidDomainName(badDomain3), 'Bad domain test failed');
+            assert.ok(!validate.isValidDomainName(badDomain4), 'Bad domain test failed');
+            assert.ok(!validate.isValidDomainName(badDomain5), 'Bad domain test failed');
+            assert.ok(!validate.isValidDomainName(""), 'Empty domain test failed');
+            assert.ok(!validate.isValidDomainName(undefined), 'Undefined domain test failed');
+            done();
+        });
     });
 });
