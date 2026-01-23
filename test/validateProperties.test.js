@@ -75,5 +75,26 @@ describe( 'ValidateProperties test', function () {
             assert.deepStrictEqual( validatedObject_2, testObject_2, 'Validation failed' );
             done();
         } );
+
+        it( 'domain validation', function ( done ) {
+            const testObject1 = { domain: "example.com" };
+            const testObject2 = { domain_name: "sub.example.com" };
+            const testObject3 = { email_domain: "my-domain.org" };
+            const testObject4 = { email_domain_name: "school.edu.in" };
+            const testObjectBad = { domain: "invalid_domain" };
+
+            const validatedObject1 = validateProperties.validateProperties( testObject1 );
+            const validatedObject2 = validateProperties.validateProperties( testObject2 );
+            const validatedObject3 = validateProperties.validateProperties( testObject3 );
+            const validatedObject4 = validateProperties.validateProperties( testObject4 );
+            const validatedObjectBad = validateProperties.validateProperties( testObjectBad );
+
+            assert.deepStrictEqual( validatedObject1, testObject1, 'Validation failed for domain' );
+            assert.deepStrictEqual( validatedObject2, testObject2, 'Validation failed for domain_name' );
+            assert.deepStrictEqual( validatedObject3, testObject3, 'Validation failed for email_domain' );
+            assert.deepStrictEqual( validatedObject4, testObject4, 'Validation failed for email_domain_name' );
+            assert.deepStrictEqual( validatedObjectBad, {}, 'Validation should have failed for invalid domain' );
+            done();
+        } );
     } );
 } );
