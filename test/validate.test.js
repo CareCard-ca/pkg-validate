@@ -41,7 +41,7 @@ describe('AuthUtil test', function () {
             const badStringTwo = "13-34";
             const goodString = "{\"blocks\":[{\"key\":\"ediog\",\"text\":\"I am doing well\",\"type\":\"unstyled\",\"depth\":0,\"inlineStyleRanges\":[],\"entityRanges\":[],\"data\":{}}],\"entityMap\":{}}";
 
-            assert.ok(!validate.isValidJsonString(), 'Undefined string test failed');
+            assert.ok(!validate.isValidJsonString(undefined), 'Undefined string test failed');
             assert.ok(!validate.isValidJsonString(3), 'Type of string test failed');
             assert.ok(!validate.isValidJsonString(badString), 'Bad string test failed');
             assert.ok(!validate.isValidJsonString(badStringTwo), 'Bad string test failed');
@@ -54,7 +54,7 @@ describe('AuthUtil test', function () {
             const badStringTwo = "13-34";
             const goodString = "17";
 
-            assert.ok(!validate.isValidIntegerString(), 'Undefined string test failed');
+            assert.ok(!validate.isValidIntegerString(undefined), 'Undefined string test failed');
             assert.ok(!validate.isValidIntegerString(3), 'Type of string test failed');
             assert.ok(!validate.isValidIntegerString(badString), 'Bad string test failed');
             assert.ok(!validate.isValidIntegerString(badStringTwo), 'Bad string test failed');
@@ -66,7 +66,7 @@ describe('AuthUtil test', function () {
             const badUuid = "1c76ea46-a212-4cc5-9031-a9a28d927c4c98";
             const goodUuid = "1c76ea46-a212-4cc5-9031-a9a28d927c4c";
 
-            assert.ok(!validate.isValidUuidString(), 'Undefined string test failed');
+            assert.ok(!validate.isValidUuidString(undefined), 'Undefined string test failed');
             assert.ok(!validate.isValidUuidString(3), 'Type of string test failed');
             assert.ok(!validate.isValidUuidString(badUuid), 'Bad string test failed');
             assert.ok(validate.isValidUuidString(goodUuid), 'Good string test failed');
@@ -74,7 +74,7 @@ describe('AuthUtil test', function () {
         });
 
         it('isCharactersString returns true if input is character false otherwise', function (done) {
-            assert.ok(!validate.isCharactersString(), 'Undefined string test failed');
+            assert.ok(!validate.isCharactersString(undefined), 'Undefined string test failed');
             assert.ok(!validate.isCharactersString(3), 'Type of string test failed');
             assert.ok(!validate.isCharactersString(badString), 'Bad string test failed');
             assert.ok(validate.isCharactersString(goodString), 'Good string test failed');

@@ -1,6 +1,6 @@
 {
   "name": "@carecard/validate",
-  "version": "2.1.1",
+  "version": "2.2.5",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/CareCard-ca/pkg-validate.git"
@@ -8,7 +8,7 @@
   "description": "Validate data",
   "main": "index.js",
   "scripts": {
-    "test": "export NODE_ENV=test && mocha --watch --recursive"
+    "test": "export NODE_ENV=test && mocha --recursive"
   },
   "keywords": [
     "validate",
@@ -18,6 +18,5 @@
   "license": "ISC",
   "devDependencies": {
     "mocha": "11.7.5"
-  },
-  "dependencies": {}
+  }
 }
