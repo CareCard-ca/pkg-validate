@@ -109,6 +109,10 @@ describe('ValidateProperties test', function () {
                 brand: 'Apple',
                 short_description: 'Short desc',
                 shortDescription: 'Short desc',
+                college_name: 'Harvard University',
+                collegeName: 'Harvard University',
+                campus_name: 'Main Campus',
+                campusName: 'Main Campus',
                 strong_password: 'Password123!',
                 strongPassword: 'Password123!',
                 new_password: 'Password123',
@@ -160,6 +164,8 @@ describe('ValidateProperties test', function () {
                 emailDomainName: 'example.com',
                 newStatus: 'Active',
                 orderId: '1c76ea46-a212-4cc5-9031-a9a28d927c4c',
+                collegeName: 'Harvard University',
+                campusName: 'Main Campus',
             };
             const validatedObject = validateProperties(testObject);
             assert.deepStrictEqual(
@@ -174,6 +180,8 @@ describe('ValidateProperties test', function () {
             const testObject = {
                 new_status: 'Active',
                 order_id: '1c76ea46-a212-4cc5-9031-a9a28d927c4c',
+                college_name: 'Harvard University',
+                campus_name: 'Main Campus',
             };
             const validatedObject = validateProperties(testObject);
             assert.deepStrictEqual(
