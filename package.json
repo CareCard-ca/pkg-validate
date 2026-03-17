@@ -1,6 +1,6 @@
 {
   "name": "@carecard/validate",
-  "version": "2.2.8",
+  "version": "2.2.10",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/CareCard-ca/pkg-validate.git"
@@ -17,6 +17,6 @@
   "author": "CareCard team",
   "license": "ISC",
   "devDependencies": {
-    "mocha": "11.3.0"
+    "mocha": "11.7.5"
   }
 }
