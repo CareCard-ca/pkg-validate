@@ -1,6 +1,6 @@
 {
   "name": "@carecard/validate",
-  "version": "2.2.10",
+  "version": "2.2.11",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/CareCard-ca/pkg-validate.git"

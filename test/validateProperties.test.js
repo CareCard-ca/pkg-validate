@@ -192,6 +192,21 @@ describe('ValidateProperties test', function () {
             done();
         });
 
+        it('expires_at validation', function (done) {
+            const testObject1 = { expires_at: "2023-10-27T10:00:00Z" };
+            const testObject2 = { expiresAt: "2023-10-27T10:00:00" };
+            const testObjectBad = { expires_at: "invalid-date" };
+
+            const validatedObject1 = validateProperties(testObject1);
+            const validatedObject2 = validateProperties(testObject2);
+            const validatedObjectBad = validateProperties(testObjectBad);
+
+            assert.deepStrictEqual(validatedObject1, testObject1, 'Validation failed for expires_at with TZ');
+            assert.deepStrictEqual(validatedObject2, testObject2, 'Validation failed for expiresAt without TZ');
+            assert.deepStrictEqual(validatedObjectBad, {}, 'Validation should have failed for invalid expires_at');
+            done();
+        });
+
         it('validateProperties returns empty object for null or undefined', function (done) {
             assert.deepStrictEqual(validateProperties(null), {});
             assert.deepStrictEqual(validateProperties(undefined), {});

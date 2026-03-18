@@ -344,5 +344,39 @@ describe('AuthUtil test', function () {
             assert.ok(!validate.isValidDomainName(undefined), 'Undefined domain test failed');
             done();
         });
+
+        it('isValidTimestampzString returns true if timestamp with time zone, false otherwise', function (done) {
+            const goodTz1 = "2023-10-27T10:00:00Z";
+            const goodTz2 = "2023-10-27T10:00:00+02:00";
+            const goodTz3 = "2023-10-27T10:00:00.123Z";
+            const badTz1 = "2023-10-27T10:00:00";
+            const badTz2 = "2023-13-27T10:00:00Z"; // Invalid month
+            const badTz3 = "2023-10-27 10:00:00Z"; // Missing T
+
+            assert.ok(validate.isValidTimestampzString(goodTz1), 'Good timestampz test failed');
+            assert.ok(validate.isValidTimestampzString(goodTz2), 'Good timestampz test failed');
+            assert.ok(validate.isValidTimestampzString(goodTz3), 'Good timestampz test failed');
+            assert.ok(!validate.isValidTimestampzString(badTz1), 'Bad timestampz test failed (no TZ)');
+            assert.ok(!validate.isValidTimestampzString(badTz2), 'Bad timestampz test failed (invalid date)');
+            assert.ok(!validate.isValidTimestampzString(badTz3), 'Bad timestampz test failed (missing T)');
+            assert.ok(!validate.isValidTimestampzString(undefined), 'Undefined test failed');
+            done();
+        });
+
+        it('isValidTimestampString returns true if timestamp without time zone, false otherwise', function (done) {
+            const goodT1 = "2023-10-27T10:00:00";
+            const goodT2 = "2023-10-27T10:00:00.123";
+            const badT1 = "2023-10-27T10:00:00Z";
+            const badT2 = "2023-13-27T10:00:00"; // Invalid month
+            const badT3 = "2023-10-27 10:00:00"; // Missing T
+
+            assert.ok(validate.isValidTimestampString(goodT1), 'Good timestamp test failed');
+            assert.ok(validate.isValidTimestampString(goodT2), 'Good timestamp test failed');
+            assert.ok(!validate.isValidTimestampString(badT1), 'Bad timestamp test failed (has TZ)');
+            assert.ok(!validate.isValidTimestampString(badT2), 'Bad timestamp test failed (invalid date)');
+            assert.ok(!validate.isValidTimestampString(badT3), 'Bad timestamp test failed (missing T)');
+            assert.ok(!validate.isValidTimestampString(undefined), 'Undefined test failed');
+            done();
+        });
     });
 });
