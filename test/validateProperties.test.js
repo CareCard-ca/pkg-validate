@@ -147,6 +147,7 @@ describe('ValidateProperties test', function () {
                 dimensions: { width: 10, height: 20 },
                 image_url: 'path/to/image.jpg',
                 imageUrl: 'path/to/image.jpg',
+                active: true,
             };
             const validatedObject = validateProperties(testObject);
 
@@ -230,6 +231,7 @@ describe('ValidateProperties test', function () {
                 weight: 'invalid json', // fails isValidJsonString
                 image_url: 'invalid url!', // fails isImageUrl
                 domain: 'invalid domain', // fails isValidDomainName
+                active: 'not a bool',
                 unknown_key: 'any value',
             };
             const validatedObject = validateProperties(testObject);
