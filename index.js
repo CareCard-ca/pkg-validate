@@ -1,4 +1,9 @@
+const validate = require( './lib/validate' );
+const validateProperties = require( './lib/validateProperties' );
+
 module.exports = {
-    validate: require( './lib/validate' ),
-    validateProperties: require( './lib/validateProperties' )
+    validate,
+    validateProperties,
+    ...validate,
+    ...validateProperties
 }

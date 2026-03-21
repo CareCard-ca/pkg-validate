@@ -1,44 +1,56 @@
 import assert from 'assert';
 import {describe, it} from 'mocha';
-import {validate, validateProperties} from '../index';
+import {
+    isBoolValue,
+    isCharactersString, isCountryCodeString, isEmailString,
+    isImageUrl, isInStringArray, isInteger, isJwtString, isNameString, isPasswordString,
+    isPasswordStringFailureMessage, isPhoneNumber, isPostalCodeString,
+    isProvinceString, isSafeSearchString, isSafeString,
+    isSimplePasswordString, isSimplePasswordStringFailureMessage, isString6To16CharacterLong,
+    isString6To24CharacterLong, isUrlSafeString, isUsernameString, isValidDomainName,
+    isValidIntegerString,
+    isValidJsonString, isValidTimestampString, isValidTimestampzString,
+    isValidUuidString,
+    validateProperties
+} from '../index';
 
 describe('pkg-validate TypeScript Type Definitions', () => {
     it('should verify all validate utility functions', () => {
         // String/Format checks
-        assert.strictEqual(typeof validate.isImageUrl('http://example.com/image.png'), 'boolean');
-        assert.strictEqual(typeof validate.isValidJsonString('{"a":1}'), 'boolean');
-        assert.strictEqual(typeof validate.isValidIntegerString('123'), 'boolean');
-        assert.strictEqual(typeof validate.isValidUuidString('550e8400-e29b-41d4-a716-446655440000'), 'boolean');
-        assert.strictEqual(typeof validate.isCharactersString('abc 123_-'), 'boolean');
-        assert.strictEqual(typeof validate.isNameString('John Doe'), 'boolean');
-        assert.strictEqual(typeof validate.isSafeSearchString('search query'), 'boolean');
-        assert.strictEqual(typeof validate.isEmailString('test@example.com'), 'boolean');
-        assert.strictEqual(typeof validate.isJwtString('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9'), 'boolean');
-        assert.strictEqual(typeof validate.isUsernameString('user123'), 'boolean');
-        assert.strictEqual(typeof validate.isPhoneNumber('123-456-7890'), 'boolean');
-        assert.strictEqual(typeof validate.isUrlSafeString('url-safe-string'), 'boolean');
-        assert.strictEqual(typeof validate.isProvinceString('ON'), 'boolean');
-        assert.strictEqual(typeof validate.isPostalCodeString('A1A 1A1'), 'boolean');
-        assert.strictEqual(typeof validate.isSafeString('safe string!'), 'boolean');
-        assert.strictEqual(typeof validate.isCountryCodeString('+1'), 'boolean');
-        assert.strictEqual(typeof validate.isValidDomainName('example.com'), 'boolean');
-        assert.strictEqual(typeof validate.isValidTimestampzString('2023-10-27T10:00:00Z'), 'boolean');
-        assert.strictEqual(typeof validate.isValidTimestampString('2023-10-27T10:00:00'), 'boolean');
+        assert.strictEqual(typeof isImageUrl('http://example.com/image.png'), 'boolean');
+        assert.strictEqual(typeof isValidJsonString('{"a":1}'), 'boolean');
+        assert.strictEqual(typeof isValidIntegerString('123'), 'boolean');
+        assert.strictEqual(typeof isValidUuidString('550e8400-e29b-41d4-a716-446655440000'), 'boolean');
+        assert.strictEqual(typeof isCharactersString('abc 123_-'), 'boolean');
+        assert.strictEqual(typeof isNameString('John Doe'), 'boolean');
+        assert.strictEqual(typeof isSafeSearchString('search query'), 'boolean');
+        assert.strictEqual(typeof isEmailString('test@example.com'), 'boolean');
+        assert.strictEqual(typeof isJwtString('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9'), 'boolean');
+        assert.strictEqual(typeof isUsernameString('user123'), 'boolean');
+        assert.strictEqual(typeof isPhoneNumber('123-456-7890'), 'boolean');
+        assert.strictEqual(typeof isUrlSafeString('url-safe-string'), 'boolean');
+        assert.strictEqual(typeof isProvinceString('ON'), 'boolean');
+        assert.strictEqual(typeof isPostalCodeString('A1A 1A1'), 'boolean');
+        assert.strictEqual(typeof isSafeString('safe string!'), 'boolean');
+        assert.strictEqual(typeof isCountryCodeString('+1'), 'boolean');
+        assert.strictEqual(typeof isValidDomainName('example.com'), 'boolean');
+        assert.strictEqual(typeof isValidTimestampzString('2023-10-27T10:00:00Z'), 'boolean');
+        assert.strictEqual(typeof isValidTimestampString('2023-10-27T10:00:00'), 'boolean');
 
         // Password checks
-        assert.strictEqual(typeof validate.isPasswordString('Pass123!'), 'boolean');
-        assert.strictEqual(typeof validate.isSimplePasswordString('pass123'), 'boolean');
-        assert.strictEqual(typeof validate.isPasswordStringFailureMessage('pass'), 'string');
-        assert.strictEqual(validate.isPasswordStringFailureMessage('Password123!'), null);
-        assert.strictEqual(typeof validate.isSimplePasswordStringFailureMessage('p'), 'string');
-        assert.strictEqual(validate.isSimplePasswordStringFailureMessage('pass123'), null);
-        assert.strictEqual(typeof validate.isString6To24CharacterLong('password'), 'boolean');
-        assert.strictEqual(typeof validate.isString6To16CharacterLong('password'), 'boolean');
+        assert.strictEqual(typeof isPasswordString('Pass123!'), 'boolean');
+        assert.strictEqual(typeof isSimplePasswordString('pass123'), 'boolean');
+        assert.strictEqual(typeof isPasswordStringFailureMessage('pass'), 'string');
+        assert.strictEqual(isPasswordStringFailureMessage('Password123!'), null);
+        assert.strictEqual(typeof isSimplePasswordStringFailureMessage('p'), 'string');
+        assert.strictEqual(isSimplePasswordStringFailureMessage('pass123'), null);
+        assert.strictEqual(typeof isString6To24CharacterLong('password'), 'boolean');
+        assert.strictEqual(typeof isString6To16CharacterLong('password'), 'boolean');
 
         // Logic checks
-        assert.strictEqual(typeof validate.isInteger(123), 'boolean');
-        assert.strictEqual(typeof validate.isBoolValue(true), 'boolean');
-        assert.strictEqual(typeof validate.isInStringArray(['a', 'b'], 'a'), 'boolean');
+        assert.strictEqual(typeof isInteger(123), 'boolean');
+        assert.strictEqual(typeof isBoolValue(true), 'boolean');
+        assert.strictEqual(typeof isInStringArray(['a', 'b'], 'a'), 'boolean');
     });
 
     it('should verify validateProperties types', () => {
@@ -47,7 +59,7 @@ describe('pkg-validate TypeScript Type Definitions', () => {
             email: 'john@example.com',
             invalid_prop: 'some value'
         };
-        const result = validateProperties.validateProperties(input);
+        const result = validateProperties(input);
         assert.ok(result);
         assert.strictEqual(result.first_name, 'John');
         assert.strictEqual(result.email, 'john@example.com');
