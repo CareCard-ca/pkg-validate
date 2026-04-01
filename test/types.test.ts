@@ -10,7 +10,7 @@ import {
     isString6To24CharacterLong, isUrlSafeString, isUsernameString, isValidDomainName,
     isValidIntegerString,
     isValidJsonString, isValidTimestampString, isValidTimestampzString,
-    isValidUuidString,
+    isValidUuidString, isValidUrl, isValidArrayOfStrings,
     validateProperties
 } from '../index';
 
@@ -36,6 +36,8 @@ describe('pkg-validate TypeScript Type Definitions', () => {
         assert.strictEqual(typeof isValidDomainName('example.com'), 'boolean');
         assert.strictEqual(typeof isValidTimestampzString('2023-10-27T10:00:00Z'), 'boolean');
         assert.strictEqual(typeof isValidTimestampString('2023-10-27T10:00:00'), 'boolean');
+        assert.strictEqual(typeof isValidUrl('https://example.com'), 'boolean');
+        assert.strictEqual(typeof isValidArrayOfStrings(['a', 'b']), 'boolean');
 
         // Password checks
         assert.strictEqual(typeof isPasswordString('Pass123!'), 'boolean');

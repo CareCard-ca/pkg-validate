@@ -17,6 +17,10 @@ describe('AuthUtil test', function () {
 
             assert.ok(!validate.isImageUrl(image_url_bad_one), 'Bad image url test failed');
             assert.ok(!validate.isImageUrl(image_url_bad_two), 'Bad image url test failed');
+            assert.ok(!validate.isImageUrl(undefined), 'Undefined image url test failed');
+            assert.ok(!validate.isImageUrl(null), 'Null image url test failed');
+            assert.ok(!validate.isImageUrl(''), 'Empty image url test failed');
+            assert.ok(!validate.isImageUrl('a'.repeat(2049)), 'Long image url test failed');
             assert.ok(validate.isImageUrl(image_url), 'Good image url test failed');
             done();
         });
@@ -56,6 +60,8 @@ describe('AuthUtil test', function () {
 
             assert.ok(!validate.isValidIntegerString(undefined), 'Undefined string test failed');
             assert.ok(!validate.isValidIntegerString(3), 'Type of string test failed');
+            assert.ok(!validate.isValidIntegerString(''), 'Empty string test failed');
+            assert.ok(!validate.isValidIntegerString('1'.repeat(21)), 'Long string test failed');
             assert.ok(!validate.isValidIntegerString(badString), 'Bad string test failed');
             assert.ok(!validate.isValidIntegerString(badStringTwo), 'Bad string test failed');
             assert.ok(validate.isValidIntegerString(goodString), 'Good string test failed');
@@ -68,6 +74,7 @@ describe('AuthUtil test', function () {
 
             assert.ok(!validate.isValidUuidString(undefined), 'Undefined string test failed');
             assert.ok(!validate.isValidUuidString(3), 'Type of string test failed');
+            assert.ok(!validate.isValidUuidString(''), 'Empty string test failed');
             assert.ok(!validate.isValidUuidString(badUuid), 'Bad string test failed');
             assert.ok(validate.isValidUuidString(goodUuid), 'Good string test failed');
             done();
@@ -76,6 +83,8 @@ describe('AuthUtil test', function () {
         it('isCharactersString returns true if input is character false otherwise', function (done) {
             assert.ok(!validate.isCharactersString(undefined), 'Undefined string test failed');
             assert.ok(!validate.isCharactersString(3), 'Type of string test failed');
+            assert.ok(!validate.isCharactersString(''), 'Empty string test failed');
+            assert.ok(!validate.isCharactersString('a'.repeat(1001)), 'Long string test failed');
             assert.ok(!validate.isCharactersString(badString), 'Bad string test failed');
             assert.ok(validate.isCharactersString(goodString), 'Good string test failed');
             done();
@@ -87,6 +96,8 @@ describe('AuthUtil test', function () {
             assert.ok(!validate.isNameString(longName), "Long name test failed");
             assert.ok(!validate.isNameString('Peter @ Singh'), 'Bad name');
             assert.ok(!validate.isNameString('3Peter'), 'Bad name');
+            assert.ok(!validate.isNameString(''), 'Empty name');
+            assert.ok(!validate.isNameString(123), 'Non-string name');
             assert.ok(validate.isNameString('Peter (Singh)'), 'Good name');
             assert.ok(validate.isNameString('Peter'), 'Good name');
             assert.ok(validate.isNameString('Peter-Singh'), 'Peter-Singh');
@@ -101,6 +112,8 @@ describe('AuthUtil test', function () {
         it('isSafeSearchString returns true if input is character false otherwise', function (done) {
             assert.ok(validate.isSafeSearchString('Peter @ Singh'), 'Bad name');
             assert.ok(!validate.isSafeSearchString('3Peter'), 'Bad name');
+            assert.ok(!validate.isSafeSearchString(''), 'Empty search');
+            assert.ok(!validate.isSafeSearchString(123), 'Non-string search');
             assert.ok(validate.isSafeSearchString('Peter (Singh)'), 'Good name');
             assert.ok(validate.isSafeSearchString('Peter'), 'Good name');
             assert.ok(validate.isSafeSearchString('Peter-Singh'), 'Peter-Singh');
@@ -117,6 +130,8 @@ describe('AuthUtil test', function () {
             const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
             const longEmail = chars.repeat(100) + "@gmail.com";
             assert.ok(!validate.isEmailString(longEmail), 'Long email test failed');
+            assert.ok(!validate.isEmailString(''), 'Empty email test failed');
+            assert.ok(!validate.isEmailString(123), 'Non-string email test failed');
             assert.ok(!validate.isEmailString(goodString), 'Bad email test failed');
             assert.ok(!validate.isEmailString(badString), 'Bad email test failed');
             assert.ok(!validate.isEmailString('peter @gmail.com'), 'Email validation failed');
@@ -131,6 +146,9 @@ describe('AuthUtil test', function () {
             assert.ok(!validate.isJwtString(goodString), 'Bad email test failed');
             assert.ok(!validate.isJwtString(badString), 'Bad email test failed');
             assert.ok(!validate.isJwtString(badJwt), 'Bad badJwt string test failed');
+            assert.ok(!validate.isJwtString(''), 'Empty jwt string test failed');
+            assert.ok(!validate.isJwtString('   '), 'Whitespace only jwt string test failed');
+            assert.ok(!validate.isJwtString('a'.repeat(8193)), 'Long jwt string test failed');
             assert.ok(validate.isJwtString(goodJwt), 'Good JwtString string test failed');
             done();
         });
@@ -152,6 +170,7 @@ describe('AuthUtil test', function () {
 
             assert.deepStrictEqual(validate.isPasswordStringFailureMessage(badPassword_1),
                 "Total 6 to 32 characters, numbers and one of !@#$%^&*_-");
+            assert.deepStrictEqual(validate.isPasswordStringFailureMessage(goodPassword_1), null);
 
             assert.ok(!validate.isPasswordString(badPassword_1), 'Bad Password validation failed');
             assert.ok(!validate.isPasswordString(badPassword_2), 'Bad Password validation failed');
@@ -159,6 +178,9 @@ describe('AuthUtil test', function () {
             assert.ok(!validate.isPasswordString(badPassword_4), 'Bad Password validation failed');
             assert.ok(!validate.isPasswordString(badPassword_5), 'Bad Password validation failed');
             assert.ok(!validate.isPasswordString(badPassword_6), 'Bad Password validation failed');
+            assert.ok(!validate.isPasswordString(''), 'Empty Password validation failed');
+            assert.ok(!validate.isPasswordString(123), 'Non-string Password validation failed');
+            assert.ok(!validate.isPasswordString('a'.repeat(129)), 'Long Password validation failed');
             assert.ok(validate.isPasswordString(goodPassword_1), 'Password validation failed');
             assert.ok(validate.isPasswordString(goodPassword_2), 'Password validation failed');
             assert.ok(validate.isPasswordString(goodPassword_3), 'Password validation failed');
@@ -187,6 +209,7 @@ describe('AuthUtil test', function () {
 
             assert.deepStrictEqual(validate.isSimplePasswordStringFailureMessage(badPassword_1),
                 "Total 6 to 32 characters, numbers or !@#$%^&*_-");
+            assert.deepStrictEqual(validate.isSimplePasswordStringFailureMessage(goodPassword_1), null);
 
             assert.ok(!validate.isSimplePasswordString(badPassword_1), 'Bad Password validation failed');
             assert.ok(!validate.isSimplePasswordString(badPassword_2), 'Bad Password validation failed');
@@ -194,6 +217,9 @@ describe('AuthUtil test', function () {
             assert.ok(!validate.isSimplePasswordString(badPassword_4), 'Bad Password validation failed');
             assert.ok(!validate.isSimplePasswordString(badPassword_5), 'Bad Password validation failed');
             assert.ok(!validate.isSimplePasswordString(badPassword_6), 'Bad Password validation failed');
+            assert.ok(!validate.isSimplePasswordString(''), 'Empty Password validation failed');
+            assert.ok(!validate.isSimplePasswordString(123), 'Non-string Password validation failed');
+            assert.ok(!validate.isSimplePasswordString('a'.repeat(129)), 'Long Password validation failed');
             assert.ok(validate.isSimplePasswordString(goodPassword_1), 'Password validation failed');
             assert.ok(validate.isSimplePasswordString(goodPassword_2), 'Password validation failed');
             assert.ok(validate.isSimplePasswordString(goodPassword_3), 'Password validation failed');
@@ -209,6 +235,8 @@ describe('AuthUtil test', function () {
             const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
             const longUserName = chars.repeat(100);
             assert.ok(!validate.isUsernameString(longUserName), "Long user name test failed");
+            assert.ok(!validate.isUsernameString(''), 'Empty string test failed');
+            assert.ok(!validate.isUsernameString(123), 'Non-string test failed');
             assert.ok(!validate.isUsernameString(goodString), 'Good string test failed');
             assert.ok(!validate.isUsernameString(badString), 'Bad string test failed');
             assert.ok(validate.isUsernameString('testUsername'), 'username validation failed');
@@ -218,7 +246,9 @@ describe('AuthUtil test', function () {
 
         it('isPhoneNumber returns true if input is username string false otherwise', function (done) {
             assert.ok(validate.isPhoneNumber("509 644 2443"), 'Good phone number test failed');
-            assert.ok(!validate.isPhoneNumber("509 644 2443998"), 'Bad phone number test failed');
+            assert.ok(!validate.isPhoneNumber("509 644 2443998776655"), 'Bad phone number test failed');
+            assert.ok(!validate.isPhoneNumber(""), 'Empty phone number test failed');
+            assert.ok(!validate.isPhoneNumber(123), 'Non-string phone number test failed');
             done();
         });
 
@@ -242,6 +272,8 @@ describe('AuthUtil test', function () {
 
             assert.ok(validate.isString6To24CharacterLong(password), 'Good password fail');
             assert.ok(!validate.isString6To24CharacterLong(badPassword), 'Bad password fail');
+            assert.ok(!validate.isString6To24CharacterLong(''), 'Empty password fail');
+            assert.ok(!validate.isString6To24CharacterLong(undefined), 'Undefined password fail');
             done();
         });
 
@@ -253,6 +285,8 @@ describe('AuthUtil test', function () {
 
             assert.ok(validate.isString6To16CharacterLong(password), 'Good password fail');
             assert.ok(!validate.isString6To16CharacterLong(badPassword), 'Bad password fail');
+            assert.ok(!validate.isString6To16CharacterLong(''), 'Empty password fail');
+            assert.ok(!validate.isString6To16CharacterLong(undefined), 'Undefined password fail');
             done();
         });
 
@@ -264,16 +298,21 @@ describe('AuthUtil test', function () {
             assert.ok(validate.isProvinceString(ontario), 'Good province code failing');
             assert.ok(validate.isProvinceString(quebec), 'Good province code failing');
             assert.ok(!validate.isProvinceString(bad), 'Bad province code failing');
+            assert.ok(!validate.isProvinceString(123), 'Non-string province code failing');
             done();
         });
 
         it('isBoolValue', function (done) {
             const trueValue = true;
-            const falseValue = true;
+            const falseValue = false;
+            const trueString = 'true';
+            const falseString = 'false';
             const notBool = 'I am string';
 
             assert.ok(validate.isBoolValue(trueValue), 'Bool value failing');
             assert.ok(validate.isBoolValue(falseValue), 'Bool value failing');
+            assert.ok(validate.isBoolValue(trueString), 'Bool string true failing');
+            assert.ok(validate.isBoolValue(falseString), 'Bool string false failing');
             assert.ok(!validate.isBoolValue(notBool), 'Not bool value failing');
             done();
         });
@@ -286,6 +325,7 @@ describe('AuthUtil test', function () {
             assert.ok(validate.isPostalCodeString(codeOne), 'Good province code failing');
             assert.ok(validate.isPostalCodeString(codeTwo), 'Good province code failing');
             assert.ok(!validate.isPostalCodeString(bad), 'Bad province code failing');
+            assert.ok(!validate.isPostalCodeString(123), 'Non-string postal code failing');
             done();
         });
 
@@ -295,10 +335,13 @@ describe('AuthUtil test', function () {
 
             assert.ok(validate.isSafeString(safeString_1), 'Safe string code failing');
             assert.ok(!validate.isSafeString(unsafeString_1), 'Unsafe string code failing');
+            assert.ok(!validate.isSafeString(''), 'Empty string failing');
+            assert.ok(!validate.isSafeString(undefined), 'Undefined string failing');
+            assert.ok(!validate.isSafeString('a'.repeat(10001)), 'Too long string failing');
             done();
         });
 
-        it('isSafeString returns true if safe', function (done) {
+        it('isInStringArray returns true if input is in string array', function (done) {
             const stringArray_1 = ["on", "ca"];
             const stringArray_2 = ["gc", "qc"];
             const value_1 = "ca";
@@ -306,10 +349,11 @@ describe('AuthUtil test', function () {
 
             assert.ok(validate.isInStringArray(stringArray_1, value_1), 'Safe string code failing');
             assert.ok(!validate.isInStringArray(stringArray_2, value_2), 'Unsafe string code failing');
+            assert.ok(!validate.isInStringArray(stringArray_1, 123), 'Non-string value in array failing');
             done();
         });
 
-        it('isCountryCodeString returns true if postal code', function (done) {
+        it('isCountryCodeString returns true if country code', function (done) {
             const codeOne = "+1";
             const codeTwo = "+966";
             const bad = "572";
@@ -317,6 +361,9 @@ describe('AuthUtil test', function () {
             assert.ok(validate.isCountryCodeString(codeOne), 'Good country code failing');
             assert.ok(validate.isCountryCodeString(codeTwo), 'Good country code failing');
             assert.ok(!validate.isCountryCodeString(bad), 'Bad country code failing');
+            assert.ok(!validate.isCountryCodeString(''), 'Empty country code failing');
+            assert.ok(!validate.isCountryCodeString(undefined), 'Undefined country code failing');
+            assert.ok(!validate.isCountryCodeString('+1234'), 'Long country code failing');
             done();
         });
 
@@ -376,6 +423,25 @@ describe('AuthUtil test', function () {
             assert.ok(!validate.isValidTimestampString(badT2), 'Bad timestamp test failed (invalid date)');
             assert.ok(!validate.isValidTimestampString(badT3), 'Bad timestamp test failed (missing T)');
             assert.ok(!validate.isValidTimestampString(undefined), 'Undefined test failed');
+            done();
+        });
+        it('isValidUrl returns true if valid url, false otherwise', function (done) {
+            assert.ok(validate.isValidUrl("http://example.com"), 'http url failed');
+            assert.ok(validate.isValidUrl("https://example.com"), 'https url failed');
+            assert.ok(!validate.isValidUrl("ftp://example.com"), 'ftp url should fail');
+            assert.ok(!validate.isValidUrl("invalid-url"), 'invalid url should fail');
+            assert.ok(!validate.isValidUrl(undefined), 'undefined url should fail');
+            assert.ok(!validate.isValidUrl(''), 'empty url should fail');
+            assert.ok(!validate.isValidUrl('a'.repeat(2049)), 'long url should fail');
+            done();
+        });
+
+        it('isValidArrayOfStrings returns true if valid array of strings, false otherwise', function (done) {
+            assert.ok(validate.isValidArrayOfStrings(["a", "b"]), 'valid array failed');
+            assert.ok(!validate.isValidArrayOfStrings(["a", 1]), 'array with number should fail');
+            assert.ok(!validate.isValidArrayOfStrings("not an array"), 'non-array should fail');
+            assert.ok(!validate.isValidArrayOfStrings([""]), 'array with empty string should fail');
+            assert.ok(!validate.isValidArrayOfStrings(['a'.repeat(10001)]), 'array with long string should fail');
             done();
         });
     });

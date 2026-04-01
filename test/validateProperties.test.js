@@ -97,6 +97,7 @@ describe('ValidateProperties test', function () {
         });
 
         it('validateProperties covers all other fields', function (done) {
+            const uuid = '1c76ea46-a212-4cc5-9031-a9a28d927c4c';
             const testObject = {
                 username: 'pankaj',
                 new_status: 'Active',
@@ -104,7 +105,7 @@ describe('ValidateProperties test', function () {
                 description: 'A description',
                 comment: 'A comment',
                 status: 'Pending',
-                name: 'John Doe',
+                name: { complex: 'name' }, // tests line 60 object branch
                 title: 'Mr',
                 brand: 'Apple',
                 short_description: 'Short desc',
@@ -113,6 +114,20 @@ describe('ValidateProperties test', function () {
                 collegeName: 'Harvard University',
                 campus_name: 'Main Campus',
                 campusName: 'Main Campus',
+                institution_name: 'Institution',
+                institutionName: 'Institution',
+                program_name: 'Program',
+                programName: 'Program',
+                role_name: 'Admin',
+                roleName: 'Admin',
+                document_type: 'PDF',
+                documentType: 'PDF',
+                reason: 'Reason',
+                type: 'Type',
+                role: 'Role',
+                role_id: 'RoleID',
+                roleId: 'RoleID',
+                campus: 'Campus',
                 strong_password: 'Password123!',
                 strongPassword: 'Password123!',
                 new_password: 'Password123',
@@ -125,17 +140,30 @@ describe('ValidateProperties test', function () {
                 emailConfirmToken: 'abc.123',
                 verification_token: 'abc.123',
                 verificationToken: 'abc.123',
-                uuid: '1c76ea46-a212-4cc5-9031-a9a28d927c4c',
-                user_id: '1c76ea46-a212-4cc5-9031-a9a28d927c4c',
-                image_id: '1c76ea46-a212-4cc5-9031-a9a28d927c4c',
-                imageId: '1c76ea46-a212-4cc5-9031-a9a28d927c4c',
-                userId: '1c76ea46-a212-4cc5-9031-a9a28d927c4c',
-                order_id: '1c76ea46-a212-4cc5-9031-a9a28d927c4c',
-                orderId: '1c76ea46-a212-4cc5-9031-a9a28d927c4c',
-                category_id: '1c76ea46-a212-4cc5-9031-a9a28d927c4c',
-                categoryId: '1c76ea46-a212-4cc5-9031-a9a28d927c4c',
-                parent_id: '1c76ea46-a212-4cc5-9031-a9a28d927c4c',
-                parentId: '1c76ea46-a212-4cc5-9031-a9a28d927c4c',
+                uuid: uuid,
+                user_id: uuid,
+                image_id: uuid,
+                imageId: uuid,
+                userId: uuid,
+                order_id: uuid,
+                orderId: uuid,
+                category_id: uuid,
+                categoryId: uuid,
+                parent_id: uuid,
+                parentId: uuid,
+                institution_id: uuid,
+                institutionId: uuid,
+                role_assignment_id: uuid,
+                roleAssignmentId: uuid,
+                user_role_id: uuid,
+                userRoleId: uuid,
+                college_id: uuid,
+                collegeId: uuid,
+                campus_id: uuid,
+                campusId: uuid,
+                program_id: uuid,
+                programId: uuid,
+                id: uuid,
                 period: 'Monthly',
                 offset_number: '10',
                 offsetNumber: '10',
@@ -145,9 +173,18 @@ describe('ValidateProperties test', function () {
                 about: '  {"key": "value"}  ',
                 weight: { value: 10, unit: 'kg' },
                 dimensions: { width: 10, height: 20 },
+                permission: { res: 'a' },
+                scope_data: { a: 1 },
+                scopeData: { a: 1 },
+                meta_data: { b: 2 },
+                metaData: { b: 2 },
                 image_url: 'path/to/image.jpg',
                 imageUrl: 'path/to/image.jpg',
+                website: 'http://example.com',
+                file_url: 'http://example.com/file.pdf',
+                fileUrl: 'http://example.com/file.pdf',
                 active: true,
+                aliases: ['a', 'b'],
             };
             const validatedObject = validateProperties(testObject);
 
@@ -230,8 +267,10 @@ describe('ValidateProperties test', function () {
                 about: 'invalid json', // fails isValidJsonString
                 weight: 'invalid json', // fails isValidJsonString
                 image_url: 'invalid url!', // fails isImageUrl
+                website: 'ftp://bad', // fails isImageUrl && isValidUrl
                 domain: 'invalid domain', // fails isValidDomainName
                 active: 'not a bool',
+                aliases: 'not an array', // fails isValidArrayOfStrings
                 unknown_key: 'any value',
             };
             const validatedObject = validateProperties(testObject);

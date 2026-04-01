@@ -60,6 +60,11 @@ export function isValidTimestampzString(str: any): boolean;
 /** Checks if the string is a valid ISO 8601 timestamp without time zone. */
 export function isValidTimestampString(str: any): boolean;
 
+/** Checks if the string is a valid URL. */
+export function isValidUrl(url: any): boolean;
+/** Checks if the array contains only safe strings. */
+export function isValidArrayOfStrings(arr: any): boolean;
+
 /**
  * Utility functions for validating various types of strings and values.
  * @deprecated Use direct imports instead.
@@ -93,4 +98,6 @@ export const validate: {
   isValidDomainName: typeof isValidDomainName;
   isValidTimestampzString: typeof isValidTimestampzString;
   isValidTimestampString: typeof isValidTimestampString;
+  isValidUrl: typeof isValidUrl;
+  isValidArrayOfStrings: typeof isValidArrayOfStrings;
 };
