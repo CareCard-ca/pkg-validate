@@ -1,23 +1,19 @@
 const assert = require('assert').strict;
-const { describe, it } = require('mocha');
-const {
-    DEFAULT_USER_ROLE_REQUEST_ROLE,
-    REQUIRE_SCOPE_WHEN_ROLE_OR_SCOPE_PRESENT,
-    isUserRoleRequestRoleString,
-    validate,
-    validateNewUserRoleRequestObject,
-} = require('../index');
+const {describe, it} = require('mocha');
+const validate = require('../index').validate;
+
 
 describe('AuthUtil test', function () {
-    const goodString = 'I am a good person';
+    const goodString = "I am a good person";
     const badString = 'I <script>am evil</script>';
-    const user = { username: 'username' };
+    const user = {username: 'username'};
 
     describe('Validate function test', function () {
+
         it('isImageUrl returns true if safe image url, false otherwise', function (done) {
-            const image_url = 'A44C0A67A8704767AD2B97DC46478827/8B57EB9F014143F2AE6B9D8EBBB7CDA6-700.jpg';
-            const image_url_bad_one = 'A44C0A67*A8704767AD2B97DC46478827/8B57EB9F014143F2AE6B9D8EBBB7CDA6-700.jpg';
-            const image_url_bad_two = 'A44C0A67>A8704767AD2B97DC46478827/8B57EB9F014143F2AE6B9D8EBBB7CDA6-700.jpg';
+            const image_url = "A44C0A67A8704767AD2B97DC46478827/8B57EB9F014143F2AE6B9D8EBBB7CDA6-700.jpg";
+            const image_url_bad_one = "A44C0A67*A8704767AD2B97DC46478827/8B57EB9F014143F2AE6B9D8EBBB7CDA6-700.jpg";
+            const image_url_bad_two = "A44C0A67>A8704767AD2B97DC46478827/8B57EB9F014143F2AE6B9D8EBBB7CDA6-700.jpg";
 
             assert.ok(!validate.isImageUrl(image_url_bad_one), 'Bad image url test failed');
             assert.ok(!validate.isImageUrl(image_url_bad_two), 'Bad image url test failed');
@@ -32,8 +28,8 @@ describe('AuthUtil test', function () {
         it('isInteger returns true if integer false otherwise', function (done) {
             const badInteger_1 = 234.65;
             const badInteger_2 = '';
-            const badInteger_3 = '3.2';
-            const badInteger_4 = '67';
+            const badInteger_3 = "3.2";
+            const badInteger_4 = "67";
             const goodInteger_1 = 72662;
 
             assert.ok(!validate.isInteger(badInteger_1), 'Bad integer test failed');
@@ -45,10 +41,9 @@ describe('AuthUtil test', function () {
         });
 
         it('isValidJsonString returns true if json false otherwise', function (done) {
-            const badString = '1chie87';
-            const badStringTwo = '13-34';
-            const goodString =
-                '{"blocks":[{"key":"ediog","text":"I am doing well","type":"unstyled","depth":0,"inlineStyleRanges":[],"entityRanges":[],"data":{}}],"entityMap":{}}';
+            const badString = "1chie87";
+            const badStringTwo = "13-34";
+            const goodString = "{\"blocks\":[{\"key\":\"ediog\",\"text\":\"I am doing well\",\"type\":\"unstyled\",\"depth\":0,\"inlineStyleRanges\":[],\"entityRanges\":[],\"data\":{}}],\"entityMap\":{}}";
 
             assert.ok(!validate.isValidJsonString(undefined), 'Undefined string test failed');
             assert.ok(!validate.isValidJsonString(3), 'Type of string test failed');
@@ -59,9 +54,9 @@ describe('AuthUtil test', function () {
         });
 
         it('isValidIntegerString returns true if integer false otherwise', function (done) {
-            const badString = '1chie87';
-            const badStringTwo = '13-34';
-            const goodString = '17';
+            const badString = "1chie87";
+            const badStringTwo = "13-34";
+            const goodString = "17";
 
             assert.ok(!validate.isValidIntegerString(undefined), 'Undefined string test failed');
             assert.ok(!validate.isValidIntegerString(3), 'Type of string test failed');
@@ -74,8 +69,8 @@ describe('AuthUtil test', function () {
         });
 
         it('isValidUuidString returns true if uuid false otherwise', function (done) {
-            const badUuid = '1c76ea46-a212-4cc5-9031-a9a28d927c4c98';
-            const goodUuid = '1c76ea46-a212-4cc5-9031-a9a28d927c4c';
+            const badUuid = "1c76ea46-a212-4cc5-9031-a9a28d927c4c98";
+            const goodUuid = "1c76ea46-a212-4cc5-9031-a9a28d927c4c";
 
             assert.ok(!validate.isValidUuidString(undefined), 'Undefined string test failed');
             assert.ok(!validate.isValidUuidString(3), 'Type of string test failed');
@@ -95,70 +90,10 @@ describe('AuthUtil test', function () {
             done();
         });
 
-        it('isStreetString returns true if valid street address false otherwise', function (done) {
-            // Valid street addresses
-            const goodStreet1 = '103 Main Market';
-            const goodStreet2 = 'H.No 21/4 MG Road';
-            const goodStreet3 = 'Flat #12A';
-            const goodStreet4 = '221B Baker Street';
-            const goodStreet5 = 'Sector 5 Block C';
-            const goodStreet6 = 'Apartment #101';
-            const goodStreet7 = '12/4 Residency Road';
-            const goodStreet8 = 'Phase 2 Plot 45';
-            const goodStreet9 = 'Near City Mall';
-            const goodStreet10 = 'A1 Building 7';
-            const goodStreet11 = '#12 MG Road';
-            // Invalid street addresses
-            const badStreet1 = '<script>alert(1)</script>';
-            const badStreet2 = '';
-            const badStreet3 = 123;
-            const badStreet4 = ',Main Street';
-            const badStreet5 = '_Main Street';
-            const badStreet6 = ' ,Main Street';
-            const badStreet7 = '-Main Street';
-            const badStreet8 = 'Main_Street';
-            const badStreet9 = 'Street@123';
-            const badStreet10 = 'Road$Area';
-            const badStreet11 = null;
-            const badStreet12 = undefined;
-            const badStreet13 = {};
-            const badStreet14 = [];
-            const badStreet15 = ' ';
-            // Positive assertions
-            assert.ok(validate.isStreetString(goodStreet1), 'Good street test 1 failed');
-            assert.ok(validate.isStreetString(goodStreet2), 'Good street test 2 failed');
-            assert.ok(validate.isStreetString(goodStreet3), 'Good street test 3 failed');
-            assert.ok(validate.isStreetString(goodStreet4), 'Good street test 4 failed');
-            assert.ok(validate.isStreetString(goodStreet5), 'Good street test 5 failed');
-            assert.ok(validate.isStreetString(goodStreet6), 'Good street test 6 failed');
-            assert.ok(validate.isStreetString(goodStreet7), 'Good street test 7 failed');
-            assert.ok(validate.isStreetString(goodStreet8), 'Good street test 8 failed');
-            assert.ok(validate.isStreetString(goodStreet9), 'Good street test 9 failed');
-            assert.ok(validate.isStreetString(goodStreet10), 'Good street test 10 failed');
-            assert.ok(validate.isStreetString(goodStreet11), 'Good street test 11 failed');
-            // Negative assertions
-            assert.ok(!validate.isStreetString(badStreet1), 'Bad street test 1 failed');
-            assert.ok(!validate.isStreetString(badStreet2), 'Bad street test 2 failed');
-            assert.ok(!validate.isStreetString(badStreet3), 'Bad street test 3 failed');
-            assert.ok(!validate.isStreetString(badStreet4), 'Bad street test 4 failed');
-            assert.ok(!validate.isStreetString(badStreet5), 'Bad street test 5 failed');
-            assert.ok(!validate.isStreetString(badStreet6), 'Bad street test 6 failed');
-            assert.ok(!validate.isStreetString(badStreet7), 'Bad street test 7 failed');
-            assert.ok(!validate.isStreetString(badStreet8), 'Bad street test 8 failed');
-            assert.ok(!validate.isStreetString(badStreet9), 'Bad street test 9 failed');
-            assert.ok(!validate.isStreetString(badStreet10), 'Bad street test 10 failed');
-            assert.ok(!validate.isStreetString(badStreet11), 'Bad street test 11 failed');
-            assert.ok(!validate.isStreetString(badStreet12), 'Bad street test 12 failed');
-            assert.ok(!validate.isStreetString(badStreet13), 'Bad street test 13 failed');
-            assert.ok(!validate.isStreetString(badStreet14), 'Bad street test 14 failed');
-            assert.ok(!validate.isStreetString(badStreet15), 'Bad street test 15 failed');
-            done();
-        });
-
         it('isNameString returns true if input is character false otherwise', function (done) {
-            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
             const longName = chars.repeat(100);
-            assert.ok(!validate.isNameString(longName), 'Long name test failed');
+            assert.ok(!validate.isNameString(longName), "Long name test failed");
             assert.ok(!validate.isNameString('Peter @ Singh'), 'Bad name');
             assert.ok(!validate.isNameString('3Peter'), 'Bad name');
             assert.ok(!validate.isNameString(''), 'Empty name');
@@ -171,22 +106,6 @@ describe('AuthUtil test', function () {
             assert.ok(validate.isNameString("P's Singh-Lion"), "P's Singh-Lion");
             assert.ok(validate.isNameString("P's Singh-Lion,s"), "P's Singh-Lion");
             assert.ok(validate.isNameString(" P's Singh-Lion "), "P's Singh-Lion");
-            done();
-        });
-
-        it('isTextString returns true for non-empty text without special character restrictions', function (done) {
-            assert.ok(validate.isTextString('Requester <tag>@example.com'), 'Text with punctuation should be accepted');
-            assert.ok(!validate.isTextString(''), 'Empty text should be rejected');
-            assert.ok(!validate.isTextString(123), 'Non-string text should be rejected');
-            assert.ok(!validate.isTextString('a'.repeat(10001)), 'Overlong text should be rejected');
-            done();
-        });
-
-        it('isUserRoleRequestStatusString returns true only for user role request statuses', function (done) {
-            assert.ok(validate.isUserRoleRequestStatusString('pending'), 'pending status should be valid');
-            assert.ok(validate.isUserRoleRequestStatusString('on_hold'), 'on_hold status should be valid');
-            assert.ok(!validate.isUserRoleRequestStatusString('not_a_status'), 'Unknown status should be rejected');
-            assert.ok(!validate.isUserRoleRequestStatusString(123), 'Non-string status should be rejected');
             done();
         });
 
@@ -203,13 +122,13 @@ describe('AuthUtil test', function () {
             assert.ok(validate.isSafeSearchString("P's Singh-Lion"), "P's Singh-Lion");
             assert.ok(validate.isSafeSearchString("P's Singh-Lion,s"), "P's Singh-Lion");
             assert.ok(validate.isSafeSearchString(" P's Singh-Lion "), "P's Singh-Lion");
-            assert.ok(validate.isSafeSearchString('pank@gmail.com '), 'pank@gmail.com');
+            assert.ok(validate.isSafeSearchString("pank@gmail.com "), "pank@gmail.com");
             done();
         });
 
         it('isEmailString returns true if input is email false otherwise ', function (done) {
-            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-            const longEmail = chars.repeat(100) + '@gmail.com';
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+            const longEmail = chars.repeat(100) + "@gmail.com";
             assert.ok(!validate.isEmailString(longEmail), 'Long email test failed');
             assert.ok(!validate.isEmailString(''), 'Empty email test failed');
             assert.ok(!validate.isEmailString(123), 'Non-string email test failed');
@@ -221,10 +140,8 @@ describe('AuthUtil test', function () {
         });
 
         it('isJwtString returns true if input is jwt string false otherwise', function (done) {
-            const goodJwt =
-                'eyJhbGciOiJzaGE1MTIiLCJ0eXAiOiJKV1QifQ.eyJ1c2VyX2lkIjoyNjg0LCJ0aW1lIjoxNjEwNzE2ODM0ODc2fQ.9o_7dM4YjjcNseH7Cw3IL_t8yD1hhs1hluTCWG_JzYEExYOp89Gd6k0AbU018x3EQXCrdMUE6KXfL0KNg2Li9g';
-            const badJwt =
-                'eyJhbGciOiJza<scriptE1MTIiLCJ0eXAiOiJKV/1QifQ.eyJ1c2VyX2lkIjoyNjg0LCJ0aW1lIjoxNjEwNzE2ODM0ODc2fQ.9o_7dM4YjjcNseH7Cw3IL_t8yD1hhs1hluTCWG_JzYEExYOp89Gd6k0AbU018x3EQXCrdMUE6KXfL0KNg2Li9g';
+            const goodJwt = 'eyJhbGciOiJzaGE1MTIiLCJ0eXAiOiJKV1QifQ.eyJ1c2VyX2lkIjoyNjg0LCJ0aW1lIjoxNjEwNzE2ODM0ODc2fQ.9o_7dM4YjjcNseH7Cw3IL_t8yD1hhs1hluTCWG_JzYEExYOp89Gd6k0AbU018x3EQXCrdMUE6KXfL0KNg2Li9g';
+            const badJwt = 'eyJhbGciOiJza<scriptE1MTIiLCJ0eXAiOiJKV/1QifQ.eyJ1c2VyX2lkIjoyNjg0LCJ0aW1lIjoxNjEwNzE2ODM0ODc2fQ.9o_7dM4YjjcNseH7Cw3IL_t8yD1hhs1hluTCWG_JzYEExYOp89Gd6k0AbU018x3EQXCrdMUE6KXfL0KNg2Li9g';
 
             assert.ok(!validate.isJwtString(goodString), 'Bad email test failed');
             assert.ok(!validate.isJwtString(badString), 'Bad email test failed');
@@ -238,7 +155,7 @@ describe('AuthUtil test', function () {
 
         it('isPasswordString returns true if input is password string false otherwise', function (done) {
             const badPassword_1 = 'I am a good person';
-            const badPassword_2 = '!@#$%^&*';
+            const badPassword_2 = "!@#$%^&*";
             const badPassword_3 = 'I <script>am evil</script>';
             const badPassword_4 = 'ha!lsw 3ol&*ler';
             const badPassword_5 = 'pnka*';
@@ -251,10 +168,8 @@ describe('AuthUtil test', function () {
             const goodPassword_6 = 'pnkaj*-hg';
             const goodPassword_7 = 'pnkaj_hg';
 
-            assert.deepStrictEqual(
-                validate.isPasswordStringFailureMessage(badPassword_1),
-                'Total 6 to 32 characters, numbers and one of !@#$%^&*_-',
-            );
+            assert.deepStrictEqual(validate.isPasswordStringFailureMessage(badPassword_1),
+                "Total 6 to 32 characters, numbers and one of !@#$%^&*_-");
             assert.deepStrictEqual(validate.isPasswordStringFailureMessage(goodPassword_1), null);
 
             assert.ok(!validate.isPasswordString(badPassword_1), 'Bad Password validation failed');
@@ -292,10 +207,8 @@ describe('AuthUtil test', function () {
             const goodPassword_7 = 'pnkajchatpta';
             const goodPassword_8 = '!@#$%^&*';
 
-            assert.deepStrictEqual(
-                validate.isSimplePasswordStringFailureMessage(badPassword_1),
-                'Total 6 to 32 characters, numbers or !@#$%^&*_-',
-            );
+            assert.deepStrictEqual(validate.isSimplePasswordStringFailureMessage(badPassword_1),
+                "Total 6 to 32 characters, numbers or !@#$%^&*_-");
             assert.deepStrictEqual(validate.isSimplePasswordStringFailureMessage(goodPassword_1), null);
 
             assert.ok(!validate.isSimplePasswordString(badPassword_1), 'Bad Password validation failed');
@@ -319,9 +232,9 @@ describe('AuthUtil test', function () {
         });
 
         it('isUsernameString returns true if input is username string false otherwise', function (done) {
-            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
             const longUserName = chars.repeat(100);
-            assert.ok(!validate.isUsernameString(longUserName), 'Long user name test failed');
+            assert.ok(!validate.isUsernameString(longUserName), "Long user name test failed");
             assert.ok(!validate.isUsernameString(''), 'Empty string test failed');
             assert.ok(!validate.isUsernameString(123), 'Non-string test failed');
             assert.ok(!validate.isUsernameString(goodString), 'Good string test failed');
@@ -332,20 +245,18 @@ describe('AuthUtil test', function () {
         });
 
         it('isPhoneNumber returns true if input is username string false otherwise', function (done) {
-            assert.ok(validate.isPhoneNumber('509 644 2443'), 'Good phone number test failed');
-            assert.ok(!validate.isPhoneNumber('509 644 2443998776655'), 'Bad phone number test failed');
-            assert.ok(!validate.isPhoneNumber(''), 'Empty phone number test failed');
+            assert.ok(validate.isPhoneNumber("509 644 2443"), 'Good phone number test failed');
+            assert.ok(!validate.isPhoneNumber("509 644 2443998776655"), 'Bad phone number test failed');
+            assert.ok(!validate.isPhoneNumber(""), 'Empty phone number test failed');
             assert.ok(!validate.isPhoneNumber(123), 'Non-string phone number test failed');
             done();
         });
 
         it('isUrlSafeString returns true if input is username string false otherwise', function (done) {
-            const urlSafeString =
-                'hbGciOiJzaGE1MTIiLCJ0eXAiOiJKV1QifQ.eyJ1c2VyX2lkIjoyNjg0LCJ0aW1lIjoxNjEwNzE2ODM0ODc2fQ.' +
+            const urlSafeString = 'hbGciOiJzaGE1MTIiLCJ0eXAiOiJKV1QifQ.eyJ1c2VyX2lkIjoyNjg0LCJ0aW1lIjoxNjEwNzE2ODM0ODc2fQ.' +
                 '9o_7dM4YjjcNseH7Cw3IL_t8yD1hhs1hluTCWG_JzYEExYOp89Gd6k0AbU018x3EQXCrdMUE6KXfL0KNg2Li9g';
 
-            const urlUnSafeString =
-                'hbGciOiJzaGE1MTIiLCJ0eXAiOiJKV1QifQ.eyJ1c2VyX2lkIjoyNjg0LCJ0aW1lIjoxNjEwNzE2ODM0ODc2fQ.' +
+            const urlUnSafeString = 'hbGciOiJzaGE1MTIiLCJ0eXAiOiJKV1QifQ.eyJ1c2VyX2lkIjoyNjg0LCJ0aW1lIjoxNjEwNzE2ODM0ODc2fQ.' +
                 '9o_7dM4YjjcNseH7Cw3IL_t8yD1hhs1hl=uTCWG_JzYEExYOp8/9Gd6k0AbU018x3EQXCrdMUE6KXfL0KNg2Li9g';
 
             assert.ok(!validate.isUrlSafeString(urlUnSafeString), 'Url unsafe test failed');
@@ -356,8 +267,7 @@ describe('AuthUtil test', function () {
         it('isPasswordLengthCorrect returns true if 6 <= password <= 24', function (done) {
             const password = 'hbGciOiJzaGE1MTIiLCJ';
 
-            const badPassword =
-                'hbGciOiJzaGE1MTIiLCJ0eXAiOiJKV1QifQ.eyJ1c2VyX2lkIjoyNjg0LCJ0aW1lIjoxNjEwNzE2ODM0ODc2fQ.' +
+            const badPassword = 'hbGciOiJzaGE1MTIiLCJ0eXAiOiJKV1QifQ.eyJ1c2VyX2lkIjoyNjg0LCJ0aW1lIjoxNjEwNzE2ODM0ODc2fQ.' +
                 '9o_7dM4YjjcNseH7Cw3IL_t8yD1hhs1hl=uTCWG_JzYEExYOp8/9Gd6k0AbU018x3EQXCrdMUE6KXfL0KNg2Li9g';
 
             assert.ok(validate.isString6To24CharacterLong(password), 'Good password fail');
@@ -370,8 +280,7 @@ describe('AuthUtil test', function () {
         it('isPasswordLengthCorrect returns true if 6 <= password <= 16', function (done) {
             const password = 'hbGciOiJzaGE1MTI';
 
-            const badPassword =
-                'hbGciOiJzaGE1MTIiLCJ0eXAiOiJKV1QifQ.eyJ1c2VyX2lkIjoyNjg0LCJ0aW1lIjoxNjEwNzE2ODM0ODc2fQ.' +
+            const badPassword = 'hbGciOiJzaGE1MTIiLCJ0eXAiOiJKV1QifQ.eyJ1c2VyX2lkIjoyNjg0LCJ0aW1lIjoxNjEwNzE2ODM0ODc2fQ.' +
                 '9o_7dM4YjjcNseH7Cw3IL_t8yD1hhs1hl=uTCWG_JzYEExYOp8/9Gd6k0AbU018x3EQXCrdMUE6KXfL0KNg2Li9g';
 
             assert.ok(validate.isString6To16CharacterLong(password), 'Good password fail');
@@ -382,9 +291,9 @@ describe('AuthUtil test', function () {
         });
 
         it('isProvinceString returns true if input is two letter province code', function (done) {
-            const ontario = 'ON';
-            const quebec = 'QC';
-            const bad = 'IamBad';
+            const ontario = "ON";
+            const quebec = "QC";
+            const bad = "IamBad";
 
             assert.ok(validate.isProvinceString(ontario), 'Good province code failing');
             assert.ok(validate.isProvinceString(quebec), 'Good province code failing');
@@ -409,9 +318,9 @@ describe('AuthUtil test', function () {
         });
 
         it('isPostalCodeString returns true if postal code', function (done) {
-            const codeOne = 'M4Y1R6';
-            const codeTwo = 'G1G0E3';
-            const bad = 'M441R6';
+            const codeOne = "M4Y1R6";
+            const codeTwo = "G1G0E3";
+            const bad = "M441R6";
 
             assert.ok(validate.isPostalCodeString(codeOne), 'Good province code failing');
             assert.ok(validate.isPostalCodeString(codeTwo), 'Good province code failing');
@@ -421,8 +330,8 @@ describe('AuthUtil test', function () {
         });
 
         it('isSafeString returns true if safe', function (done) {
-            const safeString_1 = '#346 Charles* st. west:-(ON) east_side [as]';
-            const unsafeString_1 = '<G1G0E3?';
+            const safeString_1 = "#346 Charles* st. west:-(ON) east_side [as]";
+            const unsafeString_1 = "<G1G0E3?";
 
             assert.ok(validate.isSafeString(safeString_1), 'Safe string code failing');
             assert.ok(!validate.isSafeString(unsafeString_1), 'Unsafe string code failing');
@@ -433,10 +342,10 @@ describe('AuthUtil test', function () {
         });
 
         it('isInStringArray returns true if input is in string array', function (done) {
-            const stringArray_1 = ['on', 'ca'];
-            const stringArray_2 = ['gc', 'qc'];
-            const value_1 = 'ca';
-            const value_2 = 'aa';
+            const stringArray_1 = ["on", "ca"];
+            const stringArray_2 = ["gc", "qc"];
+            const value_1 = "ca";
+            const value_2 = "aa";
 
             assert.ok(validate.isInStringArray(stringArray_1, value_1), 'Safe string code failing');
             assert.ok(!validate.isInStringArray(stringArray_2, value_2), 'Unsafe string code failing');
@@ -445,9 +354,9 @@ describe('AuthUtil test', function () {
         });
 
         it('isCountryCodeString returns true if country code', function (done) {
-            const codeOne = '+1';
-            const codeTwo = '+966';
-            const bad = '572';
+            const codeOne = "+1";
+            const codeTwo = "+966";
+            const bad = "572";
 
             assert.ok(validate.isCountryCodeString(codeOne), 'Good country code failing');
             assert.ok(validate.isCountryCodeString(codeTwo), 'Good country code failing');
@@ -459,15 +368,15 @@ describe('AuthUtil test', function () {
         });
 
         it('isValidDomainName returns true if valid domain name, false otherwise', function (done) {
-            const goodDomain1 = 'example.com';
-            const goodDomain2 = 'sub.example.com';
-            const goodDomain3 = 'my-domain.org';
-            const goodDomain4 = 'school.edu.in';
-            const badDomain1 = 'example';
-            const badDomain2 = '.example.com';
-            const badDomain3 = 'example.com-';
-            const badDomain4 = '-example.com';
-            const badDomain5 = 'example..com';
+            const goodDomain1 = "example.com";
+            const goodDomain2 = "sub.example.com";
+            const goodDomain3 = "my-domain.org";
+            const goodDomain4 = "school.edu.in";
+            const badDomain1 = "example";
+            const badDomain2 = ".example.com";
+            const badDomain3 = "example.com-";
+            const badDomain4 = "-example.com";
+            const badDomain5 = "example..com";
 
             assert.ok(validate.isValidDomainName(goodDomain1), 'Good domain test failed');
             assert.ok(validate.isValidDomainName(goodDomain2), 'Good domain test failed');
@@ -478,18 +387,18 @@ describe('AuthUtil test', function () {
             assert.ok(!validate.isValidDomainName(badDomain3), 'Bad domain test failed');
             assert.ok(!validate.isValidDomainName(badDomain4), 'Bad domain test failed');
             assert.ok(!validate.isValidDomainName(badDomain5), 'Bad domain test failed');
-            assert.ok(!validate.isValidDomainName(''), 'Empty domain test failed');
+            assert.ok(!validate.isValidDomainName(""), 'Empty domain test failed');
             assert.ok(!validate.isValidDomainName(undefined), 'Undefined domain test failed');
             done();
         });
 
         it('isValidTimestampzString returns true if timestamp with time zone, false otherwise', function (done) {
-            const goodTz1 = '2023-10-27T10:00:00Z';
-            const goodTz2 = '2023-10-27T10:00:00+02:00';
-            const goodTz3 = '2023-10-27T10:00:00.123Z';
-            const badTz1 = '2023-10-27T10:00:00';
-            const badTz2 = '2023-13-27T10:00:00Z'; // Invalid month
-            const badTz3 = '2023-10-27 10:00:00Z'; // Missing T
+            const goodTz1 = "2023-10-27T10:00:00Z";
+            const goodTz2 = "2023-10-27T10:00:00+02:00";
+            const goodTz3 = "2023-10-27T10:00:00.123Z";
+            const badTz1 = "2023-10-27T10:00:00";
+            const badTz2 = "2023-13-27T10:00:00Z"; // Invalid month
+            const badTz3 = "2023-10-27 10:00:00Z"; // Missing T
 
             assert.ok(validate.isValidTimestampzString(goodTz1), 'Good timestampz test failed');
             assert.ok(validate.isValidTimestampzString(goodTz2), 'Good timestampz test failed');
@@ -502,11 +411,11 @@ describe('AuthUtil test', function () {
         });
 
         it('isValidTimestampString returns true if timestamp without time zone, false otherwise', function (done) {
-            const goodT1 = '2023-10-27T10:00:00';
-            const goodT2 = '2023-10-27T10:00:00.123';
-            const badT1 = '2023-10-27T10:00:00Z';
-            const badT2 = '2023-13-27T10:00:00'; // Invalid month
-            const badT3 = '2023-10-27 10:00:00'; // Missing T
+            const goodT1 = "2023-10-27T10:00:00";
+            const goodT2 = "2023-10-27T10:00:00.123";
+            const badT1 = "2023-10-27T10:00:00Z";
+            const badT2 = "2023-13-27T10:00:00"; // Invalid month
+            const badT3 = "2023-10-27 10:00:00"; // Missing T
 
             assert.ok(validate.isValidTimestampString(goodT1), 'Good timestamp test failed');
             assert.ok(validate.isValidTimestampString(goodT2), 'Good timestamp test failed');
@@ -517,10 +426,10 @@ describe('AuthUtil test', function () {
             done();
         });
         it('isValidUrl returns true if valid url, false otherwise', function (done) {
-            assert.ok(validate.isValidUrl('http://example.com'), 'http url failed');
-            assert.ok(validate.isValidUrl('https://example.com'), 'https url failed');
-            assert.ok(!validate.isValidUrl('ftp://example.com'), 'ftp url should fail');
-            assert.ok(!validate.isValidUrl('invalid-url'), 'invalid url should fail');
+            assert.ok(validate.isValidUrl("http://example.com"), 'http url failed');
+            assert.ok(validate.isValidUrl("https://example.com"), 'https url failed');
+            assert.ok(!validate.isValidUrl("ftp://example.com"), 'ftp url should fail');
+            assert.ok(!validate.isValidUrl("invalid-url"), 'invalid url should fail');
             assert.ok(!validate.isValidUrl(undefined), 'undefined url should fail');
             assert.ok(!validate.isValidUrl(''), 'empty url should fail');
             assert.ok(!validate.isValidUrl('a'.repeat(2049)), 'long url should fail');
@@ -528,113 +437,11 @@ describe('AuthUtil test', function () {
         });
 
         it('isValidArrayOfStrings returns true if valid array of strings, false otherwise', function (done) {
-            assert.ok(validate.isValidArrayOfStrings(['a', 'b']), 'valid array failed');
-            assert.ok(!validate.isValidArrayOfStrings(['a', 1]), 'array with number should fail');
-            assert.ok(!validate.isValidArrayOfStrings('not an array'), 'non-array should fail');
-            assert.ok(!validate.isValidArrayOfStrings(['']), 'array with empty string should fail');
+            assert.ok(validate.isValidArrayOfStrings(["a", "b"]), 'valid array failed');
+            assert.ok(!validate.isValidArrayOfStrings(["a", 1]), 'array with number should fail');
+            assert.ok(!validate.isValidArrayOfStrings("not an array"), 'non-array should fail');
+            assert.ok(!validate.isValidArrayOfStrings([""]), 'array with empty string should fail');
             assert.ok(!validate.isValidArrayOfStrings(['a'.repeat(10001)]), 'array with long string should fail');
-            done();
-        });
-
-        it('isUserRoleRequestRoleString returns true only for student, intern, and volunteer', function (done) {
-            assert.ok(isUserRoleRequestRoleString('student'), 'student should be valid');
-            assert.ok(isUserRoleRequestRoleString('intern'), 'intern should be valid');
-            assert.ok(isUserRoleRequestRoleString('volunteer'), 'volunteer should be valid');
-            assert.ok(!isUserRoleRequestRoleString('user'), 'user should be invalid');
-            assert.ok(!isUserRoleRequestRoleString('cc_admin'), 'cc_admin should be invalid');
-            assert.ok(!isUserRoleRequestRoleString('students'), 'students should be invalid');
-            assert.ok(!isUserRoleRequestRoleString(undefined), 'undefined should be invalid');
-            done();
-        });
-
-        it('validateNewUserRoleRequestObject defaults role and requires institution and campus', function (done) {
-            const roleRequest = validateNewUserRoleRequestObject({
-                user_id: '1c76ea46-a212-4cc5-9031-a9a28d927c4c',
-                institution_id: '2c76ea46-a212-4cc5-9031-a9a28d927c4c',
-                campus_id: '3c76ea46-a212-4cc5-9031-a9a28d927c4c',
-            });
-
-            assert.strictEqual(DEFAULT_USER_ROLE_REQUEST_ROLE, 'student');
-            assert.strictEqual(roleRequest.role_name, 'student');
-            assert.strictEqual(roleRequest.institution_id, '2c76ea46-a212-4cc5-9031-a9a28d927c4c');
-            assert.strictEqual(roleRequest.campus_id, '3c76ea46-a212-4cc5-9031-a9a28d927c4c');
-            done();
-        });
-
-        it('validateNewUserRoleRequestObject rejects an empty request with default create rules', function (done) {
-            assert.throws(
-                () => validateNewUserRoleRequestObject(),
-                err => err.message === 'Bad_Input' && err.userMessage === 'Missing property: role.institutionId',
-            );
-            done();
-        });
-
-        it('validateNewUserRoleRequestObject maps role aliases to role_name', function (done) {
-            const roleRequest = validateNewUserRoleRequestObject({
-                userId: '1c76ea46-a212-4cc5-9031-a9a28d927c4c',
-                role: 'intern',
-                institutionId: '2c76ea46-a212-4cc5-9031-a9a28d927c4c',
-                campusId: '3c76ea46-a212-4cc5-9031-a9a28d927c4c',
-            });
-
-            assert.strictEqual(roleRequest.role_name, 'intern');
-            assert.strictEqual(roleRequest.institution_id, '2c76ea46-a212-4cc5-9031-a9a28d927c4c');
-            assert.strictEqual(roleRequest.campus_id, '3c76ea46-a212-4cc5-9031-a9a28d927c4c');
-            assert.strictEqual(roleRequest.role, undefined);
-            done();
-        });
-
-        it('validateNewUserRoleRequestObject rejects invalid roles', function (done) {
-            assert.throws(
-                () =>
-                    validateNewUserRoleRequestObject({
-                        role_name: 'cc_admin',
-                        institution_id: '2c76ea46-a212-4cc5-9031-a9a28d927c4c',
-                        campus_id: '3c76ea46-a212-4cc5-9031-a9a28d927c4c',
-                    }),
-                err => err.message === 'Bad_Input' && err.userMessage === 'Invalid property: role.role',
-            );
-            done();
-        });
-
-        it('validateNewUserRoleRequestObject rejects missing scope when scope is required', function (done) {
-            assert.throws(
-                () => validateNewUserRoleRequestObject({ role_name: 'volunteer', institution_id: '2c76ea46-a212-4cc5-9031-a9a28d927c4c' }),
-                err => err.message === 'Bad_Input' && err.userMessage === 'Missing property: role.campusId',
-            );
-            done();
-        });
-
-        it('validateNewUserRoleRequestObject can disable scope requirements for non-create validation', function (done) {
-            assert.deepStrictEqual(
-                validateNewUserRoleRequestObject(
-                    { role_name: 'student' },
-                    {
-                        defaultRole: undefined,
-                        requireScope: false,
-                    },
-                ),
-                { role_name: 'student' },
-            );
-            done();
-        });
-
-        it('validateNewUserRoleRequestObject can require scope only when role or scope fields are present', function (done) {
-            assert.deepStrictEqual(
-                validateNewUserRoleRequestObject(
-                    { approved_status: 'on_hold' },
-                    { defaultRole: undefined, requireScope: REQUIRE_SCOPE_WHEN_ROLE_OR_SCOPE_PRESENT },
-                ),
-                { approved_status: 'on_hold' },
-            );
-            assert.throws(
-                () =>
-                    validateNewUserRoleRequestObject(
-                        { role_name: 'student' },
-                        { defaultRole: undefined, requireScope: REQUIRE_SCOPE_WHEN_ROLE_OR_SCOPE_PRESENT },
-                    ),
-                err => err.message === 'Bad_Input' && err.userMessage === 'Missing property: role.institutionId',
-            );
             done();
         });
     });

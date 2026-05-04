@@ -3,79 +3,6 @@
  */
 export function validateProperties(obj?: Record<string, any>): Record<string, any>;
 
-/**
- * Options for {@link validateWhitelistProperties}.
- */
-export interface ValidateWhitelistPropertiesOptions {
-    /** Properties allowed in the input but not required. */
-    optionalProperties?: string[];
-    /** When true, the returned object's keys are converted to snake_case. */
-    convertToSnakeCase?: boolean;
-    /**
-     * When true, the returned object is flattened so that every validated leaf
-     * becomes a top-level key. No nested objects remain in the output. Applied
-     * after snake_case conversion.
-     */
-    flattenOutput?: boolean;
-    /**
-     * Controls flattened key naming when `flattenOutput` is true.
-     * - `path` uses full dot-notation paths, e.g. `{ "user.email": "Jane" }`.
-     * - `leaf` uses only leaf names, e.g. `{ email: "Jane" }`.
-     *
-     * Defaults to `path`.
-     */
-    flattenKeyStyle?: 'path' | 'leaf';
-}
-
-/**
- * Validates and transforms whitelisted properties from an input object.
- *
- * - Supports nested objects via dot-notation paths (e.g. `"address.city"`),
- *   up to 5 levels deep. The function checks that each path resolves to an
- *   existing leaf property and validates the leaf value by its leaf segment.
- * - Extracts only the whitelisted (required + optional) leaf properties and
- *   rebuilds the same nested shape in the result.
- * - Validates values via {@link validateProperties}.
- * - Throws a "Bad_Input" error when any required property is missing/invalid,
- *   when a provided optional property has an invalid value, when a path
- *   exceeds 5 levels of nesting, or when the combined count of
- *   `requiredProperties` and `options.optionalProperties` exceeds 5000.
- * - Array values are supported: if a leaf value is an array, the per-leaf
- *   validator is applied to each element. The leaf is accepted only when every
- *   element passes validation, and the returned value is an array of the
- *   validated elements (e.g. `{ name: ["First", "Other"] }` is validated like
- *   `{ name: "First" }` and `{ name: "Other" }` individually).
- * - Optionally converts the resulting keys (including nested keys) to snake_case.
- * - Optionally flattens the result after snake_case conversion.
- *
- * @param inputObject The input object (e.g. `req.body` or `req.params`).
- * @param requiredProperties Leaf paths that must be present and valid. Dot-notation supported.
- * @param options Optional additional leaf paths plus output transformation flags.
- */
-export function validateWhitelistProperties(
-    inputObject: Record<string, any>,
-    requiredProperties?: string[],
-    options?: ValidateWhitelistPropertiesOptions,
-): Promise<Record<string, any>>;
-
-export const DEFAULT_USER_ROLE_REQUEST_ROLE: 'student';
-export const REQUIRE_SCOPE_WHEN_ROLE_OR_SCOPE_PRESENT: 'whenRoleOrScopePresent';
-
-export interface ValidateNewUserRoleRequestOptions {
-    defaultRole?: 'student' | undefined;
-    requireScope?: boolean | typeof REQUIRE_SCOPE_WHEN_ROLE_OR_SCOPE_PRESENT;
-}
-
-/**
- * Normalizes and validates a carecard.new_user_role_request payload.
- * Only student, intern, and volunteer are accepted. When scope is required,
- * both institution_id and campus_id must be provided.
- */
-export function validateNewUserRoleRequestObject(
-    roleRequest?: Record<string, any>,
-    options?: ValidateNewUserRoleRequestOptions,
-): Record<string, any>;
-
 /** Checks if the string is a valid image URL format. */
 export function isImageUrl(imageUrl: any): boolean;
 /** Checks if the value is an integer. */
@@ -88,8 +15,6 @@ export function isValidIntegerString(str: any): boolean;
 export function isValidUuidString(str: any): boolean;
 /** Checks if the string contains only alphanumeric characters, spaces, underscores, or hyphens. */
 export function isCharactersString(str: any): boolean;
-/** Checks if the string is a valid street address format. */
-export function isStreetString(str: any): boolean;
 /** Checks if the string is a valid name format. */
 export function isNameString(str: any): boolean;
 /** Checks if the string is safe for search queries. */
@@ -124,14 +49,8 @@ export function isBoolValue(inputValue: any): boolean;
 export function isPostalCodeString(inputString: any): boolean;
 /** Checks if the string contains only allowed "safe" characters. */
 export function isSafeString(str: any): boolean;
-/** Checks if the value is non-empty text up to the supported maximum length. */
-export function isTextString(str: any): boolean;
 /** Checks if a string exists within a given array of strings (case-insensitive). */
 export function isInStringArray(StringArray: string[], inputString: any): boolean;
-/** Checks if the string is one of the supported user role request statuses. */
-export function isUserRoleRequestStatusString(inputString: any): boolean;
-/** Checks if the string is a supported new user role request role. */
-export function isUserRoleRequestRoleString(inputString: any): boolean;
 /** Checks if the string is a valid country code (e.g., +1). */
 export function isCountryCodeString(str: any): boolean;
 /** Checks if the string is a valid domain name. */
@@ -151,38 +70,34 @@ export function isValidArrayOfStrings(arr: any): boolean;
  * @deprecated Use direct imports instead.
  */
 export const validate: {
-    isImageUrl: typeof isImageUrl;
-    isInteger: typeof isInteger;
-    isValidJsonString: typeof isValidJsonString;
-    isValidIntegerString: typeof isValidIntegerString;
-    isValidUuidString: typeof isValidUuidString;
-    isCharactersString: typeof isCharactersString;
-    isStreetString: typeof isStreetString;
-    isNameString: typeof isNameString;
-    isSafeSearchString: typeof isSafeSearchString;
-    isEmailString: typeof isEmailString;
-    isJwtString: typeof isJwtString;
-    isPasswordString: typeof isPasswordString;
-    isSimplePasswordString: typeof isSimplePasswordString;
-    isPasswordStringFailureMessage: typeof isPasswordStringFailureMessage;
-    isSimplePasswordStringFailureMessage: typeof isSimplePasswordStringFailureMessage;
-    isUsernameString: typeof isUsernameString;
-    isPhoneNumber: typeof isPhoneNumber;
-    isUrlSafeString: typeof isUrlSafeString;
-    isString6To24CharacterLong: typeof isString6To24CharacterLong;
-    isString6To16CharacterLong: typeof isString6To16CharacterLong;
-    isProvinceString: typeof isProvinceString;
-    isBoolValue: typeof isBoolValue;
-    isPostalCodeString: typeof isPostalCodeString;
-    isSafeString: typeof isSafeString;
-    isTextString: typeof isTextString;
-    isInStringArray: typeof isInStringArray;
-    isUserRoleRequestStatusString: typeof isUserRoleRequestStatusString;
-    isUserRoleRequestRoleString: typeof isUserRoleRequestRoleString;
-    isCountryCodeString: typeof isCountryCodeString;
-    isValidDomainName: typeof isValidDomainName;
-    isValidTimestampzString: typeof isValidTimestampzString;
-    isValidTimestampString: typeof isValidTimestampString;
-    isValidUrl: typeof isValidUrl;
-    isValidArrayOfStrings: typeof isValidArrayOfStrings;
+  isImageUrl: typeof isImageUrl;
+  isInteger: typeof isInteger;
+  isValidJsonString: typeof isValidJsonString;
+  isValidIntegerString: typeof isValidIntegerString;
+  isValidUuidString: typeof isValidUuidString;
+  isCharactersString: typeof isCharactersString;
+  isNameString: typeof isNameString;
+  isSafeSearchString: typeof isSafeSearchString;
+  isEmailString: typeof isEmailString;
+  isJwtString: typeof isJwtString;
+  isPasswordString: typeof isPasswordString;
+  isSimplePasswordString: typeof isSimplePasswordString;
+  isPasswordStringFailureMessage: typeof isPasswordStringFailureMessage;
+  isSimplePasswordStringFailureMessage: typeof isSimplePasswordStringFailureMessage;
+  isUsernameString: typeof isUsernameString;
+  isPhoneNumber: typeof isPhoneNumber;
+  isUrlSafeString: typeof isUrlSafeString;
+  isString6To24CharacterLong: typeof isString6To24CharacterLong;
+  isString6To16CharacterLong: typeof isString6To16CharacterLong;
+  isProvinceString: typeof isProvinceString;
+  isBoolValue: typeof isBoolValue;
+  isPostalCodeString: typeof isPostalCodeString;
+  isSafeString: typeof isSafeString;
+  isInStringArray: typeof isInStringArray;
+  isCountryCodeString: typeof isCountryCodeString;
+  isValidDomainName: typeof isValidDomainName;
+  isValidTimestampzString: typeof isValidTimestampzString;
+  isValidTimestampString: typeof isValidTimestampString;
+  isValidUrl: typeof isValidUrl;
+  isValidArrayOfStrings: typeof isValidArrayOfStrings;
 };
