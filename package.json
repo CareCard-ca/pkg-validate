@@ -1,6 +1,6 @@
 {
   "name": "@carecard/validate",
-  "version": "3.0.11",
+  "version": "3.0.13",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/CareCard-ca/pkg-validate.git"
@@ -10,7 +10,8 @@
   "types": "index.d.ts",
   "scripts": {
     "test": "export NODE_ENV=test && mocha --recursive",
-    "test:types": "tsc --noEmit && mocha -r ts-node/register test/types.test.ts"
+    "test:types": "tsc --noEmit && mocha -r ts-node/register test/types.test.ts",
+    "prepare": "husky"
   },
   "keywords": [
     "validate",
@@ -21,6 +22,7 @@
   "devDependencies": {
     "@types/mocha": "10.0.10",
     "@types/node": "25.5.0",
+    "husky": "^9.1.7",
     "mocha": "11.7.5",
     "ts-node": "10.9.2",
     "typescript": "5.9.3"
