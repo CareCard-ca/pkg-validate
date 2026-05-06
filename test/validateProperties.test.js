@@ -164,6 +164,8 @@ describe('ValidateProperties test', function () {
                 program_id: uuid,
                 programId: uuid,
                 id: uuid,
+                from: '0',
+                number: '10',
                 period: 'Monthly',
                 offset_number: '10',
                 offsetNumber: '10',
