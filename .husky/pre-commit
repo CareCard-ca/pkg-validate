@@ -1,3 +1,5 @@
+npm run lint:fix
+npm run format
+
 # Run tests
-npm run test
-npm run test:types
+npm run test:All
