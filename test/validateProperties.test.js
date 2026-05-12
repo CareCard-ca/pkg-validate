@@ -173,6 +173,8 @@ describe('ValidateProperties test', function () {
         roleAssignmentId: uuid,
         user_role_id: uuid,
         userRoleId: uuid,
+        phone_number_id: uuid,
+        phoneNumberId: uuid,
         college_id: uuid,
         collegeId: uuid,
         campus_id: uuid,
@@ -284,6 +286,8 @@ describe('ValidateProperties test', function () {
         isPrimary: 'invalid',
         address_id: 'invalid-uuid',
         addressId: 'invalid-uuid',
+        phone_number_id: 'invalid-uuid',
+        phoneNumberId: 'invalid-uuid',
         search_string: 123, // fails isSafeSearchString
         password: 'short', // fails isString6To16CharacterLong
         new_password: 'validButTooLongForIsString6To16CharacterLong', // fails isString6To16CharacterLong
