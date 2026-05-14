@@ -58,7 +58,7 @@ describe('ValidateProperties test', function () {
       'type',
     ];
 
-    nameKeys.forEach((key) => {
+    nameKeys.forEach(key => {
       it(`accepts a valid name string for "${key}"`, function () {
         assertAccepts(key, 'Pankaj');
       });
@@ -70,7 +70,7 @@ describe('ValidateProperties test', function () {
   });
 
   describe('Postal code / period (isCharactersString)', function () {
-    ['postal_code', 'postalCode', 'period'].forEach((key) => {
+    ['postal_code', 'postalCode', 'period'].forEach(key => {
       it(`accepts a valid string for "${key}"`, function () {
         assertAccepts(key, '492001');
       });
@@ -82,7 +82,7 @@ describe('ValidateProperties test', function () {
   });
 
   describe('Boolean fields (isBoolValue)', function () {
-    ['is_primary', 'isPrimary', 'active'].forEach((key) => {
+    ['is_primary', 'isPrimary', 'active'].forEach(key => {
       it(`accepts boolean true for "${key}"`, function () {
         assertAccepts(key, true);
       });
@@ -98,7 +98,7 @@ describe('ValidateProperties test', function () {
   });
 
   describe('Search string fields (isSafeSearchString)', function () {
-    ['search_string', 'searchString'].forEach((key) => {
+    ['search_string', 'searchString'].forEach(key => {
       it(`accepts a valid safe search string for "${key}"`, function () {
         assertAccepts(key, ' claudpsnd@yahoo.ca ');
       });
@@ -114,7 +114,7 @@ describe('ValidateProperties test', function () {
   });
 
   describe('Simple password fields', function () {
-    ['password', 'new_password', 'newPassword'].forEach((key) => {
+    ['password', 'new_password', 'newPassword'].forEach(key => {
       it(`accepts a valid simple password for "${key}"`, function () {
         assertAccepts(key, 'secret782*goo');
       });
@@ -130,7 +130,7 @@ describe('ValidateProperties test', function () {
   });
 
   describe('Strong password fields', function () {
-    ['strong_password', 'strongPassword'].forEach((key) => {
+    ['strong_password', 'strongPassword'].forEach(key => {
       it(`accepts a valid strong password for "${key}"`, function () {
         assertAccepts(key, 'Password123!');
       });
@@ -152,7 +152,7 @@ describe('ValidateProperties test', function () {
   });
 
   describe('Phone number fields (isPhoneNumber)', function () {
-    ['phone_number', 'phoneNumber'].forEach((key) => {
+    ['phone_number', 'phoneNumber'].forEach(key => {
       it(`accepts a valid phone number for "${key}"`, function () {
         assertAccepts(key, '123-456-7890');
       });
@@ -164,15 +164,9 @@ describe('ValidateProperties test', function () {
   });
 
   describe('URL-safe token fields (isUrlSafeString)', function () {
-    const tokenKeys = [
-      'token',
-      'email_confirm_token',
-      'emailConfirmToken',
-      'verification_token',
-      'verificationToken',
-    ];
+    const tokenKeys = ['token', 'email_confirm_token', 'emailConfirmToken', 'verification_token', 'verificationToken'];
 
-    tokenKeys.forEach((key) => {
+    tokenKeys.forEach(key => {
       it(`accepts a valid url-safe token for "${key}"`, function () {
         assertAccepts(key, 'abc.123');
       });
@@ -217,7 +211,7 @@ describe('ValidateProperties test', function () {
       'phoneNumberId',
     ];
 
-    uuidKeys.forEach((key) => {
+    uuidKeys.forEach(key => {
       it(`accepts a valid UUID for "${key}"`, function () {
         assertAccepts(key, VALID_UUID);
       });
@@ -229,7 +223,7 @@ describe('ValidateProperties test', function () {
   });
 
   describe('Integer string fields (isValidIntegerString)', function () {
-    ['offset_number', 'offsetNumber', 'number_of_orders', 'numberOfOrders', 'price', 'from', 'number'].forEach((key) => {
+    ['offset_number', 'offsetNumber', 'number_of_orders', 'numberOfOrders', 'price', 'from', 'number'].forEach(key => {
       it(`accepts a valid integer string for "${key}"`, function () {
         assertAccepts(key, '10');
       });
@@ -251,7 +245,7 @@ describe('ValidateProperties test', function () {
   });
 
   describe('JSON object fields (isValidJsonString on JSON.stringify)', function () {
-    ['weight', 'dimensions', 'permission', 'scope_data', 'scopeData', 'meta_data', 'metaData'].forEach((key) => {
+    ['weight', 'dimensions', 'permission', 'scope_data', 'scopeData', 'meta_data', 'metaData'].forEach(key => {
       it(`accepts a valid object for "${key}"`, function () {
         assertAccepts(key, { a: 1, b: 'two' });
       });
@@ -279,7 +273,7 @@ describe('ValidateProperties test', function () {
   });
 
   describe('URL fields (isImageUrl || isValidUrl)', function () {
-    ['image_url', 'imageUrl', 'website', 'file_url', 'fileUrl'].forEach((key) => {
+    ['image_url', 'imageUrl', 'website', 'file_url', 'fileUrl'].forEach(key => {
       it(`accepts a valid URL for "${key}"`, function () {
         assertAccepts(key, 'http://example.com/file.pdf');
       });
@@ -293,7 +287,7 @@ describe('ValidateProperties test', function () {
   describe('Domain fields (isValidDomainName)', function () {
     const domainKeys = ['domain_name', 'domainName', 'domain', 'email_domain', 'emailDomain', 'email_domain_name', 'emailDomainName'];
 
-    domainKeys.forEach((key) => {
+    domainKeys.forEach(key => {
       it(`accepts a valid domain for "${key}"`, function () {
         assertAccepts(key, 'sub.example.com');
       });
@@ -305,7 +299,7 @@ describe('ValidateProperties test', function () {
   });
 
   describe('Expires-at fields (isValidTimestampzString || isValidTimestampString)', function () {
-    ['expires_at', 'expiresAt'].forEach((key) => {
+    ['expires_at', 'expiresAt'].forEach(key => {
       it(`accepts a valid timestamptz for "${key}"`, function () {
         assertAccepts(key, '2023-10-27T10:00:00Z');
       });
