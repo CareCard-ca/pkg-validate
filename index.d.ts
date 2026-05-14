@@ -16,15 +16,21 @@ export interface ValidateWhitelistPropertiesOptions {
 /**
  * Validates and transforms whitelisted properties from an input object.
  *
- * - Extracts only the whitelisted (required + optional) properties.
+ * - Supports nested objects via dot-notation paths (e.g. `"address.city"`),
+ *   up to 5 levels deep. The function checks that each path resolves to an
+ *   existing leaf property and validates the leaf value by its leaf segment.
+ * - Extracts only the whitelisted (required + optional) leaf properties and
+ *   rebuilds the same nested shape in the result.
  * - Validates values via {@link validateProperties}.
  * - Throws a "Bad_Input" error when any required property is missing/invalid,
- *   or when a provided optional property has an invalid value.
- * - Optionally converts the resulting keys to snake_case.
+ *   when a provided optional property has an invalid value, when a path
+ *   exceeds 5 levels of nesting, or when the combined count of
+ *   `requiredProperties` and `options.optionalProperties` exceeds 5000.
+ * - Optionally converts the resulting keys (including nested keys) to snake_case.
  *
  * @param inputObject The input object (e.g. `req.body` or `req.params`).
- * @param requiredProperties Properties that must be present and valid.
- * @param options Optional list of additional allowed properties and case-conversion flag.
+ * @param requiredProperties Leaf paths that must be present and valid. Dot-notation supported.
+ * @param options Optional list of additional allowed leaf paths and case-conversion flag.
  */
 export function validateWhitelistProperties(
   inputObject: Record<string, any>,
