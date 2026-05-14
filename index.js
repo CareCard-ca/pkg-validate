@@ -3,9 +3,9 @@ const validateProperties = require('./lib/validateProperties');
 const validateWhitelistProperties = require('./lib/validateWhitelistProperties');
 
 module.exports = {
-  validate,
-  validateProperties,
-  validateWhitelistProperties,
-  ...validate,
-  ...validateProperties,
+    validate,
+    validateProperties,
+    validateWhitelistProperties,
+    ...validate,
+    ...validateProperties,
 };

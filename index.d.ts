@@ -7,16 +7,16 @@ export function validateProperties(obj?: Record<string, any>): Record<string, an
  * Options for {@link validateWhitelistProperties}.
  */
 export interface ValidateWhitelistPropertiesOptions {
-  /** Properties allowed in the input but not required. */
-  optionalProperties?: string[];
-  /** When true, the returned object's keys are converted to snake_case. */
-  convertToSnakeCase?: boolean;
-  /**
-   * When true, the returned object is flattened so that every validated leaf
-   * becomes a top-level key, joined by `.` (e.g. `{ 'user.first_name': 'Jane' }`).
-   * No nested objects remain in the output. Applied after snake_case conversion.
-   */
-  flattenOutput?: boolean;
+    /** Properties allowed in the input but not required. */
+    optionalProperties?: string[];
+    /** When true, the returned object's keys are converted to snake_case. */
+    convertToSnakeCase?: boolean;
+    /**
+     * When true, the returned object is flattened so that every validated leaf
+     * becomes a top-level key, joined by `.` (e.g. `{ 'user.first_name': 'Jane' }`).
+     * No nested objects remain in the output. Applied after snake_case conversion.
+     */
+    flattenOutput?: boolean;
 }
 
 /**
@@ -44,9 +44,9 @@ export interface ValidateWhitelistPropertiesOptions {
  * @param options Optional list of additional allowed leaf paths and case-conversion flag.
  */
 export function validateWhitelistProperties(
-  inputObject: Record<string, any>,
-  requiredProperties?: string[],
-  options?: ValidateWhitelistPropertiesOptions,
+    inputObject: Record<string, any>,
+    requiredProperties?: string[],
+    options?: ValidateWhitelistPropertiesOptions,
 ): Promise<Record<string, any>>;
 
 /** Checks if the string is a valid image URL format. */
@@ -116,34 +116,34 @@ export function isValidArrayOfStrings(arr: any): boolean;
  * @deprecated Use direct imports instead.
  */
 export const validate: {
-  isImageUrl: typeof isImageUrl;
-  isInteger: typeof isInteger;
-  isValidJsonString: typeof isValidJsonString;
-  isValidIntegerString: typeof isValidIntegerString;
-  isValidUuidString: typeof isValidUuidString;
-  isCharactersString: typeof isCharactersString;
-  isNameString: typeof isNameString;
-  isSafeSearchString: typeof isSafeSearchString;
-  isEmailString: typeof isEmailString;
-  isJwtString: typeof isJwtString;
-  isPasswordString: typeof isPasswordString;
-  isSimplePasswordString: typeof isSimplePasswordString;
-  isPasswordStringFailureMessage: typeof isPasswordStringFailureMessage;
-  isSimplePasswordStringFailureMessage: typeof isSimplePasswordStringFailureMessage;
-  isUsernameString: typeof isUsernameString;
-  isPhoneNumber: typeof isPhoneNumber;
-  isUrlSafeString: typeof isUrlSafeString;
-  isString6To24CharacterLong: typeof isString6To24CharacterLong;
-  isString6To16CharacterLong: typeof isString6To16CharacterLong;
-  isProvinceString: typeof isProvinceString;
-  isBoolValue: typeof isBoolValue;
-  isPostalCodeString: typeof isPostalCodeString;
-  isSafeString: typeof isSafeString;
-  isInStringArray: typeof isInStringArray;
-  isCountryCodeString: typeof isCountryCodeString;
-  isValidDomainName: typeof isValidDomainName;
-  isValidTimestampzString: typeof isValidTimestampzString;
-  isValidTimestampString: typeof isValidTimestampString;
-  isValidUrl: typeof isValidUrl;
-  isValidArrayOfStrings: typeof isValidArrayOfStrings;
+    isImageUrl: typeof isImageUrl;
+    isInteger: typeof isInteger;
+    isValidJsonString: typeof isValidJsonString;
+    isValidIntegerString: typeof isValidIntegerString;
+    isValidUuidString: typeof isValidUuidString;
+    isCharactersString: typeof isCharactersString;
+    isNameString: typeof isNameString;
+    isSafeSearchString: typeof isSafeSearchString;
+    isEmailString: typeof isEmailString;
+    isJwtString: typeof isJwtString;
+    isPasswordString: typeof isPasswordString;
+    isSimplePasswordString: typeof isSimplePasswordString;
+    isPasswordStringFailureMessage: typeof isPasswordStringFailureMessage;
+    isSimplePasswordStringFailureMessage: typeof isSimplePasswordStringFailureMessage;
+    isUsernameString: typeof isUsernameString;
+    isPhoneNumber: typeof isPhoneNumber;
+    isUrlSafeString: typeof isUrlSafeString;
+    isString6To24CharacterLong: typeof isString6To24CharacterLong;
+    isString6To16CharacterLong: typeof isString6To16CharacterLong;
+    isProvinceString: typeof isProvinceString;
+    isBoolValue: typeof isBoolValue;
+    isPostalCodeString: typeof isPostalCodeString;
+    isSafeString: typeof isSafeString;
+    isInStringArray: typeof isInStringArray;
+    isCountryCodeString: typeof isCountryCodeString;
+    isValidDomainName: typeof isValidDomainName;
+    isValidTimestampzString: typeof isValidTimestampzString;
+    isValidTimestampString: typeof isValidTimestampString;
+    isValidUrl: typeof isValidUrl;
+    isValidArrayOfStrings: typeof isValidArrayOfStrings;
 };

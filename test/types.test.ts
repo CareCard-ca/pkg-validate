@@ -53,7 +53,7 @@ import {
  * to the explicit generic type parameter `T`. It is a no-op at runtime.
  */
 function expectType<T>(_value: T): void {
-  /* no-op */
+    /* no-op */
 }
 
 // ---------------------------------------------------------------------------
@@ -62,26 +62,26 @@ function expectType<T>(_value: T): void {
 
 // Signature: (Record<string, any>, string[]?, ValidateWhitelistPropertiesOptions?) => Promise<Record<string, any>>
 expectType<
-  (
-    inputObject: Record<string, any>,
-    requiredProperties?: string[],
-    options?: ValidateWhitelistPropertiesOptions,
-  ) => Promise<Record<string, any>>
+    (
+        inputObject: Record<string, any>,
+        requiredProperties?: string[],
+        options?: ValidateWhitelistPropertiesOptions,
+    ) => Promise<Record<string, any>>
 >(validateWhitelistProperties);
 
 // Return type is a Promise of an object.
 expectType<Promise<Record<string, any>>>(validateWhitelistProperties({ a: 1 }));
 expectType<Promise<Record<string, any>>>(validateWhitelistProperties({ a: 1 }, ['a']));
 expectType<Promise<Record<string, any>>>(
-  validateWhitelistProperties({ a: 1 }, ['a'], { optionalProperties: ['b'], convertToSnakeCase: true }),
+    validateWhitelistProperties({ a: 1 }, ['a'], { optionalProperties: ['b'], convertToSnakeCase: true }),
 );
 
 // Options interface: all fields optional.
 const optsEmpty: ValidateWhitelistPropertiesOptions = {};
 const optsPartial: ValidateWhitelistPropertiesOptions = { optionalProperties: ['x'] };
 const optsFull: ValidateWhitelistPropertiesOptions = {
-  optionalProperties: ['x', 'y'],
-  convertToSnakeCase: false,
+    optionalProperties: ['x', 'y'],
+    convertToSnakeCase: false,
 };
 expectType<ValidateWhitelistPropertiesOptions>(optsEmpty);
 expectType<ValidateWhitelistPropertiesOptions>(optsPartial);
