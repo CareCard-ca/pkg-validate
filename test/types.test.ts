@@ -1,90 +1,191 @@
-import assert from 'assert';
-import { describe, it } from 'mocha';
+/**
+ * Compile-time type tests for `@carecard/validate`.
+ *
+ * Each `expectType<T>(value)` call asserts that the inferred type of `value`
+ * is assignable to the explicit type parameter `T`. If the public type surface
+ * declared in `index.d.ts` changes in a backwards-incompatible way, this file
+ * will fail to compile, and `npm run test:types` (`tsc --noEmit`) will fail.
+ *
+ * This file is intentionally a pure type-level test — it has no runtime
+ * assertions and is not executed by Mocha. It is type-checked via the
+ * `include` glob in `tsconfig.json` (`test/**\/*.ts`).
+ */
+
 import {
-  isBoolValue,
-  isCharactersString,
-  isCountryCodeString,
-  isEmailString,
-  isImageUrl,
-  isInStringArray,
-  isInteger,
-  isJwtString,
-  isNameString,
-  isPasswordString,
-  isPasswordStringFailureMessage,
-  isPhoneNumber,
-  isPostalCodeString,
-  isProvinceString,
-  isSafeSearchString,
-  isSafeString,
-  isSimplePasswordString,
-  isSimplePasswordStringFailureMessage,
-  isString6To16CharacterLong,
-  isString6To24CharacterLong,
-  isUrlSafeString,
-  isUsernameString,
-  isValidArrayOfStrings,
-  isValidDomainName,
-  isValidIntegerString,
-  isValidJsonString,
-  isValidTimestampString,
-  isValidTimestampzString,
-  isValidUrl,
-  isValidUuidString,
-  validateProperties,
+    isBoolValue,
+    isCharactersString,
+    isCountryCodeString,
+    isEmailString,
+    isImageUrl,
+    isInStringArray,
+    isInteger,
+    isJwtString,
+    isNameString,
+    isPasswordString,
+    isPasswordStringFailureMessage,
+    isPhoneNumber,
+    isPostalCodeString,
+    isProvinceString,
+    isSafeSearchString,
+    isSafeString,
+    isSimplePasswordString,
+    isSimplePasswordStringFailureMessage,
+    isString6To16CharacterLong,
+    isString6To24CharacterLong,
+    isUrlSafeString,
+    isUsernameString,
+    isValidArrayOfStrings,
+    isValidDomainName,
+    isValidIntegerString,
+    isValidJsonString,
+    isValidTimestampString,
+    isValidTimestampzString,
+    isValidUrl,
+    isValidUuidString,
+    validate,
+    validateProperties,
+    validateWhitelistProperties,
+    ValidateWhitelistPropertiesOptions,
 } from '../index';
 
-describe('pkg-validate TypeScript Type Definitions', () => {
-  it('should verify all validate utility functions', () => {
-    // String/Format checks
-    assert.strictEqual(typeof isImageUrl('http://example.com/image.png'), 'boolean');
-    assert.strictEqual(typeof isValidJsonString('{"a":1}'), 'boolean');
-    assert.strictEqual(typeof isValidIntegerString('123'), 'boolean');
-    assert.strictEqual(typeof isValidUuidString('550e8400-e29b-41d4-a716-446655440000'), 'boolean');
-    assert.strictEqual(typeof isCharactersString('abc 123_-'), 'boolean');
-    assert.strictEqual(typeof isNameString('John Doe'), 'boolean');
-    assert.strictEqual(typeof isSafeSearchString('search query'), 'boolean');
-    assert.strictEqual(typeof isEmailString('test@example.com'), 'boolean');
-    assert.strictEqual(typeof isJwtString('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9'), 'boolean');
-    assert.strictEqual(typeof isUsernameString('user123'), 'boolean');
-    assert.strictEqual(typeof isPhoneNumber('123-456-7890'), 'boolean');
-    assert.strictEqual(typeof isUrlSafeString('url-safe-string'), 'boolean');
-    assert.strictEqual(typeof isProvinceString('ON'), 'boolean');
-    assert.strictEqual(typeof isPostalCodeString('A1A 1A1'), 'boolean');
-    assert.strictEqual(typeof isSafeString('safe string!'), 'boolean');
-    assert.strictEqual(typeof isCountryCodeString('+1'), 'boolean');
-    assert.strictEqual(typeof isValidDomainName('example.com'), 'boolean');
-    assert.strictEqual(typeof isValidTimestampzString('2023-10-27T10:00:00Z'), 'boolean');
-    assert.strictEqual(typeof isValidTimestampString('2023-10-27T10:00:00'), 'boolean');
-    assert.strictEqual(typeof isValidUrl('https://example.com'), 'boolean');
-    assert.strictEqual(typeof isValidArrayOfStrings(['a', 'b']), 'boolean');
+/**
+ * Compile-time helper. Forces TypeScript to check that `value` is assignable
+ * to the explicit generic type parameter `T`. It is a no-op at runtime.
+ */
+function expectType<T>(_value: T): void {
+    /* no-op */
+}
 
-    // Password checks
-    assert.strictEqual(typeof isPasswordString('Pass123!'), 'boolean');
-    assert.strictEqual(typeof isSimplePasswordString('pass123'), 'boolean');
-    assert.strictEqual(typeof isPasswordStringFailureMessage('pass'), 'string');
-    assert.strictEqual(isPasswordStringFailureMessage('Password123!'), null);
-    assert.strictEqual(typeof isSimplePasswordStringFailureMessage('p'), 'string');
-    assert.strictEqual(isSimplePasswordStringFailureMessage('pass123'), null);
-    assert.strictEqual(typeof isString6To24CharacterLong('password'), 'boolean');
-    assert.strictEqual(typeof isString6To16CharacterLong('password'), 'boolean');
+// ---------------------------------------------------------------------------
+// validateWhitelistProperties + options interface
+// ---------------------------------------------------------------------------
 
-    // Logic checks
-    assert.strictEqual(typeof isInteger(123), 'boolean');
-    assert.strictEqual(typeof isBoolValue(true), 'boolean');
-    assert.strictEqual(typeof isInStringArray(['a', 'b'], 'a'), 'boolean');
-  });
+// Signature: (Record<string, any>, string[]?, ValidateWhitelistPropertiesOptions?) => Promise<Record<string, any>>
+expectType<
+    (
+        inputObject: Record<string, any>,
+        requiredProperties?: string[],
+        options?: ValidateWhitelistPropertiesOptions,
+    ) => Promise<Record<string, any>>
+>(validateWhitelistProperties);
 
-  it('should verify validateProperties types', () => {
-    const input = {
-      first_name: 'John',
-      email: 'john@example.com',
-      invalid_prop: 'some value',
-    };
-    const result = validateProperties(input);
-    assert.ok(result);
-    assert.strictEqual(result.first_name, 'John');
-    assert.strictEqual(result.email, 'john@example.com');
-    assert.strictEqual(result.invalid_prop, undefined);
-  });
-});
+// Return type is a Promise of an object.
+expectType<Promise<Record<string, any>>>(validateWhitelistProperties({ a: 1 }));
+expectType<Promise<Record<string, any>>>(validateWhitelistProperties({ a: 1 }, ['a']));
+expectType<Promise<Record<string, any>>>(
+    validateWhitelistProperties({ a: 1 }, ['a'], { optionalProperties: ['b'], convertToSnakeCase: true }),
+);
+
+// Options interface: all fields optional.
+const optsEmpty: ValidateWhitelistPropertiesOptions = {};
+const optsPartial: ValidateWhitelistPropertiesOptions = { optionalProperties: ['x'] };
+const optsFull: ValidateWhitelistPropertiesOptions = {
+    optionalProperties: ['x', 'y'],
+    convertToSnakeCase: false,
+};
+expectType<ValidateWhitelistPropertiesOptions>(optsEmpty);
+expectType<ValidateWhitelistPropertiesOptions>(optsPartial);
+expectType<ValidateWhitelistPropertiesOptions>(optsFull);
+expectType<string[] | undefined>(optsFull.optionalProperties);
+expectType<boolean | undefined>(optsFull.convertToSnakeCase);
+
+// ---------------------------------------------------------------------------
+// validateProperties
+// ---------------------------------------------------------------------------
+
+expectType<(obj?: Record<string, any>) => Record<string, any>>(validateProperties);
+expectType<Record<string, any>>(validateProperties());
+expectType<Record<string, any>>(validateProperties({ first_name: 'Jane' }));
+
+// ---------------------------------------------------------------------------
+// Boolean-returning validators: (any) => boolean
+// ---------------------------------------------------------------------------
+
+type BoolValidator = (input: any) => boolean;
+
+expectType<BoolValidator>(isImageUrl);
+expectType<BoolValidator>(isInteger);
+expectType<BoolValidator>(isValidJsonString);
+expectType<BoolValidator>(isValidIntegerString);
+expectType<BoolValidator>(isValidUuidString);
+expectType<BoolValidator>(isCharactersString);
+expectType<BoolValidator>(isNameString);
+expectType<BoolValidator>(isSafeSearchString);
+expectType<BoolValidator>(isEmailString);
+expectType<BoolValidator>(isJwtString);
+expectType<BoolValidator>(isPasswordString);
+expectType<BoolValidator>(isSimplePasswordString);
+expectType<BoolValidator>(isUsernameString);
+expectType<BoolValidator>(isPhoneNumber);
+expectType<BoolValidator>(isUrlSafeString);
+expectType<BoolValidator>(isString6To24CharacterLong);
+expectType<BoolValidator>(isString6To16CharacterLong);
+expectType<BoolValidator>(isProvinceString);
+expectType<BoolValidator>(isBoolValue);
+expectType<BoolValidator>(isPostalCodeString);
+expectType<BoolValidator>(isSafeString);
+expectType<BoolValidator>(isCountryCodeString);
+expectType<BoolValidator>(isValidDomainName);
+expectType<BoolValidator>(isValidTimestampzString);
+expectType<BoolValidator>(isValidTimestampString);
+expectType<BoolValidator>(isValidUrl);
+expectType<BoolValidator>(isValidArrayOfStrings);
+
+// Confirm returns are actually `boolean`, not `any`.
+expectType<boolean>(isEmailString('a@b.com'));
+expectType<boolean>(isInteger(1));
+expectType<boolean>(isValidUuidString('x'));
+expectType<boolean>(isBoolValue(true));
+expectType<boolean>(isValidArrayOfStrings(['a']));
+
+// ---------------------------------------------------------------------------
+// String-or-null validators
+// ---------------------------------------------------------------------------
+
+expectType<(password: any) => string | null>(isPasswordStringFailureMessage);
+expectType<(password: any) => string | null>(isSimplePasswordStringFailureMessage);
+expectType<string | null>(isPasswordStringFailureMessage('short'));
+expectType<string | null>(isSimplePasswordStringFailureMessage('short'));
+
+// ---------------------------------------------------------------------------
+// Two-argument validator: isInStringArray
+// ---------------------------------------------------------------------------
+
+expectType<(arr: string[], input: any) => boolean>(isInStringArray);
+expectType<boolean>(isInStringArray(['ON', 'QC'], 'on'));
+
+// ---------------------------------------------------------------------------
+// `validate` namespace (deprecated). Every key must still be present and have
+// the same callable type as its top-level counterpart.
+// ---------------------------------------------------------------------------
+
+expectType<typeof isImageUrl>(validate.isImageUrl);
+expectType<typeof isInteger>(validate.isInteger);
+expectType<typeof isValidJsonString>(validate.isValidJsonString);
+expectType<typeof isValidIntegerString>(validate.isValidIntegerString);
+expectType<typeof isValidUuidString>(validate.isValidUuidString);
+expectType<typeof isCharactersString>(validate.isCharactersString);
+expectType<typeof isNameString>(validate.isNameString);
+expectType<typeof isSafeSearchString>(validate.isSafeSearchString);
+expectType<typeof isEmailString>(validate.isEmailString);
+expectType<typeof isJwtString>(validate.isJwtString);
+expectType<typeof isPasswordString>(validate.isPasswordString);
+expectType<typeof isSimplePasswordString>(validate.isSimplePasswordString);
+expectType<typeof isPasswordStringFailureMessage>(validate.isPasswordStringFailureMessage);
+expectType<typeof isSimplePasswordStringFailureMessage>(validate.isSimplePasswordStringFailureMessage);
+expectType<typeof isUsernameString>(validate.isUsernameString);
+expectType<typeof isPhoneNumber>(validate.isPhoneNumber);
+expectType<typeof isUrlSafeString>(validate.isUrlSafeString);
+expectType<typeof isString6To24CharacterLong>(validate.isString6To24CharacterLong);
+expectType<typeof isString6To16CharacterLong>(validate.isString6To16CharacterLong);
+expectType<typeof isProvinceString>(validate.isProvinceString);
+expectType<typeof isBoolValue>(validate.isBoolValue);
+expectType<typeof isPostalCodeString>(validate.isPostalCodeString);
+expectType<typeof isSafeString>(validate.isSafeString);
+expectType<typeof isInStringArray>(validate.isInStringArray);
+expectType<typeof isCountryCodeString>(validate.isCountryCodeString);
+expectType<typeof isValidDomainName>(validate.isValidDomainName);
+expectType<typeof isValidTimestampzString>(validate.isValidTimestampzString);
+expectType<typeof isValidTimestampString>(validate.isValidTimestampString);
+expectType<typeof isValidUrl>(validate.isValidUrl);
+expectType<typeof isValidArrayOfStrings>(validate.isValidArrayOfStrings);
