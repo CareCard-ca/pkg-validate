@@ -260,11 +260,9 @@ describe('validateWhitelistProperties', function () {
 
       it('produces an output with no nested object values', async function () {
         const input = { user: { first_name: VALID_NAME, contact: { email: VALID_EMAIL, phone_number: VALID_PHONE } } };
-        const out = await validateWhitelistProperties(
-          input,
-          ['user.first_name', 'user.contact.email', 'user.contact.phone_number'],
-          { flattenOutput: true },
-        );
+        const out = await validateWhitelistProperties(input, ['user.first_name', 'user.contact.email', 'user.contact.phone_number'], {
+          flattenOutput: true,
+        });
         Object.values(out).forEach(v => {
           assert.ok(v === null || typeof v !== 'object', `Expected no nested objects in flat output, got: ${JSON.stringify(v)}`);
         });
