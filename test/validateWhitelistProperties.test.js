@@ -219,6 +219,81 @@ describe('validateWhitelistProperties', function () {
     });
   });
 
+  describe('array values (per-element validation)', function () {
+    it('accepts a top-level leaf whose value is an array of valid strings', async function () {
+      const input = { name: ['First Name', 'Other Name'] };
+      const out = await validateWhitelistProperties(input, ['name']);
+      assert.deepStrictEqual(out, { name: ['First Name', 'Other Name'] });
+    });
+
+    it('validates each array element the same way as a scalar leaf', async function () {
+      // Single-element array behaves like the scalar case.
+      const scalarOut = await validateWhitelistProperties({ name: 'pankaj' }, ['name']);
+      const arrayOut = await validateWhitelistProperties({ name: ['pankaj'] }, ['name']);
+      assert.deepStrictEqual(scalarOut, { name: 'pankaj' });
+      assert.deepStrictEqual(arrayOut, { name: ['pankaj'] });
+    });
+
+    it('accepts an empty array as a required leaf value', async function () {
+      const out = await validateWhitelistProperties({ name: [] }, ['name']);
+      assert.deepStrictEqual(out, { name: [] });
+    });
+
+    it('accepts an array value for an optional leaf when all elements are valid', async function () {
+      const input = { first_name: VALID_NAME, name: ['Alice', 'Bob'] };
+      const out = await validateWhitelistProperties(input, ['first_name'], { optionalProperties: ['name'] });
+      assert.deepStrictEqual(out, { first_name: VALID_NAME, name: ['Alice', 'Bob'] });
+    });
+
+    it('rejects a required leaf array when any element is invalid', async function () {
+      await assertRejectsBadInput(
+        () => validateWhitelistProperties({ email: [VALID_EMAIL, 'not-an-email'] }, ['email']),
+        'Missing or invalid property: email',
+      );
+    });
+
+    it('rejects an optional leaf array when any element is invalid', async function () {
+      await assertRejectsBadInput(
+        () =>
+          validateWhitelistProperties({ first_name: VALID_NAME, email: [VALID_EMAIL, 'bad'] }, ['first_name'], {
+            optionalProperties: ['email'],
+          }),
+        'Invalid property value: email',
+      );
+    });
+
+    it('accepts an array of valid emails on a required leaf', async function () {
+      const input = { email: ['a@example.com', 'b@example.com'] };
+      const out = await validateWhitelistProperties(input, ['email']);
+      assert.deepStrictEqual(out, { email: ['a@example.com', 'b@example.com'] });
+    });
+
+    it('supports arrays at a nested leaf path', async function () {
+      const input = { user: { name: ['First Name', 'Other Name'] } };
+      const out = await validateWhitelistProperties(input, ['user.name']);
+      assert.deepStrictEqual(out, { user: { name: ['First Name', 'Other Name'] } });
+    });
+
+    it('rejects when a nested array leaf contains an invalid element', async function () {
+      await assertRejectsBadInput(
+        () => validateWhitelistProperties({ user: { email: [VALID_EMAIL, 'nope'] } }, ['user.email']),
+        'Missing or invalid property: user.email',
+      );
+    });
+
+    it('preserves array values when converting keys to snake_case', async function () {
+      const input = { userInfo: { firstName: ['Alice', 'Bob'] } };
+      const out = await validateWhitelistProperties(input, ['userInfo.firstName'], { convertToSnakeCase: true });
+      assert.deepStrictEqual(out, { user_info: { first_name: ['Alice', 'Bob'] } });
+    });
+
+    it('preserves array values intact when flattenOutput is true', async function () {
+      const input = { user: { name: ['First Name', 'Other Name'] } };
+      const out = await validateWhitelistProperties(input, ['user.name'], { flattenOutput: true });
+      assert.deepStrictEqual(out, { 'user.name': ['First Name', 'Other Name'] });
+    });
+  });
+
   describe('option: flattenOutput', function () {
     describe('flattenOutput: false (default)', function () {
       it('keeps nested shape when flattenOutput is not set', async function () {

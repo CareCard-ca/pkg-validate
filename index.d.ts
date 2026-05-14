@@ -32,6 +32,11 @@ export interface ValidateWhitelistPropertiesOptions {
  *   when a provided optional property has an invalid value, when a path
  *   exceeds 5 levels of nesting, or when the combined count of
  *   `requiredProperties` and `options.optionalProperties` exceeds 5000.
+ * - Array values are supported: if a leaf value is an array, the per-leaf
+ *   validator is applied to each element. The leaf is accepted only when every
+ *   element passes validation, and the returned value is an array of the
+ *   validated elements (e.g. `{ name: ["First", "Other"] }` is validated like
+ *   `{ name: "First" }` and `{ name: "Other" }` individually).
  * - Optionally converts the resulting keys (including nested keys) to snake_case.
  *
  * @param inputObject The input object (e.g. `req.body` or `req.params`).
