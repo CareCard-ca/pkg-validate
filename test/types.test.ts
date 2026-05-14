@@ -61,11 +61,13 @@ function expectType<T>(_value: T): void {
 // ---------------------------------------------------------------------------
 
 // Signature: (Record<string, any>, string[]?, ValidateWhitelistPropertiesOptions?) => Promise<Record<string, any>>
-expectType<(
-  inputObject: Record<string, any>,
-  requiredProperties?: string[],
-  options?: ValidateWhitelistPropertiesOptions,
-) => Promise<Record<string, any>>>(validateWhitelistProperties);
+expectType<
+  (
+    inputObject: Record<string, any>,
+    requiredProperties?: string[],
+    options?: ValidateWhitelistPropertiesOptions,
+  ) => Promise<Record<string, any>>
+>(validateWhitelistProperties);
 
 // Return type is a Promise of an object.
 expectType<Promise<Record<string, any>>>(validateWhitelistProperties({ a: 1 }));
@@ -187,4 +189,3 @@ expectType<typeof isValidTimestampzString>(validate.isValidTimestampzString);
 expectType<typeof isValidTimestampString>(validate.isValidTimestampString);
 expectType<typeof isValidUrl>(validate.isValidUrl);
 expectType<typeof isValidArrayOfStrings>(validate.isValidArrayOfStrings);
-

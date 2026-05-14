@@ -10,7 +10,7 @@
   "types": "index.d.ts",
   "scripts": {
     "test": "mocha --recursive",
-    "test:types": "tsc --noEmit",
+    "test:types": "tsc --noEmit && echo \"\\n  ✔ Type tests passed: tsc --noEmit reported 0 errors across index.d.ts and test/**/*.ts\\n\"",
     "test:coverage": "tsc --noEmit && export NODE_ENV=test && nyc mocha --recursive",
     "test:All": "npm run test && npm run test:types",
     "format": "prettier --write .",
