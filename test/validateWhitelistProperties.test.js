@@ -18,7 +18,7 @@ async function assertRejectsBadInput(thunk, expectedFragment) {
     if (expectedFragment) {
       assert.ok(
         (err.userMessage || '').includes(expectedFragment),
-        `Expected userMessage to include "${expectedFragment}", got: "${err.userMessage}"`
+        `Expected userMessage to include "${expectedFragment}", got: "${err.userMessage}"`,
       );
     }
     return err;
@@ -84,36 +84,26 @@ describe('validateWhitelistProperties', function () {
 
   describe('invalid inputs', function () {
     it('rejects when a required property is missing from input', async function () {
-      await assertRejectsBadInput(
-        () => validateWhitelistProperties({}, ['first_name']),
-        'Missing or invalid property: first_name'
-      );
+      await assertRejectsBadInput(() => validateWhitelistProperties({}, ['first_name']), 'Missing or invalid property: first_name');
     });
 
     it('rejects when a required property is present but has an invalid value', async function () {
       await assertRejectsBadInput(
         () => validateWhitelistProperties({ email: 'not-an-email' }, ['email']),
-        'Missing or invalid property: email'
+        'Missing or invalid property: email',
       );
     });
 
     it('rejects when a provided optional property has an invalid value', async function () {
       await assertRejectsBadInput(
         () =>
-          validateWhitelistProperties(
-            { first_name: VALID_NAME, email: 'not-an-email' },
-            ['first_name'],
-            { optionalProperties: ['email'] }
-          ),
-        'Invalid property value: email'
+          validateWhitelistProperties({ first_name: VALID_NAME, email: 'not-an-email' }, ['first_name'], { optionalProperties: ['email'] }),
+        'Invalid property value: email',
       );
     });
 
     it('rejects when input is null and a required property is configured', async function () {
-      await assertRejectsBadInput(
-        () => validateWhitelistProperties(null, ['first_name']),
-        'Missing or invalid property: first_name'
-      );
+      await assertRejectsBadInput(() => validateWhitelistProperties(null, ['first_name']), 'Missing or invalid property: first_name');
     });
 
     it('throws an Error whose code is BAD_INPUT', async function () {

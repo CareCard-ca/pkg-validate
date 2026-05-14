@@ -29,7 +29,7 @@ export interface ValidateWhitelistPropertiesOptions {
 export function validateWhitelistProperties(
   inputObject: Record<string, any>,
   requiredProperties?: string[],
-  options?: ValidateWhitelistPropertiesOptions
+  options?: ValidateWhitelistPropertiesOptions,
 ): Promise<Record<string, any>>;
 
 /** Checks if the string is a valid image URL format. */
