@@ -480,10 +480,7 @@ describe('validateWhitelistProperties', function () {
         });
 
         it('rejects a mixed-case segment inside a nested path', async function () {
-            await assertRejectsBadInput(
-                () => validateWhitelistProperties({}, ['user.my_mixName']),
-                'mixing snake_case and camelCase',
-            );
+            await assertRejectsBadInput(() => validateWhitelistProperties({}, ['user.my_mixName']), 'mixing snake_case and camelCase');
         });
 
         it('rejects a mixed-case intermediate segment in a nested path', async function () {
@@ -494,10 +491,55 @@ describe('validateWhitelistProperties', function () {
         });
 
         it('rejects when the alternate-case key is also absent from the input', async function () {
+            await assertRejectsBadInput(() => validateWhitelistProperties({}, ['firstName']), 'Missing or invalid property: firstName');
+        });
+    });
+
+    describe('branch coverage: parameter defaults and edge paths', function () {
+        it('uses default requiredProperties = [] when called with only inputObject', async function () {
+            // Exercises the default-value branch for the `requiredProperties` parameter.
+            const out = await validateWhitelistProperties({ first_name: VALID_NAME });
+            assert.deepStrictEqual(out, {});
+        });
+
+        it('treats a null requiredProperties as zero (falsy branch in total-keys check)', async function () {
+            // Exercises the `requiredProperties ? requiredProperties.length : 0` falsy branch.
+            const out = await validateWhitelistProperties({ first_name: VALID_NAME }, null, {
+                optionalProperties: ['first_name'],
+            });
+            assert.deepStrictEqual(out, { first_name: VALID_NAME });
+        });
+
+        it('treats an undefined requiredProperties as zero (falsy branch in total-keys check)', async function () {
+            const out = await validateWhitelistProperties({ first_name: VALID_NAME }, undefined, {
+                optionalProperties: ['first_name'],
+            });
+            assert.deepStrictEqual(out, { first_name: VALID_NAME });
+        });
+
+        it('rejects when a deep intermediate node is null on a required path (4+ segments)', async function () {
+            // Exercises the in-loop non-object guard in readLeaf: with a 4-segment
+            // path, the loop iterates twice and the second iteration sees a null
+            // `current` BEFORE reaching the post-loop check.
             await assertRejectsBadInput(
-                () => validateWhitelistProperties({}, ['firstName']),
-                'Missing or invalid property: firstName',
+                () => validateWhitelistProperties({ a: { b: null } }, ['a.b.c.email']),
+                'Missing or invalid property: a.b.c.email',
             );
+        });
+
+        it('rejects when a deep intermediate node is a non-object on a required path (4+ segments)', async function () {
+            await assertRejectsBadInput(
+                () => validateWhitelistProperties({ a: { b: 'not-an-object' } }, ['a.b.c.email']),
+                'Missing or invalid property: a.b.c.email',
+            );
+        });
+
+        it('omits an optional leaf when a deep intermediate node is null (4+ segments)', async function () {
+            const input = { first_name: VALID_NAME, a: { b: null } };
+            const out = await validateWhitelistProperties(input, ['first_name'], {
+                optionalProperties: ['a.b.c.email'],
+            });
+            assert.deepStrictEqual(out, { first_name: VALID_NAME });
         });
     });
 
