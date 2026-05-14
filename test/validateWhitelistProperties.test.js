@@ -239,10 +239,7 @@ describe('validateWhitelistProperties', function () {
     });
 
     it('rejects when a required path exceeds the maximum nesting depth of 5', async function () {
-      await assertRejectsBadInput(
-        () => validateWhitelistProperties({}, ['a.b.c.d.e.f']),
-        'exceeds maximum nesting depth of 5',
-      );
+      await assertRejectsBadInput(() => validateWhitelistProperties({}, ['a.b.c.d.e.f']), 'exceeds maximum nesting depth of 5');
     });
 
     it('rejects when an optional path exceeds the maximum nesting depth of 5', async function () {
@@ -270,11 +267,9 @@ describe('validateWhitelistProperties', function () {
     it('accepts when required + optional equals exactly 5000', async function () {
       const required = ['first_name'];
       const optional = new Array(MAX - 1).fill('phone_number');
-      const out = await validateWhitelistProperties(
-        { first_name: VALID_NAME, phone_number: VALID_PHONE },
-        required,
-        { optionalProperties: optional },
-      );
+      const out = await validateWhitelistProperties({ first_name: VALID_NAME, phone_number: VALID_PHONE }, required, {
+        optionalProperties: optional,
+      });
       assert.deepStrictEqual(out, { first_name: VALID_NAME, phone_number: VALID_PHONE });
     });
 
