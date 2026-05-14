@@ -3,6 +3,35 @@
  */
 export function validateProperties(obj?: Record<string, any>): Record<string, any>;
 
+/**
+ * Options for {@link validateWhitelistProperties}.
+ */
+export interface ValidateWhitelistPropertiesOptions {
+  /** Properties allowed in the input but not required. */
+  optionalProperties?: string[];
+  /** When true, the returned object's keys are converted to snake_case. */
+  convertToSnakeCase?: boolean;
+}
+
+/**
+ * Validates and transforms whitelisted properties from an input object.
+ *
+ * - Extracts only the whitelisted (required + optional) properties.
+ * - Validates values via {@link validateProperties}.
+ * - Throws a "Bad_Input" error when any required property is missing/invalid,
+ *   or when a provided optional property has an invalid value.
+ * - Optionally converts the resulting keys to snake_case.
+ *
+ * @param inputObject The input object (e.g. `req.body` or `req.params`).
+ * @param requiredProperties Properties that must be present and valid.
+ * @param options Optional list of additional allowed properties and case-conversion flag.
+ */
+export function validateWhitelistProperties(
+  inputObject: Record<string, any>,
+  requiredProperties?: string[],
+  options?: ValidateWhitelistPropertiesOptions
+): Promise<Record<string, any>>;
+
 /** Checks if the string is a valid image URL format. */
 export function isImageUrl(imageUrl: any): boolean;
 /** Checks if the value is an integer. */
