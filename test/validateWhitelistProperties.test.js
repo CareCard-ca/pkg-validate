@@ -395,6 +395,154 @@ describe('validateWhitelistProperties', function () {
         });
     });
 
+    describe('case tolerance (camelCase vs snake_case)', function () {
+        it('accepts a camelCase whitelist matching a snake_case input key', async function () {
+            const input = { first_name: VALID_NAME, phone_number: VALID_PHONE };
+            const out = await validateWhitelistProperties(input, ['firstName'], {
+                optionalProperties: ['phoneNumber'],
+            });
+            // Output preserves the requested (camelCase) names.
+            assert.deepStrictEqual(out, { firstName: VALID_NAME, phoneNumber: VALID_PHONE });
+        });
+
+        it('accepts a snake_case whitelist matching a camelCase input key', async function () {
+            const input = { firstName: VALID_NAME, phoneNumber: VALID_PHONE };
+            const out = await validateWhitelistProperties(input, ['first_name'], {
+                optionalProperties: ['phone_number'],
+            });
+            // Output preserves the requested (snake_case) names.
+            assert.deepStrictEqual(out, { first_name: VALID_NAME, phone_number: VALID_PHONE });
+        });
+
+        it('matches when both whitelist and input use the same camelCase form', async function () {
+            const input = { firstName: VALID_NAME };
+            const out = await validateWhitelistProperties(input, ['firstName']);
+            assert.deepStrictEqual(out, { firstName: VALID_NAME });
+        });
+
+        it('matches when both whitelist and input use the same snake_case form', async function () {
+            const input = { first_name: VALID_NAME };
+            const out = await validateWhitelistProperties(input, ['first_name']);
+            assert.deepStrictEqual(out, { first_name: VALID_NAME });
+        });
+
+        it('prefers the exact form when both forms are present on the input', async function () {
+            // If both `firstName` and `first_name` exist, the exact (camelCase)
+            // form is preferred when a camelCase path is requested.
+            const input = { firstName: 'Alice', first_name: 'Bob' };
+            const out = await validateWhitelistProperties(input, ['firstName']);
+            assert.deepStrictEqual(out, { firstName: 'Alice' });
+        });
+
+        it('accepts a nested camelCase whitelist matching nested snake_case input keys', async function () {
+            const input = { user_info: { first_name: VALID_NAME, phone_number: VALID_PHONE } };
+            const out = await validateWhitelistProperties(input, ['userInfo.firstName'], {
+                optionalProperties: ['userInfo.phoneNumber'],
+            });
+            assert.deepStrictEqual(out, { userInfo: { firstName: VALID_NAME, phoneNumber: VALID_PHONE } });
+        });
+
+        it('accepts a nested snake_case whitelist matching nested camelCase input keys', async function () {
+            const input = { userInfo: { firstName: VALID_NAME, phoneNumber: VALID_PHONE } };
+            const out = await validateWhitelistProperties(input, ['user_info.first_name'], {
+                optionalProperties: ['user_info.phone_number'],
+            });
+            assert.deepStrictEqual(out, { user_info: { first_name: VALID_NAME, phone_number: VALID_PHONE } });
+        });
+
+        it('supports mixed segment forms on a single path (camel intermediate, snake leaf)', async function () {
+            const input = { user_info: { firstName: VALID_NAME } };
+            const out = await validateWhitelistProperties(input, ['userInfo.first_name']);
+            assert.deepStrictEqual(out, { userInfo: { first_name: VALID_NAME } });
+        });
+
+        it('still applies convertToSnakeCase to the output regardless of whitelist form', async function () {
+            const input = { first_name: VALID_NAME, phone_number: VALID_PHONE };
+            const out = await validateWhitelistProperties(input, ['firstName'], {
+                optionalProperties: ['phoneNumber'],
+                convertToSnakeCase: true,
+            });
+            assert.deepStrictEqual(out, { first_name: VALID_NAME, phone_number: VALID_PHONE });
+        });
+
+        it('rejects a required property whose name mixes snake_case and camelCase', async function () {
+            await assertRejectsBadInput(
+                () => validateWhitelistProperties({ my_mixName: 'x' }, ['my_mixName']),
+                'mixing snake_case and camelCase',
+            );
+        });
+
+        it('rejects an optional property whose name mixes snake_case and camelCase', async function () {
+            await assertRejectsBadInput(
+                () => validateWhitelistProperties({}, [], { optionalProperties: ['my_mixName'] }),
+                'mixing snake_case and camelCase',
+            );
+        });
+
+        it('rejects a mixed-case segment inside a nested path', async function () {
+            await assertRejectsBadInput(() => validateWhitelistProperties({}, ['user.my_mixName']), 'mixing snake_case and camelCase');
+        });
+
+        it('rejects a mixed-case intermediate segment in a nested path', async function () {
+            await assertRejectsBadInput(
+                () => validateWhitelistProperties({}, ['my_mixName.first_name']),
+                'mixing snake_case and camelCase',
+            );
+        });
+
+        it('rejects when the alternate-case key is also absent from the input', async function () {
+            await assertRejectsBadInput(() => validateWhitelistProperties({}, ['firstName']), 'Missing or invalid property: firstName');
+        });
+    });
+
+    describe('branch coverage: parameter defaults and edge paths', function () {
+        it('uses default requiredProperties = [] when called with only inputObject', async function () {
+            // Exercises the default-value branch for the `requiredProperties` parameter.
+            const out = await validateWhitelistProperties({ first_name: VALID_NAME });
+            assert.deepStrictEqual(out, {});
+        });
+
+        it('treats a null requiredProperties as zero (falsy branch in total-keys check)', async function () {
+            // Exercises the `requiredProperties ? requiredProperties.length : 0` falsy branch.
+            const out = await validateWhitelistProperties({ first_name: VALID_NAME }, null, {
+                optionalProperties: ['first_name'],
+            });
+            assert.deepStrictEqual(out, { first_name: VALID_NAME });
+        });
+
+        it('treats an undefined requiredProperties as zero (falsy branch in total-keys check)', async function () {
+            const out = await validateWhitelistProperties({ first_name: VALID_NAME }, undefined, {
+                optionalProperties: ['first_name'],
+            });
+            assert.deepStrictEqual(out, { first_name: VALID_NAME });
+        });
+
+        it('rejects when a deep intermediate node is null on a required path (4+ segments)', async function () {
+            // Exercises the in-loop non-object guard in readLeaf: with a 4-segment
+            // path, the loop iterates twice and the second iteration sees a null
+            // `current` BEFORE reaching the post-loop check.
+            await assertRejectsBadInput(
+                () => validateWhitelistProperties({ a: { b: null } }, ['a.b.c.email']),
+                'Missing or invalid property: a.b.c.email',
+            );
+        });
+
+        it('rejects when a deep intermediate node is a non-object on a required path (4+ segments)', async function () {
+            await assertRejectsBadInput(
+                () => validateWhitelistProperties({ a: { b: 'not-an-object' } }, ['a.b.c.email']),
+                'Missing or invalid property: a.b.c.email',
+            );
+        });
+
+        it('omits an optional leaf when a deep intermediate node is null (4+ segments)', async function () {
+            const input = { first_name: VALID_NAME, a: { b: null } };
+            const out = await validateWhitelistProperties(input, ['first_name'], {
+                optionalProperties: ['a.b.c.email'],
+            });
+            assert.deepStrictEqual(out, { first_name: VALID_NAME });
+        });
+    });
+
     describe('limits: MAX_NESTING_DEPTH (5)', function () {
         const mod = require('../lib/validateWhitelistProperties');
 
