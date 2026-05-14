@@ -219,6 +219,103 @@ describe('validateWhitelistProperties', function () {
     });
   });
 
+  describe('option: flattenOutput', function () {
+    describe('flattenOutput: false (default)', function () {
+      it('keeps nested shape when flattenOutput is not set', async function () {
+        const input = { user: { first_name: VALID_NAME, contact: { email: VALID_EMAIL } } };
+        const out = await validateWhitelistProperties(input, ['user.first_name', 'user.contact.email']);
+        assert.deepStrictEqual(out, {
+          user: { first_name: VALID_NAME, contact: { email: VALID_EMAIL } },
+        });
+      });
+
+      it('keeps nested shape when flattenOutput is explicitly false', async function () {
+        const input = { user: { first_name: VALID_NAME, contact: { email: VALID_EMAIL } } };
+        const out = await validateWhitelistProperties(input, ['user.first_name', 'user.contact.email'], {
+          flattenOutput: false,
+        });
+        assert.deepStrictEqual(out, {
+          user: { first_name: VALID_NAME, contact: { email: VALID_EMAIL } },
+        });
+      });
+
+      it('keeps flat shape unchanged for top-level-only paths when flattenOutput is false', async function () {
+        const input = { first_name: VALID_NAME, email: VALID_EMAIL };
+        const out = await validateWhitelistProperties(input, ['first_name', 'email'], { flattenOutput: false });
+        assert.deepStrictEqual(out, { first_name: VALID_NAME, email: VALID_EMAIL });
+      });
+    });
+
+    describe('flattenOutput: true', function () {
+      it('flattens a nested result into dot-joined top-level keys', async function () {
+        const input = { user: { first_name: VALID_NAME, contact: { email: VALID_EMAIL } } };
+        const out = await validateWhitelistProperties(input, ['user.first_name', 'user.contact.email'], {
+          flattenOutput: true,
+        });
+        assert.deepStrictEqual(out, {
+          'user.first_name': VALID_NAME,
+          'user.contact.email': VALID_EMAIL,
+        });
+      });
+
+      it('produces an output with no nested object values', async function () {
+        const input = { user: { first_name: VALID_NAME, contact: { email: VALID_EMAIL, phone_number: VALID_PHONE } } };
+        const out = await validateWhitelistProperties(
+          input,
+          ['user.first_name', 'user.contact.email', 'user.contact.phone_number'],
+          { flattenOutput: true },
+        );
+        Object.values(out).forEach(v => {
+          assert.ok(v === null || typeof v !== 'object', `Expected no nested objects in flat output, got: ${JSON.stringify(v)}`);
+        });
+        assert.deepStrictEqual(out, {
+          'user.first_name': VALID_NAME,
+          'user.contact.email': VALID_EMAIL,
+          'user.contact.phone_number': VALID_PHONE,
+        });
+      });
+
+      it('leaves already-flat results unchanged in shape', async function () {
+        const input = { first_name: VALID_NAME, email: VALID_EMAIL };
+        const out = await validateWhitelistProperties(input, ['first_name', 'email'], { flattenOutput: true });
+        assert.deepStrictEqual(out, { first_name: VALID_NAME, email: VALID_EMAIL });
+      });
+
+      it('flattens at the maximum supported depth of 5', async function () {
+        const input = { a: { b: { c: { d: { email: VALID_EMAIL } } } } };
+        const out = await validateWhitelistProperties(input, ['a.b.c.d.email'], { flattenOutput: true });
+        assert.deepStrictEqual(out, { 'a.b.c.d.email': VALID_EMAIL });
+      });
+
+      it('applies snake_case conversion before flattening (keys joined post-conversion)', async function () {
+        const input = { userInfo: { firstName: VALID_NAME, phoneNumber: VALID_PHONE } };
+        const out = await validateWhitelistProperties(input, ['userInfo.firstName'], {
+          optionalProperties: ['userInfo.phoneNumber'],
+          convertToSnakeCase: true,
+          flattenOutput: true,
+        });
+        assert.deepStrictEqual(out, {
+          'user_info.first_name': VALID_NAME,
+          'user_info.phone_number': VALID_PHONE,
+        });
+      });
+
+      it('omits absent optional nested leaves in the flat output', async function () {
+        const input = { user: { first_name: VALID_NAME } };
+        const out = await validateWhitelistProperties(input, ['user.first_name'], {
+          optionalProperties: ['user.contact.email'],
+          flattenOutput: true,
+        });
+        assert.deepStrictEqual(out, { 'user.first_name': VALID_NAME });
+      });
+
+      it('returns an empty object when no properties are configured', async function () {
+        const out = await validateWhitelistProperties({ user: { first_name: VALID_NAME } }, [], { flattenOutput: true });
+        assert.deepStrictEqual(out, {});
+      });
+    });
+  });
+
   describe('limits: MAX_NESTING_DEPTH (5)', function () {
     const mod = require('../lib/validateWhitelistProperties');
 

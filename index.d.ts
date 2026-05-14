@@ -11,6 +11,12 @@ export interface ValidateWhitelistPropertiesOptions {
   optionalProperties?: string[];
   /** When true, the returned object's keys are converted to snake_case. */
   convertToSnakeCase?: boolean;
+  /**
+   * When true, the returned object is flattened so that every validated leaf
+   * becomes a top-level key, joined by `.` (e.g. `{ 'user.first_name': 'Jane' }`).
+   * No nested objects remain in the output. Applied after snake_case conversion.
+   */
+  flattenOutput?: boolean;
 }
 
 /**
