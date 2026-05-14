@@ -3,6 +3,52 @@
  */
 export function validateProperties(obj?: Record<string, any>): Record<string, any>;
 
+/**
+ * Options for {@link validateWhitelistProperties}.
+ */
+export interface ValidateWhitelistPropertiesOptions {
+    /** Properties allowed in the input but not required. */
+    optionalProperties?: string[];
+    /** When true, the returned object's keys are converted to snake_case. */
+    convertToSnakeCase?: boolean;
+    /**
+     * When true, the returned object is flattened so that every validated leaf
+     * becomes a top-level key, joined by `.` (e.g. `{ 'user.first_name': 'Jane' }`).
+     * No nested objects remain in the output. Applied after snake_case conversion.
+     */
+    flattenOutput?: boolean;
+}
+
+/**
+ * Validates and transforms whitelisted properties from an input object.
+ *
+ * - Supports nested objects via dot-notation paths (e.g. `"address.city"`),
+ *   up to 5 levels deep. The function checks that each path resolves to an
+ *   existing leaf property and validates the leaf value by its leaf segment.
+ * - Extracts only the whitelisted (required + optional) leaf properties and
+ *   rebuilds the same nested shape in the result.
+ * - Validates values via {@link validateProperties}.
+ * - Throws a "Bad_Input" error when any required property is missing/invalid,
+ *   when a provided optional property has an invalid value, when a path
+ *   exceeds 5 levels of nesting, or when the combined count of
+ *   `requiredProperties` and `options.optionalProperties` exceeds 5000.
+ * - Array values are supported: if a leaf value is an array, the per-leaf
+ *   validator is applied to each element. The leaf is accepted only when every
+ *   element passes validation, and the returned value is an array of the
+ *   validated elements (e.g. `{ name: ["First", "Other"] }` is validated like
+ *   `{ name: "First" }` and `{ name: "Other" }` individually).
+ * - Optionally converts the resulting keys (including nested keys) to snake_case.
+ *
+ * @param inputObject The input object (e.g. `req.body` or `req.params`).
+ * @param requiredProperties Leaf paths that must be present and valid. Dot-notation supported.
+ * @param options Optional list of additional allowed leaf paths and case-conversion flag.
+ */
+export function validateWhitelistProperties(
+    inputObject: Record<string, any>,
+    requiredProperties?: string[],
+    options?: ValidateWhitelistPropertiesOptions,
+): Promise<Record<string, any>>;
+
 /** Checks if the string is a valid image URL format. */
 export function isImageUrl(imageUrl: any): boolean;
 /** Checks if the value is an integer. */
@@ -70,34 +116,34 @@ export function isValidArrayOfStrings(arr: any): boolean;
  * @deprecated Use direct imports instead.
  */
 export const validate: {
-  isImageUrl: typeof isImageUrl;
-  isInteger: typeof isInteger;
-  isValidJsonString: typeof isValidJsonString;
-  isValidIntegerString: typeof isValidIntegerString;
-  isValidUuidString: typeof isValidUuidString;
-  isCharactersString: typeof isCharactersString;
-  isNameString: typeof isNameString;
-  isSafeSearchString: typeof isSafeSearchString;
-  isEmailString: typeof isEmailString;
-  isJwtString: typeof isJwtString;
-  isPasswordString: typeof isPasswordString;
-  isSimplePasswordString: typeof isSimplePasswordString;
-  isPasswordStringFailureMessage: typeof isPasswordStringFailureMessage;
-  isSimplePasswordStringFailureMessage: typeof isSimplePasswordStringFailureMessage;
-  isUsernameString: typeof isUsernameString;
-  isPhoneNumber: typeof isPhoneNumber;
-  isUrlSafeString: typeof isUrlSafeString;
-  isString6To24CharacterLong: typeof isString6To24CharacterLong;
-  isString6To16CharacterLong: typeof isString6To16CharacterLong;
-  isProvinceString: typeof isProvinceString;
-  isBoolValue: typeof isBoolValue;
-  isPostalCodeString: typeof isPostalCodeString;
-  isSafeString: typeof isSafeString;
-  isInStringArray: typeof isInStringArray;
-  isCountryCodeString: typeof isCountryCodeString;
-  isValidDomainName: typeof isValidDomainName;
-  isValidTimestampzString: typeof isValidTimestampzString;
-  isValidTimestampString: typeof isValidTimestampString;
-  isValidUrl: typeof isValidUrl;
-  isValidArrayOfStrings: typeof isValidArrayOfStrings;
+    isImageUrl: typeof isImageUrl;
+    isInteger: typeof isInteger;
+    isValidJsonString: typeof isValidJsonString;
+    isValidIntegerString: typeof isValidIntegerString;
+    isValidUuidString: typeof isValidUuidString;
+    isCharactersString: typeof isCharactersString;
+    isNameString: typeof isNameString;
+    isSafeSearchString: typeof isSafeSearchString;
+    isEmailString: typeof isEmailString;
+    isJwtString: typeof isJwtString;
+    isPasswordString: typeof isPasswordString;
+    isSimplePasswordString: typeof isSimplePasswordString;
+    isPasswordStringFailureMessage: typeof isPasswordStringFailureMessage;
+    isSimplePasswordStringFailureMessage: typeof isSimplePasswordStringFailureMessage;
+    isUsernameString: typeof isUsernameString;
+    isPhoneNumber: typeof isPhoneNumber;
+    isUrlSafeString: typeof isUrlSafeString;
+    isString6To24CharacterLong: typeof isString6To24CharacterLong;
+    isString6To16CharacterLong: typeof isString6To16CharacterLong;
+    isProvinceString: typeof isProvinceString;
+    isBoolValue: typeof isBoolValue;
+    isPostalCodeString: typeof isPostalCodeString;
+    isSafeString: typeof isSafeString;
+    isInStringArray: typeof isInStringArray;
+    isCountryCodeString: typeof isCountryCodeString;
+    isValidDomainName: typeof isValidDomainName;
+    isValidTimestampzString: typeof isValidTimestampzString;
+    isValidTimestampString: typeof isValidTimestampString;
+    isValidUrl: typeof isValidUrl;
+    isValidArrayOfStrings: typeof isValidArrayOfStrings;
 };
