@@ -335,6 +335,14 @@ describe('validateWhitelistProperties', function () {
                 });
             });
 
+            it('flattens multiple leaves from the same deep object into direct leaf keys', async function () {
+                const input = { a: { b: { c: { d: { email: VALID_EMAIL, name: VALID_NAME, ignored: 'hi' } } } } };
+                const out = await validateWhitelistProperties(input, ['a.b.c.d.email', 'a.b.c.d.name'], {
+                    flattenOutput: true,
+                });
+                assert.deepStrictEqual(out, { email: VALID_EMAIL, name: VALID_NAME });
+            });
+
             it('produces an output with no nested object values', async function () {
                 const input = { user: { first_name: VALID_NAME, contact: { email: VALID_EMAIL, phone_number: VALID_PHONE } } };
                 const out = await validateWhitelistProperties(

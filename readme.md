@@ -141,11 +141,11 @@ const out = await validateWhitelistProperties(body, ['first_name', 'email'], {
 
 ### Options
 
-| Option               | Default | Behavior                                                                                              |
-| -------------------- | ------- | ----------------------------------------------------------------------------------------------------- |
-| `optionalProperties` | `[]`    | Additional property paths that may be present. If present, each value must be valid.                  |
-| `convertToSnakeCase` | `false` | Converts returned keys, including nested keys, to snake_case using `@carecard/common-util`.           |
-| `flattenOutput`      | `false` | Flattens returned nested objects into dot-joined top-level keys. Applied after snake_case conversion. |
+| Option               | Default | Behavior                                                                                                                                                                                      |
+| -------------------- | ------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `optionalProperties` | `[]`    | Additional property paths that may be present. If present, each value must be valid.                                                                                                          |
+| `convertToSnakeCase` | `false` | Converts returned keys, including nested keys, to snake_case using `@carecard/common-util`.                                                                                                   |
+| `flattenOutput`      | `false` | Flattens returned nested objects. Existing dot-path output is preserved, and sibling leaves from the same nested parent can flatten to direct leaf keys. Applied after snake_case conversion. |
 
 ### Required And Optional Values
 
@@ -225,6 +225,26 @@ const out = await validateWhitelistProperties({ userInfo: { firstName: 'Jane', p
 //   'user_info.first_name': 'Jane',
 //   'user_info.phone_number': '4165551234'
 // }
+```
+
+With `flattenOutput: false` or no `flattenOutput` option, nested paths keep the
+nested output shape:
+
+```js
+const input = { a: { b: { c: { d: { email: 'jane@example.com' } } } } };
+await validateWhitelistProperties(input, ['a.b.c.d.email']);
+// { a: { b: { c: { d: { email: 'jane@example.com' } } } } }
+```
+
+With `flattenOutput: true`, sibling leaves from the same nested parent are
+returned as top-level leaf keys:
+
+```js
+const input = { a: { b: { c: { d: { email: 'jane@example.com', name: 'Jane' } } } } };
+await validateWhitelistProperties(input, ['a.b.c.d.email', 'a.b.c.d.name'], {
+    flattenOutput: true,
+});
+// { email: 'jane@example.com', name: 'Jane' }
 ```
 
 ## TypeScript
