@@ -38,10 +38,11 @@ export interface ValidateWhitelistPropertiesOptions {
  *   validated elements (e.g. `{ name: ["First", "Other"] }` is validated like
  *   `{ name: "First" }` and `{ name: "Other" }` individually).
  * - Optionally converts the resulting keys (including nested keys) to snake_case.
+ * - Optionally flattens the result after snake_case conversion.
  *
  * @param inputObject The input object (e.g. `req.body` or `req.params`).
  * @param requiredProperties Leaf paths that must be present and valid. Dot-notation supported.
- * @param options Optional list of additional allowed leaf paths and case-conversion flag.
+ * @param options Optional additional leaf paths plus output transformation flags.
  */
 export function validateWhitelistProperties(
     inputObject: Record<string, any>,
