@@ -343,6 +343,42 @@ describe('validateWhitelistProperties', function () {
                 assert.deepStrictEqual(out, { email: VALID_EMAIL, name: VALID_NAME });
             });
 
+            it('keeps the higher-level property when direct leaf-key flattening has duplicate leaf names', async function () {
+                const input = {
+                    name: 'Top Level Name',
+                    user: { name: 'Nested Name', email: VALID_EMAIL },
+                };
+                const out = await validateWhitelistProperties(input, ['name', 'user.name', 'user.email'], {
+                    flattenOutput: true,
+                });
+                assert.deepStrictEqual(out, { name: 'Top Level Name', email: VALID_EMAIL });
+            });
+
+            it('keeps the shallower nested property when a lower nested duplicate appears later', async function () {
+                const input = {
+                    user: {
+                        name: 'Higher Nested Name',
+                        profile: { name: 'Lower Nested Name' },
+                        email: VALID_EMAIL,
+                    },
+                };
+                const out = await validateWhitelistProperties(input, ['user.name', 'user.profile.name', 'user.email'], {
+                    flattenOutput: true,
+                });
+                assert.deepStrictEqual(out, { name: 'Higher Nested Name', email: VALID_EMAIL });
+            });
+
+            it('keeps dot-joined keys when duplicate leaf names are at the same nesting depth', async function () {
+                const input = {
+                    user: { name: 'User Name' },
+                    account: { name: 'Account Name' },
+                };
+                const out = await validateWhitelistProperties(input, ['user.name', 'account.name'], {
+                    flattenOutput: true,
+                });
+                assert.deepStrictEqual(out, { 'user.name': 'User Name', 'account.name': 'Account Name' });
+            });
+
             it('produces an output with no nested object values', async function () {
                 const input = { user: { first_name: VALID_NAME, contact: { email: VALID_EMAIL, phone_number: VALID_PHONE } } };
                 const out = await validateWhitelistProperties(

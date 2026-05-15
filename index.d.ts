@@ -15,8 +15,9 @@ export interface ValidateWhitelistPropertiesOptions {
      * When true, the returned object is flattened so that every validated leaf
      * becomes a top-level key. Existing dot-path flattening is preserved, and
      * multiple leaves from the same nested parent can flatten to direct leaf
-     * property names (e.g. `{ email: 'Jane' }`). No nested objects remain in
-     * the output. Applied after snake_case conversion.
+     * property names (e.g. `{ email: 'Jane' }`). If duplicate direct leaf keys
+     * exist at different nesting levels, the higher-level property wins. No
+     * nested objects remain in the output. Applied after snake_case conversion.
      */
     flattenOutput?: boolean;
 }
