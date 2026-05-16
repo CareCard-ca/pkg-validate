@@ -139,14 +139,63 @@ const out = await validateWhitelistProperties(body, ['first_name', 'email'], {
 // }
 ```
 
+### Defaults
+
+When omitted, `requiredProperties` defaults to `[]` and `options` defaults to:
+
+```js
+{
+    optionalProperties: [],
+    convertToSnakeCase: false,
+    flattenOutput: false,
+    flattenKeyStyle: 'path',
+}
+```
+
+The default output preserves the nested shape described by whitelisted dot paths.
+`flattenKeyStyle` only changes output when `flattenOutput` is `true`.
+
+```js
+const input = {
+    user: {
+        first_name: 'Jane',
+        contact: { email: 'jane@example.com' },
+    },
+};
+
+await validateWhitelistProperties(input, ['user.first_name', 'user.contact.email']);
+// {
+//   user: {
+//     first_name: 'Jane',
+//     contact: { email: 'jane@example.com' }
+//   }
+// }
+```
+
 ### Options
 
-| Option               | Default  | Behavior                                                                                                                                 |
-| -------------------- | -------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
-| `optionalProperties` | `[]`     | Additional property paths that may be present. If present, each value must be valid.                                                     |
-| `convertToSnakeCase` | `false`  | Converts returned keys, including nested keys, to snake_case using `@carecard/common-util`.                                              |
-| `flattenOutput`      | `false`  | Flattens returned nested objects so every validated leaf becomes a top-level key. Applied after snake_case conversion.                   |
-| `flattenKeyStyle`    | `'path'` | Controls flattened key naming when `flattenOutput` is `true`. Use `'path'` for full dot-notation keys or `'leaf'` for direct leaf names. |
+| Option               | Default  | Behavior                                                                                                                                                                           |
+| -------------------- | -------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `optionalProperties` | `[]`     | Additional property paths that may be present. Absent optional paths are ignored. Present optional paths must be valid.                                                            |
+| `convertToSnakeCase` | `false`  | When `true`, converts returned keys, including nested keys, to snake_case using `@carecard/common-util`. Conversion happens before flattening.                                     |
+| `flattenOutput`      | `false`  | When `true`, removes nested objects from the returned value so every validated leaf becomes a top-level key.                                                                       |
+| `flattenKeyStyle`    | `'path'` | Controls flattened key naming when `flattenOutput` is `true`. Use `'path'` for full dot-notation keys or `'leaf'` for direct leaf names. Invalid values throw a `BAD_INPUT` error. |
+
+Example with only the default options:
+
+```js
+await validateWhitelistProperties({ first_name: 'Jane', email: 'jane@example.com', ignored: 'x' }, ['first_name']);
+// { first_name: 'Jane' }
+```
+
+Example with optional properties:
+
+```js
+await validateWhitelistProperties({ first_name: 'Jane', phone_number: '4165551234' }, ['first_name'], {
+    optionalProperties: ['phone_number'],
+});
+// { first_name: 'Jane', phone_number: '4165551234' }
+```
 
 ### Required And Optional Values
 
