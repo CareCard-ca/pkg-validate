@@ -233,15 +233,17 @@ describe('ValidateProperties test', function () {
     });
 
     describe('Integer string fields (isValidIntegerString)', function () {
-        ['offset_number', 'offsetNumber', 'number_of_orders', 'numberOfOrders', 'price', 'from', 'number', 'limit', 'offset'].forEach(key => {
-            it(`accepts a valid integer string for "${key}"`, function () {
-                assertAccepts(key, '10');
-            });
+        ['offset_number', 'offsetNumber', 'number_of_orders', 'numberOfOrders', 'price', 'from', 'number', 'limit', 'offset'].forEach(
+            key => {
+                it(`accepts a valid integer string for "${key}"`, function () {
+                    assertAccepts(key, '10');
+                });
 
-            it(`rejects a non-integer value for "${key}"`, function () {
-                assertRejects(key, 'abc');
-            });
-        });
+                it(`rejects a non-integer value for "${key}"`, function () {
+                    assertRejects(key, 'abc');
+                });
+            },
+        );
     });
 
     describe('About field (isValidJsonString on raw value)', function () {
