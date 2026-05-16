@@ -141,11 +141,12 @@ const out = await validateWhitelistProperties(body, ['first_name', 'email'], {
 
 ### Options
 
-| Option               | Default | Behavior                                                                                                                                                                                                                                                                                       |
-| -------------------- | ------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `optionalProperties` | `[]`    | Additional property paths that may be present. If present, each value must be valid.                                                                                                                                                                                                           |
-| `convertToSnakeCase` | `false` | Converts returned keys, including nested keys, to snake_case using `@carecard/common-util`.                                                                                                                                                                                                    |
-| `flattenOutput`      | `false` | Flattens returned nested objects. Existing dot-path output is preserved, and sibling leaves from the same nested parent can flatten to direct leaf keys. If duplicate direct leaf keys occur at different nesting levels, the higher-level property wins. Applied after snake_case conversion. |
+| Option               | Default  | Behavior                                                                                                                                 |
+| -------------------- | -------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| `optionalProperties` | `[]`     | Additional property paths that may be present. If present, each value must be valid.                                                     |
+| `convertToSnakeCase` | `false`  | Converts returned keys, including nested keys, to snake_case using `@carecard/common-util`.                                              |
+| `flattenOutput`      | `false`  | Flattens returned nested objects so every validated leaf becomes a top-level key. Applied after snake_case conversion.                   |
+| `flattenKeyStyle`    | `'path'` | Controls flattened key naming when `flattenOutput` is `true`. Use `'path'` for full dot-notation keys or `'leaf'` for direct leaf names. |
 
 ### Required And Optional Values
 
@@ -236,20 +237,31 @@ await validateWhitelistProperties(input, ['a.b.c.d.email']);
 // { a: { b: { c: { d: { email: 'jane@example.com' } } } } }
 ```
 
-With `flattenOutput: true`, sibling leaves from the same nested parent are
-returned as top-level leaf keys:
+With `flattenOutput: true`, keys are full dot paths by default:
 
 ```js
 const input = { a: { b: { c: { d: { email: 'jane@example.com', name: 'Jane' } } } } };
 await validateWhitelistProperties(input, ['a.b.c.d.email', 'a.b.c.d.name'], {
     flattenOutput: true,
 });
+// { 'a.b.c.d.email': 'jane@example.com', 'a.b.c.d.name': 'Jane' }
+```
+
+Use `flattenKeyStyle: 'leaf'` to return top-level leaf keys instead:
+
+```js
+const input = { a: { b: { c: { d: { email: 'jane@example.com', name: 'Jane' } } } } };
+await validateWhitelistProperties(input, ['a.b.c.d.email', 'a.b.c.d.name'], {
+    flattenOutput: true,
+    flattenKeyStyle: 'leaf',
+});
 // { email: 'jane@example.com', name: 'Jane' }
 ```
 
-If direct leaf-key flattening produces duplicate keys at different nesting
+When `flattenKeyStyle: 'leaf'` produces duplicate keys at different nesting
 levels, the higher-level value is kept and the lower-level duplicate is
-discarded:
+discarded. Duplicate leaf keys at the same nesting depth keep the first value
+encountered:
 
 ```js
 const input = {
@@ -259,6 +271,7 @@ const input = {
 
 await validateWhitelistProperties(input, ['name', 'user.name', 'user.email'], {
     flattenOutput: true,
+    flattenKeyStyle: 'leaf',
 });
 // { name: 'Top Level Name', email: 'jane@example.com' }
 ```

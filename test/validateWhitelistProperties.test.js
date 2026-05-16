@@ -480,10 +480,20 @@ describe('validateWhitelistProperties', function () {
                 const out = await validateWhitelistProperties(input, ['first_name', 'email'], { flattenOutput: false });
                 assert.deepStrictEqual(out, { first_name: VALID_NAME, email: VALID_EMAIL });
             });
+
+            it('ignores flattenKeyStyle when output is not flattened', async function () {
+                const input = { user: { first_name: VALID_NAME, contact: { email: VALID_EMAIL } } };
+                const out = await validateWhitelistProperties(input, ['user.first_name', 'user.contact.email'], {
+                    flattenKeyStyle: 'leaf',
+                });
+                assert.deepStrictEqual(out, {
+                    user: { first_name: VALID_NAME, contact: { email: VALID_EMAIL } },
+                });
+            });
         });
 
-        describe('flattenOutput: true', function () {
-            it('flattens a nested result into dot-joined top-level keys', async function () {
+        describe('flattenOutput: true with path keys', function () {
+            it('uses dot-joined top-level keys by default', async function () {
                 const input = { user: { first_name: VALID_NAME, contact: { email: VALID_EMAIL } } };
                 const out = await validateWhitelistProperties(input, ['user.first_name', 'user.contact.email'], {
                     flattenOutput: true,
@@ -494,15 +504,24 @@ describe('validateWhitelistProperties', function () {
                 });
             });
 
-            it('flattens multiple leaves from the same deep object into direct leaf keys', async function () {
+            it('uses dot-joined keys for multiple leaves from the same deep object by default', async function () {
                 const input = { a: { b: { c: { d: { email: VALID_EMAIL, name: VALID_NAME, ignored: 'hi' } } } } };
                 const out = await validateWhitelistProperties(input, ['a.b.c.d.email', 'a.b.c.d.name'], {
                     flattenOutput: true,
                 });
-                assert.deepStrictEqual(out, { email: VALID_EMAIL, name: VALID_NAME });
+                assert.deepStrictEqual(out, { 'a.b.c.d.email': VALID_EMAIL, 'a.b.c.d.name': VALID_NAME });
             });
 
-            it('keeps the higher-level property when direct leaf-key flattening has duplicate leaf names', async function () {
+            it('uses dot-joined keys when flattenKeyStyle is explicitly path', async function () {
+                const input = { a: { b: { c: { d: { email: VALID_EMAIL, name: VALID_NAME } } } } };
+                const out = await validateWhitelistProperties(input, ['a.b.c.d.email', 'a.b.c.d.name'], {
+                    flattenOutput: true,
+                    flattenKeyStyle: 'path',
+                });
+                assert.deepStrictEqual(out, { 'a.b.c.d.email': VALID_EMAIL, 'a.b.c.d.name': VALID_NAME });
+            });
+
+            it('keeps duplicate leaf names distinct with dot-joined keys', async function () {
                 const input = {
                     name: 'Top Level Name',
                     user: { name: 'Nested Name', email: VALID_EMAIL },
@@ -510,24 +529,10 @@ describe('validateWhitelistProperties', function () {
                 const out = await validateWhitelistProperties(input, ['name', 'user.name', 'user.email'], {
                     flattenOutput: true,
                 });
-                assert.deepStrictEqual(out, { name: 'Top Level Name', email: VALID_EMAIL });
+                assert.deepStrictEqual(out, { name: 'Top Level Name', 'user.name': 'Nested Name', 'user.email': VALID_EMAIL });
             });
 
-            it('keeps the shallower nested property when a lower nested duplicate appears later', async function () {
-                const input = {
-                    user: {
-                        name: 'Higher Nested Name',
-                        profile: { name: 'Lower Nested Name' },
-                        email: VALID_EMAIL,
-                    },
-                };
-                const out = await validateWhitelistProperties(input, ['user.name', 'user.profile.name', 'user.email'], {
-                    flattenOutput: true,
-                });
-                assert.deepStrictEqual(out, { name: 'Higher Nested Name', email: VALID_EMAIL });
-            });
-
-            it('keeps dot-joined keys when duplicate leaf names are at the same nesting depth', async function () {
+            it('keeps same-depth duplicate leaf names distinct with dot-joined keys', async function () {
                 const input = {
                     user: { name: 'User Name' },
                     account: { name: 'Account Name' },
@@ -594,6 +599,139 @@ describe('validateWhitelistProperties', function () {
             it('returns an empty object when no properties are configured', async function () {
                 const out = await validateWhitelistProperties({ user: { first_name: VALID_NAME } }, [], { flattenOutput: true });
                 assert.deepStrictEqual(out, {});
+            });
+        });
+
+        describe('flattenOutput: true with leaf keys', function () {
+            it('flattens multiple leaves from the same deep object into direct leaf keys', async function () {
+                const input = { a: { b: { c: { d: { email: VALID_EMAIL, name: VALID_NAME, ignored: 'hi' } } } } };
+                const out = await validateWhitelistProperties(input, ['a.b.c.d.email', 'a.b.c.d.name'], {
+                    flattenOutput: true,
+                    flattenKeyStyle: 'leaf',
+                });
+                assert.deepStrictEqual(out, { email: VALID_EMAIL, name: VALID_NAME });
+            });
+
+            it('keeps the higher-level property when leaf-key flattening has duplicate leaf names', async function () {
+                const input = {
+                    name: 'Top Level Name',
+                    user: { name: 'Nested Name', email: VALID_EMAIL },
+                };
+                const out = await validateWhitelistProperties(input, ['name', 'user.name', 'user.email'], {
+                    flattenOutput: true,
+                    flattenKeyStyle: 'leaf',
+                });
+                assert.deepStrictEqual(out, { name: 'Top Level Name', email: VALID_EMAIL });
+            });
+
+            it('keeps the shallower nested property when a lower nested duplicate appears later', async function () {
+                const input = {
+                    user: {
+                        name: 'Higher Nested Name',
+                        profile: { name: 'Lower Nested Name' },
+                        email: VALID_EMAIL,
+                    },
+                };
+                const out = await validateWhitelistProperties(input, ['user.name', 'user.profile.name', 'user.email'], {
+                    flattenOutput: true,
+                    flattenKeyStyle: 'leaf',
+                });
+                assert.deepStrictEqual(out, { name: 'Higher Nested Name', email: VALID_EMAIL });
+            });
+
+            it('keeps the first value when duplicate leaf names are at the same nesting depth', async function () {
+                const input = {
+                    user: { name: 'User Name' },
+                    account: { name: 'Account Name' },
+                };
+                const out = await validateWhitelistProperties(input, ['user.name', 'account.name'], {
+                    flattenOutput: true,
+                    flattenKeyStyle: 'leaf',
+                });
+                assert.deepStrictEqual(out, { name: 'User Name' });
+            });
+
+            it('produces an output with no nested object values', async function () {
+                const input = { user: { first_name: VALID_NAME, contact: { email: VALID_EMAIL, phone_number: VALID_PHONE } } };
+                const out = await validateWhitelistProperties(
+                    input,
+                    ['user.first_name', 'user.contact.email', 'user.contact.phone_number'],
+                    {
+                        flattenOutput: true,
+                        flattenKeyStyle: 'leaf',
+                    },
+                );
+                Object.values(out).forEach(v => {
+                    assert.ok(v === null || typeof v !== 'object', `Expected no nested objects in flat output, got: ${JSON.stringify(v)}`);
+                });
+                assert.deepStrictEqual(out, {
+                    first_name: VALID_NAME,
+                    email: VALID_EMAIL,
+                    phone_number: VALID_PHONE,
+                });
+            });
+
+            it('leaves already-flat results unchanged in shape', async function () {
+                const input = { first_name: VALID_NAME, email: VALID_EMAIL };
+                const out = await validateWhitelistProperties(input, ['first_name', 'email'], {
+                    flattenOutput: true,
+                    flattenKeyStyle: 'leaf',
+                });
+                assert.deepStrictEqual(out, { first_name: VALID_NAME, email: VALID_EMAIL });
+            });
+
+            it('uses the leaf key at the maximum supported depth of 5', async function () {
+                const input = { a: { b: { c: { d: { email: VALID_EMAIL } } } } };
+                const out = await validateWhitelistProperties(input, ['a.b.c.d.email'], {
+                    flattenOutput: true,
+                    flattenKeyStyle: 'leaf',
+                });
+                assert.deepStrictEqual(out, { email: VALID_EMAIL });
+            });
+
+            it('applies snake_case conversion before leaf flattening', async function () {
+                const input = { userInfo: { firstName: VALID_NAME, phoneNumber: VALID_PHONE } };
+                const out = await validateWhitelistProperties(input, ['userInfo.firstName'], {
+                    optionalProperties: ['userInfo.phoneNumber'],
+                    convertToSnakeCase: true,
+                    flattenOutput: true,
+                    flattenKeyStyle: 'leaf',
+                });
+                assert.deepStrictEqual(out, {
+                    first_name: VALID_NAME,
+                    phone_number: VALID_PHONE,
+                });
+            });
+
+            it('omits absent optional nested leaves in the flat leaf-key output', async function () {
+                const input = { user: { first_name: VALID_NAME } };
+                const out = await validateWhitelistProperties(input, ['user.first_name'], {
+                    optionalProperties: ['user.contact.email'],
+                    flattenOutput: true,
+                    flattenKeyStyle: 'leaf',
+                });
+                assert.deepStrictEqual(out, { first_name: VALID_NAME });
+            });
+
+            it('returns an empty object when no properties are configured', async function () {
+                const out = await validateWhitelistProperties({ user: { first_name: VALID_NAME } }, [], {
+                    flattenOutput: true,
+                    flattenKeyStyle: 'leaf',
+                });
+                assert.deepStrictEqual(out, {});
+            });
+        });
+
+        describe('flattenKeyStyle validation', function () {
+            it('rejects an unsupported flattenKeyStyle', async function () {
+                await assertRejectsBadInput(
+                    () =>
+                        validateWhitelistProperties({ user: { first_name: VALID_NAME } }, ['user.first_name'], {
+                            flattenOutput: true,
+                            flattenKeyStyle: 'inferred',
+                        }),
+                    'Invalid flattenKeyStyle: inferred. Expected "path" or "leaf"',
+                );
             });
         });
     });
