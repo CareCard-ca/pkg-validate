@@ -89,6 +89,22 @@ describe('AuthUtil test', function () {
             done();
         });
 
+        it('isStreetString returns true if valid street address false otherwise', function (done) {
+            const goodStreet1 = '103, main market';
+            const goodStreet2 = 'H.No-21/4, MG Road';
+            const goodStreet3 = 'Flat #12-A';
+            const badStreet1 = '<script>alert(1)</script>';
+            const badStreet2 = '';
+            const badStreet3 = 123;
+            assert.ok(validate.isStreetString(goodStreet1), 'Good street test failed');
+            assert.ok(validate.isStreetString(goodStreet2), 'Good street test failed');
+            assert.ok(validate.isStreetString(goodStreet3), 'Good street test failed');
+            assert.ok(!validate.isStreetString(badStreet1), 'Bad street test failed');
+            assert.ok(!validate.isStreetString(badStreet2), 'Empty street test failed');
+            assert.ok(!validate.isStreetString(badStreet3), 'Non-string street test failed');
+            done();
+        });
+
         it('isNameString returns true if input is character false otherwise', function (done) {
             const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
             const longName = chars.repeat(100);
