@@ -30,6 +30,7 @@ import {
     isSafeString,
     isSimplePasswordString,
     isSimplePasswordStringFailureMessage,
+    isStreetString,
     isString6To16CharacterLong,
     isString6To24CharacterLong,
     isUrlSafeString,
@@ -109,6 +110,7 @@ expectType<BoolValidator>(isValidJsonString);
 expectType<BoolValidator>(isValidIntegerString);
 expectType<BoolValidator>(isValidUuidString);
 expectType<BoolValidator>(isCharactersString);
+expectType<BoolValidator>(isStreetString);
 expectType<BoolValidator>(isNameString);
 expectType<BoolValidator>(isSafeSearchString);
 expectType<BoolValidator>(isEmailString);
@@ -135,6 +137,7 @@ expectType<BoolValidator>(isValidArrayOfStrings);
 expectType<boolean>(isEmailString('a@b.com'));
 expectType<boolean>(isInteger(1));
 expectType<boolean>(isValidUuidString('x'));
+expectType<boolean>(isStreetString('103 Main Street'));
 expectType<boolean>(isBoolValue(true));
 expectType<boolean>(isValidArrayOfStrings(['a']));
 
@@ -165,6 +168,7 @@ expectType<typeof isValidJsonString>(validate.isValidJsonString);
 expectType<typeof isValidIntegerString>(validate.isValidIntegerString);
 expectType<typeof isValidUuidString>(validate.isValidUuidString);
 expectType<typeof isCharactersString>(validate.isCharactersString);
+expectType<typeof isStreetString>(validate.isStreetString);
 expectType<typeof isNameString>(validate.isNameString);
 expectType<typeof isSafeSearchString>(validate.isSafeSearchString);
 expectType<typeof isEmailString>(validate.isEmailString);

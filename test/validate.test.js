@@ -89,6 +89,66 @@ describe('AuthUtil test', function () {
             done();
         });
 
+        it('isStreetString returns true if valid street address false otherwise', function (done) {
+            // Valid street addresses
+            const goodStreet1 = '103 Main Market';
+            const goodStreet2 = 'H.No 21/4 MG Road';
+            const goodStreet3 = 'Flat #12A';
+            const goodStreet4 = '221B Baker Street';
+            const goodStreet5 = 'Sector 5 Block C';
+            const goodStreet6 = 'Apartment #101';
+            const goodStreet7 = '12/4 Residency Road';
+            const goodStreet8 = 'Phase 2 Plot 45';
+            const goodStreet9 = 'Near City Mall';
+            const goodStreet10 = 'A1 Building 7';
+            const goodStreet11 = '#12 MG Road';
+            // Invalid street addresses
+            const badStreet1 = '<script>alert(1)</script>';
+            const badStreet2 = '';
+            const badStreet3 = 123;
+            const badStreet4 = ',Main Street';
+            const badStreet5 = '_Main Street';
+            const badStreet6 = ' ,Main Street';
+            const badStreet7 = '-Main Street';
+            const badStreet8 = 'Main_Street';
+            const badStreet9 = 'Street@123';
+            const badStreet10 = 'Road$Area';
+            const badStreet11 = null;
+            const badStreet12 = undefined;
+            const badStreet13 = {};
+            const badStreet14 = [];
+            const badStreet15 = ' ';
+            // Positive assertions
+            assert.ok(validate.isStreetString(goodStreet1), 'Good street test 1 failed');
+            assert.ok(validate.isStreetString(goodStreet2), 'Good street test 2 failed');
+            assert.ok(validate.isStreetString(goodStreet3), 'Good street test 3 failed');
+            assert.ok(validate.isStreetString(goodStreet4), 'Good street test 4 failed');
+            assert.ok(validate.isStreetString(goodStreet5), 'Good street test 5 failed');
+            assert.ok(validate.isStreetString(goodStreet6), 'Good street test 6 failed');
+            assert.ok(validate.isStreetString(goodStreet7), 'Good street test 7 failed');
+            assert.ok(validate.isStreetString(goodStreet8), 'Good street test 8 failed');
+            assert.ok(validate.isStreetString(goodStreet9), 'Good street test 9 failed');
+            assert.ok(validate.isStreetString(goodStreet10), 'Good street test 10 failed');
+            assert.ok(validate.isStreetString(goodStreet11), 'Good street test 11 failed');
+            // Negative assertions
+            assert.ok(!validate.isStreetString(badStreet1), 'Bad street test 1 failed');
+            assert.ok(!validate.isStreetString(badStreet2), 'Bad street test 2 failed');
+            assert.ok(!validate.isStreetString(badStreet3), 'Bad street test 3 failed');
+            assert.ok(!validate.isStreetString(badStreet4), 'Bad street test 4 failed');
+            assert.ok(!validate.isStreetString(badStreet5), 'Bad street test 5 failed');
+            assert.ok(!validate.isStreetString(badStreet6), 'Bad street test 6 failed');
+            assert.ok(!validate.isStreetString(badStreet7), 'Bad street test 7 failed');
+            assert.ok(!validate.isStreetString(badStreet8), 'Bad street test 8 failed');
+            assert.ok(!validate.isStreetString(badStreet9), 'Bad street test 9 failed');
+            assert.ok(!validate.isStreetString(badStreet10), 'Bad street test 10 failed');
+            assert.ok(!validate.isStreetString(badStreet11), 'Bad street test 11 failed');
+            assert.ok(!validate.isStreetString(badStreet12), 'Bad street test 12 failed');
+            assert.ok(!validate.isStreetString(badStreet13), 'Bad street test 13 failed');
+            assert.ok(!validate.isStreetString(badStreet14), 'Bad street test 14 failed');
+            assert.ok(!validate.isStreetString(badStreet15), 'Bad street test 15 failed');
+            done();
+        });
+
         it('isNameString returns true if input is character false otherwise', function (done) {
             const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
             const longName = chars.repeat(100);
