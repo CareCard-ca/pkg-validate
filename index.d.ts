@@ -70,6 +70,8 @@ export function isValidIntegerString(str: any): boolean;
 export function isValidUuidString(str: any): boolean;
 /** Checks if the string contains only alphanumeric characters, spaces, underscores, or hyphens. */
 export function isCharactersString(str: any): boolean;
+/** Checks if the string is a valid street address format. */
+export function isStreetString(str: any): boolean;
 /** Checks if the string is a valid name format. */
 export function isNameString(str: any): boolean;
 /** Checks if the string is safe for search queries. */
@@ -131,6 +133,7 @@ export const validate: {
     isValidIntegerString: typeof isValidIntegerString;
     isValidUuidString: typeof isValidUuidString;
     isCharactersString: typeof isCharactersString;
+    isStreetString: typeof isStreetString;
     isNameString: typeof isNameString;
     isSafeSearchString: typeof isSafeSearchString;
     isEmailString: typeof isEmailString;
