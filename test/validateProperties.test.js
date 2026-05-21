@@ -51,7 +51,10 @@ describe('ValidateProperties test', function () {
             'document_type',
             'documentType',
             'reason',
-            'street',
+            'entity_type',
+            'entityType',
+            'action_type',
+            'actionType',
             'city',
             'state',
             'country',
@@ -66,6 +69,20 @@ describe('ValidateProperties test', function () {
             it(`rejects an invalid (non-string) value for "${key}"`, function () {
                 assertRejects(key, 123);
             });
+        });
+    });
+
+    describe('Street field', function () {
+        it('accepts a valid street address', function () {
+            assertAccepts('street', '103, main market');
+        });
+
+        it('accepts a street with special characters', function () {
+            assertAccepts('street', 'H.No-21/4, MG Road');
+        });
+
+        it('rejects a non-string street value', function () {
+            assertRejects('street', 123);
         });
     });
 
@@ -209,6 +226,12 @@ describe('ValidateProperties test', function () {
             'userRoleId',
             'phone_number_id',
             'phoneNumberId',
+            'entity_id',
+            'entityId',
+            'changed_by',
+            'changedBy',
+            'request_id',
+            'requestId',
         ];
 
         uuidKeys.forEach(key => {
@@ -223,15 +246,17 @@ describe('ValidateProperties test', function () {
     });
 
     describe('Integer string fields (isValidIntegerString)', function () {
-        ['offset_number', 'offsetNumber', 'number_of_orders', 'numberOfOrders', 'price', 'from', 'number'].forEach(key => {
-            it(`accepts a valid integer string for "${key}"`, function () {
-                assertAccepts(key, '10');
-            });
+        ['offset_number', 'offsetNumber', 'number_of_orders', 'numberOfOrders', 'price', 'from', 'number', 'limit', 'offset'].forEach(
+            key => {
+                it(`accepts a valid integer string for "${key}"`, function () {
+                    assertAccepts(key, '10');
+                });
 
-            it(`rejects a non-integer value for "${key}"`, function () {
-                assertRejects(key, 'abc');
-            });
-        });
+                it(`rejects a non-integer value for "${key}"`, function () {
+                    assertRejects(key, 'abc');
+                });
+            },
+        );
     });
 
     describe('About field (isValidJsonString on raw value)', function () {
@@ -299,7 +324,7 @@ describe('ValidateProperties test', function () {
     });
 
     describe('Expires-at fields (isValidTimestampzString || isValidTimestampString)', function () {
-        ['expires_at', 'expiresAt'].forEach(key => {
+        ['expires_at', 'expiresAt', 'start_time', 'startTime', 'end_time', 'endTime'].forEach(key => {
             it(`accepts a valid timestamptz for "${key}"`, function () {
                 assertAccepts(key, '2023-10-27T10:00:00Z');
             });
@@ -380,7 +405,7 @@ describe('ValidateProperties test', function () {
                 documentType: 'PDF',
                 reason: 'Reason',
                 type: 'Type',
-                street: 'MG Road',
+                street: '103, main market',
                 city: 'Raipur',
                 state: 'Chhattisgarh',
                 country: 'India',
@@ -467,6 +492,22 @@ describe('ValidateProperties test', function () {
                 emailDomainName: 'school.edu.in',
                 expires_at: '2023-10-27T10:00:00Z',
                 expiresAt: '2023-10-27T10:00:00',
+                entity_type: 'document',
+                entityType: 'document',
+                action_type: 'create',
+                actionType: 'create',
+                entity_id: VALID_UUID,
+                entityId: VALID_UUID,
+                changed_by: VALID_UUID,
+                changedBy: VALID_UUID,
+                request_id: VALID_UUID,
+                requestId: VALID_UUID,
+                start_time: '2023-10-27T10:00:00Z',
+                startTime: '2023-10-27T10:00:00Z',
+                end_time: '2023-10-27T10:00:00Z',
+                endTime: '2023-10-27T10:00:00Z',
+                limit: '50',
+                offset: '0',
             };
             const validatedObject = validateProperties(testObject);
             assert.deepStrictEqual(validatedObject, testObject, 'Validation failed for some fields');
