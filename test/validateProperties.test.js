@@ -55,7 +55,6 @@ describe('ValidateProperties test', function () {
             'entityType',
             'action_type',
             'actionType',
-            'street',
             'city',
             'state',
             'country',
@@ -70,6 +69,20 @@ describe('ValidateProperties test', function () {
             it(`rejects an invalid (non-string) value for "${key}"`, function () {
                 assertRejects(key, 123);
             });
+        });
+    });
+
+    describe('Street field', function () {
+        it('accepts a valid street address', function () {
+            assertAccepts('street', '103, main market');
+        });
+
+        it('accepts a street with special characters', function () {
+            assertAccepts('street', 'H.No-21/4, MG Road');
+        });
+
+        it('rejects a non-string street value', function () {
+            assertRejects('street', 123);
         });
     });
 
@@ -392,7 +405,7 @@ describe('ValidateProperties test', function () {
                 documentType: 'PDF',
                 reason: 'Reason',
                 type: 'Type',
-                street: 'MG Road',
+                street: '103, main market',
                 city: 'Raipur',
                 state: 'Chhattisgarh',
                 country: 'India',
