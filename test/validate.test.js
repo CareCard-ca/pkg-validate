@@ -168,6 +168,22 @@ describe('AuthUtil test', function () {
             done();
         });
 
+        it('isTextString returns true for non-empty text without special character restrictions', function (done) {
+            assert.ok(validate.isTextString('Requester <tag>@example.com'), 'Text with punctuation should be accepted');
+            assert.ok(!validate.isTextString(''), 'Empty text should be rejected');
+            assert.ok(!validate.isTextString(123), 'Non-string text should be rejected');
+            assert.ok(!validate.isTextString('a'.repeat(10001)), 'Overlong text should be rejected');
+            done();
+        });
+
+        it('isUserRoleRequestStatusString returns true only for user role request statuses', function (done) {
+            assert.ok(validate.isUserRoleRequestStatusString('pending'), 'pending status should be valid');
+            assert.ok(validate.isUserRoleRequestStatusString('on_hold'), 'on_hold status should be valid');
+            assert.ok(!validate.isUserRoleRequestStatusString('not_a_status'), 'Unknown status should be rejected');
+            assert.ok(!validate.isUserRoleRequestStatusString(123), 'Non-string status should be rejected');
+            done();
+        });
+
         it('isSafeSearchString returns true if input is character false otherwise', function (done) {
             assert.ok(validate.isSafeSearchString('Peter @ Singh'), 'Bad name');
             assert.ok(!validate.isSafeSearchString('3Peter'), 'Bad name');

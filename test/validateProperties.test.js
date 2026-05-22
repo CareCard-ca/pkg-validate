@@ -55,6 +55,8 @@ describe('ValidateProperties test', function () {
             'entityType',
             'action_type',
             'actionType',
+            'approved_by_role',
+            'approvedByRole',
             'city',
             'state',
             'country',
@@ -180,6 +182,45 @@ describe('ValidateProperties test', function () {
         });
     });
 
+    describe('User role request text fields (isTextString)', function () {
+        const textKeys = [
+            'requested_by_name',
+            'requestedByName',
+            'requested_by_email',
+            'requestedByEmail',
+            'requested_by_phone',
+            'requestedByPhone',
+            'approved_by_name',
+            'approvedByName',
+            'approved_by_email',
+            'approvedByEmail',
+            'approved_by_phone',
+            'approvedByPhone',
+        ];
+
+        textKeys.forEach(key => {
+            it(`accepts text for "${key}"`, function () {
+                assertAccepts(key, 'Requester <person>@example.com');
+            });
+
+            it(`rejects non-text for "${key}"`, function () {
+                assertRejects(key, 123);
+            });
+        });
+    });
+
+    describe('User role request status fields', function () {
+        ['approved_status', 'approvedStatus'].forEach(key => {
+            it(`accepts a user role request status for "${key}"`, function () {
+                assertAccepts(key, 'info_needed');
+            });
+
+            it(`rejects an invalid user role request status for "${key}"`, function () {
+                assertRejects(key, 'not_a_status');
+            });
+        });
+    });
+
     describe('URL-safe token fields (isUrlSafeString)', function () {
         const tokenKeys = ['token', 'email_confirm_token', 'emailConfirmToken', 'verification_token', 'verificationToken'];
 
@@ -232,6 +273,8 @@ describe('ValidateProperties test', function () {
             'changedBy',
             'request_id',
             'requestId',
+            'approved_by_user_id',
+            'approvedByUserId',
         ];
 
         uuidKeys.forEach(key => {
@@ -323,8 +366,19 @@ describe('ValidateProperties test', function () {
         });
     });
 
-    describe('Expires-at fields (isValidTimestampzString || isValidTimestampString)', function () {
-        ['expires_at', 'expiresAt', 'start_time', 'startTime', 'end_time', 'endTime'].forEach(key => {
+    describe('Timestamp fields (isValidTimestampzString || isValidTimestampString)', function () {
+        [
+            'expires_at',
+            'expiresAt',
+            'starts_at',
+            'startsAt',
+            'start_time',
+            'startTime',
+            'end_time',
+            'endTime',
+            'approved_at',
+            'approvedAt',
+        ].forEach(key => {
             it(`accepts a valid timestamptz for "${key}"`, function () {
                 assertAccepts(key, '2023-10-27T10:00:00Z');
             });
@@ -496,16 +550,38 @@ describe('ValidateProperties test', function () {
                 entityType: 'document',
                 action_type: 'create',
                 actionType: 'create',
+                approved_by_role: 'cc_admin',
+                approvedByRole: 'cc_admin',
                 entity_id: VALID_UUID,
                 entityId: VALID_UUID,
                 changed_by: VALID_UUID,
                 changedBy: VALID_UUID,
                 request_id: VALID_UUID,
                 requestId: VALID_UUID,
+                approved_by_user_id: VALID_UUID,
+                approvedByUserId: VALID_UUID,
                 start_time: '2023-10-27T10:00:00Z',
                 startTime: '2023-10-27T10:00:00Z',
+                starts_at: '2023-10-27T10:00:00Z',
+                startsAt: '2023-10-27T10:00:00Z',
                 end_time: '2023-10-27T10:00:00Z',
                 endTime: '2023-10-27T10:00:00Z',
+                approved_at: '2023-10-27T10:00:00Z',
+                approvedAt: '2023-10-27T10:00:00Z',
+                approved_status: 'info_needed',
+                approvedStatus: 'on_hold',
+                requested_by_name: 'Requester <person>@example.com',
+                requestedByName: 'Requester <person>@example.com',
+                requested_by_email: 'requester@example.com',
+                requestedByEmail: 'requester@example.com',
+                requested_by_phone: '+1 416 555 0101',
+                requestedByPhone: '+1 416 555 0101',
+                approved_by_name: 'Approver <person>@example.com',
+                approvedByName: 'Approver <person>@example.com',
+                approved_by_email: 'approver@example.com',
+                approvedByEmail: 'approver@example.com',
+                approved_by_phone: '+1 647 555 0101',
+                approvedByPhone: '+1 647 555 0101',
                 limit: '50',
                 offset: '0',
             };
