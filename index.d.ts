@@ -97,8 +97,12 @@ export function isBoolValue(inputValue: any): boolean;
 export function isPostalCodeString(inputString: any): boolean;
 /** Checks if the string contains only allowed "safe" characters. */
 export function isSafeString(str: any): boolean;
+/** Checks if the value is non-empty text up to the supported maximum length. */
+export function isTextString(str: any): boolean;
 /** Checks if a string exists within a given array of strings (case-insensitive). */
 export function isInStringArray(StringArray: string[], inputString: any): boolean;
+/** Checks if the string is one of the supported user role request statuses. */
+export function isUserRoleRequestStatusString(inputString: any): boolean;
 /** Checks if the string is a valid country code (e.g., +1). */
 export function isCountryCodeString(str: any): boolean;
 /** Checks if the string is a valid domain name. */
@@ -142,7 +146,9 @@ export const validate: {
     isBoolValue: typeof isBoolValue;
     isPostalCodeString: typeof isPostalCodeString;
     isSafeString: typeof isSafeString;
+    isTextString: typeof isTextString;
     isInStringArray: typeof isInStringArray;
+    isUserRoleRequestStatusString: typeof isUserRoleRequestStatusString;
     isCountryCodeString: typeof isCountryCodeString;
     isValidDomainName: typeof isValidDomainName;
     isValidTimestampzString: typeof isValidTimestampzString;
