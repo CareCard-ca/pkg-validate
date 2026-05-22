@@ -43,6 +43,8 @@ import {
     isValidTimestampzString,
     isValidUrl,
     isValidUuidString,
+    isTextString,
+    isUserRoleRequestStatusString,
     validate,
     validateProperties,
     validateWhitelistProperties,
@@ -126,7 +128,9 @@ expectType<BoolValidator>(isProvinceString);
 expectType<BoolValidator>(isBoolValue);
 expectType<BoolValidator>(isPostalCodeString);
 expectType<BoolValidator>(isSafeString);
+expectType<BoolValidator>(isTextString);
 expectType<BoolValidator>(isCountryCodeString);
+expectType<BoolValidator>(isUserRoleRequestStatusString);
 expectType<BoolValidator>(isValidDomainName);
 expectType<BoolValidator>(isValidTimestampzString);
 expectType<BoolValidator>(isValidTimestampString);
@@ -138,6 +142,8 @@ expectType<boolean>(isEmailString('a@b.com'));
 expectType<boolean>(isInteger(1));
 expectType<boolean>(isValidUuidString('x'));
 expectType<boolean>(isStreetString('103 Main Street'));
+expectType<boolean>(isTextString('free text'));
+expectType<boolean>(isUserRoleRequestStatusString('pending'));
 expectType<boolean>(isBoolValue(true));
 expectType<boolean>(isValidArrayOfStrings(['a']));
 
@@ -186,7 +192,9 @@ expectType<typeof isProvinceString>(validate.isProvinceString);
 expectType<typeof isBoolValue>(validate.isBoolValue);
 expectType<typeof isPostalCodeString>(validate.isPostalCodeString);
 expectType<typeof isSafeString>(validate.isSafeString);
+expectType<typeof isTextString>(validate.isTextString);
 expectType<typeof isInStringArray>(validate.isInStringArray);
+expectType<typeof isUserRoleRequestStatusString>(validate.isUserRoleRequestStatusString);
 expectType<typeof isCountryCodeString>(validate.isCountryCodeString);
 expectType<typeof isValidDomainName>(validate.isValidDomainName);
 expectType<typeof isValidTimestampzString>(validate.isValidTimestampzString);
