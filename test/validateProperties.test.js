@@ -221,6 +221,22 @@ describe('ValidateProperties test', function () {
         });
     });
 
+    describe('User role request role fields', function () {
+        ['user_role_request_role', 'userRoleRequestRole'].forEach(key => {
+            it(`accepts a requestable user role for "${key}"`, function () {
+                assertAccepts(key, 'student');
+                assertAccepts(key, 'intern');
+                assertAccepts(key, 'volunteer');
+            });
+
+            it(`rejects a non-requestable user role for "${key}"`, function () {
+                assertRejects(key, 'user');
+                assertRejects(key, 'cc_admin');
+                assertRejects(key, 'students');
+            });
+        });
+    });
+
     describe('URL-safe token fields (isUrlSafeString)', function () {
         const tokenKeys = ['token', 'email_confirm_token', 'emailConfirmToken', 'verification_token', 'verificationToken'];
 

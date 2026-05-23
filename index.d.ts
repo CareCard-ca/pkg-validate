@@ -13,18 +13,10 @@ export interface ValidateWhitelistPropertiesOptions {
     convertToSnakeCase?: boolean;
     /**
      * When true, the returned object is flattened so that every validated leaf
-     * becomes a top-level key. No nested objects remain in the output. Applied
-     * after snake_case conversion.
+     * becomes a top-level key, joined by `.` (e.g. `{ 'user.first_name': 'Jane' }`).
+     * No nested objects remain in the output. Applied after snake_case conversion.
      */
     flattenOutput?: boolean;
-    /**
-     * Controls flattened key naming when `flattenOutput` is true.
-     * - `path` uses full dot-notation paths, e.g. `{ "user.email": "Jane" }`.
-     * - `leaf` uses only leaf names, e.g. `{ email: "Jane" }`.
-     *
-     * Defaults to `path`.
-     */
-    flattenKeyStyle?: 'path' | 'leaf';
 }
 
 /**
@@ -46,17 +38,34 @@ export interface ValidateWhitelistPropertiesOptions {
  *   validated elements (e.g. `{ name: ["First", "Other"] }` is validated like
  *   `{ name: "First" }` and `{ name: "Other" }` individually).
  * - Optionally converts the resulting keys (including nested keys) to snake_case.
- * - Optionally flattens the result after snake_case conversion.
  *
  * @param inputObject The input object (e.g. `req.body` or `req.params`).
  * @param requiredProperties Leaf paths that must be present and valid. Dot-notation supported.
- * @param options Optional additional leaf paths plus output transformation flags.
+ * @param options Optional list of additional allowed leaf paths and case-conversion flag.
  */
 export function validateWhitelistProperties(
     inputObject: Record<string, any>,
     requiredProperties?: string[],
     options?: ValidateWhitelistPropertiesOptions,
 ): Promise<Record<string, any>>;
+
+export const DEFAULT_USER_ROLE_REQUEST_ROLE: 'student';
+export const REQUIRE_SCOPE_WHEN_ROLE_OR_SCOPE_PRESENT: 'whenRoleOrScopePresent';
+
+export interface ValidateNewUserRoleRequestOptions {
+    defaultRole?: 'student' | undefined;
+    requireScope?: boolean | typeof REQUIRE_SCOPE_WHEN_ROLE_OR_SCOPE_PRESENT;
+}
+
+/**
+ * Normalizes and validates a carecard.new_user_role_request payload.
+ * Only student, intern, and volunteer are accepted. When scope is required,
+ * both institution_id and campus_id must be provided.
+ */
+export function validateNewUserRoleRequestObject(
+    roleRequest?: Record<string, any>,
+    options?: ValidateNewUserRoleRequestOptions,
+): Record<string, any>;
 
 /** Checks if the string is a valid image URL format. */
 export function isImageUrl(imageUrl: any): boolean;
@@ -112,6 +121,8 @@ export function isTextString(str: any): boolean;
 export function isInStringArray(StringArray: string[], inputString: any): boolean;
 /** Checks if the string is one of the supported user role request statuses. */
 export function isUserRoleRequestStatusString(inputString: any): boolean;
+/** Checks if the string is a supported new user role request role. */
+export function isUserRoleRequestRoleString(inputString: any): boolean;
 /** Checks if the string is a valid country code (e.g., +1). */
 export function isCountryCodeString(str: any): boolean;
 /** Checks if the string is a valid domain name. */
@@ -158,6 +169,7 @@ export const validate: {
     isTextString: typeof isTextString;
     isInStringArray: typeof isInStringArray;
     isUserRoleRequestStatusString: typeof isUserRoleRequestStatusString;
+    isUserRoleRequestRoleString: typeof isUserRoleRequestRoleString;
     isCountryCodeString: typeof isCountryCodeString;
     isValidDomainName: typeof isValidDomainName;
     isValidTimestampzString: typeof isValidTimestampzString;
