@@ -49,6 +49,24 @@ export function validateWhitelistProperties(
     options?: ValidateWhitelistPropertiesOptions,
 ): Promise<Record<string, any>>;
 
+export const DEFAULT_USER_ROLE_REQUEST_ROLE: 'student';
+export const REQUIRE_SCOPE_WHEN_ROLE_OR_SCOPE_PRESENT: 'whenRoleOrScopePresent';
+
+export interface ValidateNewUserRoleRequestOptions {
+    defaultRole?: 'student' | undefined;
+    requireScope?: boolean | typeof REQUIRE_SCOPE_WHEN_ROLE_OR_SCOPE_PRESENT;
+}
+
+/**
+ * Normalizes and validates a carecard.new_user_role_request payload.
+ * Only student, intern, and volunteer are accepted. When scope is required,
+ * both institution_id and campus_id must be provided.
+ */
+export function validateNewUserRoleRequestObject(
+    roleRequest?: Record<string, any>,
+    options?: ValidateNewUserRoleRequestOptions,
+): Record<string, any>;
+
 /** Checks if the string is a valid image URL format. */
 export function isImageUrl(imageUrl: any): boolean;
 /** Checks if the value is an integer. */
@@ -103,6 +121,8 @@ export function isTextString(str: any): boolean;
 export function isInStringArray(StringArray: string[], inputString: any): boolean;
 /** Checks if the string is one of the supported user role request statuses. */
 export function isUserRoleRequestStatusString(inputString: any): boolean;
+/** Checks if the string is a supported new user role request role. */
+export function isUserRoleRequestRoleString(inputString: any): boolean;
 /** Checks if the string is a valid country code (e.g., +1). */
 export function isCountryCodeString(str: any): boolean;
 /** Checks if the string is a valid domain name. */
@@ -149,6 +169,7 @@ export const validate: {
     isTextString: typeof isTextString;
     isInStringArray: typeof isInStringArray;
     isUserRoleRequestStatusString: typeof isUserRoleRequestStatusString;
+    isUserRoleRequestRoleString: typeof isUserRoleRequestRoleString;
     isCountryCodeString: typeof isCountryCodeString;
     isValidDomainName: typeof isValidDomainName;
     isValidTimestampzString: typeof isValidTimestampzString;

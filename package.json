@@ -1,6 +1,6 @@
 {
     "name": "@carecard/validate",
-    "version": "3.1.23",
+    "version": "3.1.24",
     "repository": {
         "type": "git",
         "url": "git+https://github.com/CareCard-ca/pkg-validate.git"
@@ -12,7 +12,7 @@
         "test": "mocha --recursive",
         "test:types": "tsc --noEmit && echo \"\\n  ✔ Type tests passed: tsc --noEmit reported 0 errors across index.d.ts and test/**/*.ts\\n\"",
         "test:coverage": "tsc --noEmit && export NODE_ENV=test && nyc mocha --recursive",
-        "test:All": "npm run test && npm run test:types",
+        "test:All": "npm run test:coverage && npm run test:types",
         "format": "prettier --write .",
         "format:check": "prettier --check .",
         "prepare": "husky",
@@ -39,5 +39,17 @@
     },
     "dependencies": {
         "@carecard/common-util": "^3.1.13"
+    },
+    "nyc": {
+        "all": true,
+        "include": [
+            "index.js",
+            "lib/**/*.js"
+        ],
+        "check-coverage": true,
+        "branches": 100,
+        "functions": 100,
+        "lines": 100,
+        "statements": 100
     }
 }
