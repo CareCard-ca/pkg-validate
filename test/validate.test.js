@@ -1,6 +1,12 @@
 const assert = require('assert').strict;
 const { describe, it } = require('mocha');
-const validate = require('../index').validate;
+const {
+    DEFAULT_USER_ROLE_REQUEST_ROLE,
+    REQUIRE_SCOPE_WHEN_ROLE_OR_SCOPE_PRESENT,
+    isUserRoleRequestRoleString,
+    validate,
+    validateNewUserRoleRequestObject,
+} = require('../index');
 
 describe('AuthUtil test', function () {
     const goodString = 'I am a good person';
@@ -527,6 +533,108 @@ describe('AuthUtil test', function () {
             assert.ok(!validate.isValidArrayOfStrings('not an array'), 'non-array should fail');
             assert.ok(!validate.isValidArrayOfStrings(['']), 'array with empty string should fail');
             assert.ok(!validate.isValidArrayOfStrings(['a'.repeat(10001)]), 'array with long string should fail');
+            done();
+        });
+
+        it('isUserRoleRequestRoleString returns true only for student, intern, and volunteer', function (done) {
+            assert.ok(isUserRoleRequestRoleString('student'), 'student should be valid');
+            assert.ok(isUserRoleRequestRoleString('intern'), 'intern should be valid');
+            assert.ok(isUserRoleRequestRoleString('volunteer'), 'volunteer should be valid');
+            assert.ok(!isUserRoleRequestRoleString('user'), 'user should be invalid');
+            assert.ok(!isUserRoleRequestRoleString('cc_admin'), 'cc_admin should be invalid');
+            assert.ok(!isUserRoleRequestRoleString('students'), 'students should be invalid');
+            assert.ok(!isUserRoleRequestRoleString(undefined), 'undefined should be invalid');
+            done();
+        });
+
+        it('validateNewUserRoleRequestObject defaults role and requires institution and campus', function (done) {
+            const roleRequest = validateNewUserRoleRequestObject({
+                user_id: '1c76ea46-a212-4cc5-9031-a9a28d927c4c',
+                institution_id: '2c76ea46-a212-4cc5-9031-a9a28d927c4c',
+                campus_id: '3c76ea46-a212-4cc5-9031-a9a28d927c4c',
+            });
+
+            assert.strictEqual(DEFAULT_USER_ROLE_REQUEST_ROLE, 'student');
+            assert.strictEqual(roleRequest.role_name, 'student');
+            assert.strictEqual(roleRequest.institution_id, '2c76ea46-a212-4cc5-9031-a9a28d927c4c');
+            assert.strictEqual(roleRequest.campus_id, '3c76ea46-a212-4cc5-9031-a9a28d927c4c');
+            done();
+        });
+
+        it('validateNewUserRoleRequestObject rejects an empty request with default create rules', function (done) {
+            assert.throws(
+                () => validateNewUserRoleRequestObject(),
+                err => err.message === 'Bad_Input' && err.userMessage === 'Missing property: role.institutionId',
+            );
+            done();
+        });
+
+        it('validateNewUserRoleRequestObject maps role aliases to role_name', function (done) {
+            const roleRequest = validateNewUserRoleRequestObject({
+                userId: '1c76ea46-a212-4cc5-9031-a9a28d927c4c',
+                role: 'intern',
+                institutionId: '2c76ea46-a212-4cc5-9031-a9a28d927c4c',
+                campusId: '3c76ea46-a212-4cc5-9031-a9a28d927c4c',
+            });
+
+            assert.strictEqual(roleRequest.role_name, 'intern');
+            assert.strictEqual(roleRequest.institution_id, '2c76ea46-a212-4cc5-9031-a9a28d927c4c');
+            assert.strictEqual(roleRequest.campus_id, '3c76ea46-a212-4cc5-9031-a9a28d927c4c');
+            assert.strictEqual(roleRequest.role, undefined);
+            done();
+        });
+
+        it('validateNewUserRoleRequestObject rejects invalid roles', function (done) {
+            assert.throws(
+                () =>
+                    validateNewUserRoleRequestObject({
+                        role_name: 'cc_admin',
+                        institution_id: '2c76ea46-a212-4cc5-9031-a9a28d927c4c',
+                        campus_id: '3c76ea46-a212-4cc5-9031-a9a28d927c4c',
+                    }),
+                err => err.message === 'Bad_Input' && err.userMessage === 'Invalid property: role.role',
+            );
+            done();
+        });
+
+        it('validateNewUserRoleRequestObject rejects missing scope when scope is required', function (done) {
+            assert.throws(
+                () => validateNewUserRoleRequestObject({ role_name: 'volunteer', institution_id: '2c76ea46-a212-4cc5-9031-a9a28d927c4c' }),
+                err => err.message === 'Bad_Input' && err.userMessage === 'Missing property: role.campusId',
+            );
+            done();
+        });
+
+        it('validateNewUserRoleRequestObject can disable scope requirements for non-create validation', function (done) {
+            assert.deepStrictEqual(
+                validateNewUserRoleRequestObject(
+                    { role_name: 'student' },
+                    {
+                        defaultRole: undefined,
+                        requireScope: false,
+                    },
+                ),
+                { role_name: 'student' },
+            );
+            done();
+        });
+
+        it('validateNewUserRoleRequestObject can require scope only when role or scope fields are present', function (done) {
+            assert.deepStrictEqual(
+                validateNewUserRoleRequestObject(
+                    { approved_status: 'on_hold' },
+                    { defaultRole: undefined, requireScope: REQUIRE_SCOPE_WHEN_ROLE_OR_SCOPE_PRESENT },
+                ),
+                { approved_status: 'on_hold' },
+            );
+            assert.throws(
+                () =>
+                    validateNewUserRoleRequestObject(
+                        { role_name: 'student' },
+                        { defaultRole: undefined, requireScope: REQUIRE_SCOPE_WHEN_ROLE_OR_SCOPE_PRESENT },
+                    ),
+                err => err.message === 'Bad_Input' && err.userMessage === 'Missing property: role.institutionId',
+            );
             done();
         });
     });
