@@ -1,0 +1,4 @@
+interface:
+    display_name: 'Package Validate'
+    short_description: 'CareCard validation package workflow'
+    default_prompt: 'Use $pkg-validate when changing @carecard/validate.'
