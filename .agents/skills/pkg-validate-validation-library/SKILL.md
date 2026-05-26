@@ -1,9 +1,52 @@
 ---
-name: pkg-validate
-description: Use when changing pkg-validate, the @carecard/validate CommonJS validation package. Covers direct validators, validateProperties, validateWhitelistProperties, nested dot paths, snake_case/camelCase aliases, flattening, CareCard BAD_INPUT errors, public exports, TypeScript declarations, Mocha tests, coverage thresholds, and type tests.
+name: pkg-validate-validation-library
+description: Use when changing pkg-validate validators, sanitizers, whitelist behavior, nested path rules, bad-input errors, package exports, or tests.
 ---
 
 # Package Validate
+
+## Purpose
+
+CareCard validation package for deterministic validators, sanitization, whitelist validation, nested paths, error mapping, exports, and tests.
+
+## When To Use
+
+- Use when changing pkg-validate validators, sanitizers, whitelist behavior, nested path rules, bad-input errors, package exports, or tests.
+- Pair with `carecard-workspace-standards` when the task affects shared CareCard conventions or cross-repository contracts.
+
+## When Not To Use
+
+- Do not use for service-local behavior that should remain inside one API or app.
+- Do not change package public APIs without updating consumers and compatibility tests.
+
+## Relevant Files And Directories
+
+- package entry files
+- `src` when present
+- `test`
+- `package.json`
+- `package-lock.json`
+- `.husky`
+
+## Coding Principles
+
+- Preserve the repository structure, naming style, module system, and local helper patterns.
+- Prefer readable, maintainable code with meaningful function, variable, file, and test names.
+- Avoid new dependencies unless the existing stack cannot reasonably solve the task and the user confirms the tradeoff.
+- Keep public exports stable and update CommonJS, ESM, TypeScript declaration, and compatibility surfaces together when present.
+
+## Testing Expectations
+
+- Write or update package tests before behavior or public API changes.
+- Include type/export compatibility tests where the package already has them.
+- Run package test, lint, type, and Husky validation commands required by the changed area.
+
+## Safety Constraints
+
+- Do not edit generated output, dependency folders, logs, coverage, dist, or build artifacts unless the task explicitly requires it.
+- Do not revert or overwrite user changes; stage only files related to the requested skill or instruction update.
+- Never suppress errors, lint failures, type failures, security failures, or failing tests; fix the underlying issue or report the blocker.
+- Do not log or expose secrets, JWTs, passwords, credentials, private keys, sensitive personal data, SQL internals, or stack traces.
 
 ## Overview
 

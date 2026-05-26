@@ -1,0 +1,5 @@
+interface:
+    display_name: 'GitHub PR Merge And Cleanup'
+    short_description: 'Review, validate, merge, close, delete branch, and clean local state for a GitHub pull request targeting origin/development'
+    brand_color: '#0F766E'
+    default_prompt: 'Use $github-pr-merge-cleanup when this task matches the skill scope.'
