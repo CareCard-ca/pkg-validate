@@ -1,6 +1,6 @@
 ---
 name: pkg-validate-validation-library
-description: 'Use when changing pkg-validate validators, sanitizers, whitelist behavior, nested path rules, bad-input errors, package exports, or tests.'
+description: Use when changing pkg-validate validators, sanitizers, whitelist behavior, nested path rules, bad-input errors, package exports, or tests.
 ---
 
 # Package Validate
@@ -43,8 +43,8 @@ CareCard validation package for deterministic validators, sanitization, whitelis
 
 ## Safety Constraints
 
-- Do not edit generated output, dependency folders, logs, coverage, dist, or build artifacts unless the task requires it.
-- Do not revert or overwrite user changes; stage only requested skill or instruction files.
+- Do not edit generated output, dependency folders, logs, coverage, dist, or build artifacts unless the task explicitly requires it.
+- Do not revert or overwrite user changes; stage only files related to the requested skill or instruction update.
 - Never suppress errors, lint failures, type failures, security failures, or failing tests; fix the underlying issue or report the blocker.
 - Do not log or expose secrets, JWTs, passwords, credentials, private keys, sensitive personal data, SQL internals, or stack traces.
 
@@ -160,10 +160,6 @@ npm run test:All
 
 If any validation command cannot run, report the exact command, failure reason,
 and remaining risk.
-
-## Remote Git Operations Guardrail
-
-Do not run remote Git or GitHub operations unless the current user request explicitly asks for them. This includes `git fetch`, `git pull`, `git push`, `git push --delete`, remote branch cleanup, GitHub API calls, and any `gh pr` command that creates, updates, readies, merges, closes, or cleans up a pull request. Do not infer permission from branch names, validation needs, prior workflow habits, or convenience; ask first when remote state would help but was not requested.
 
 ## Agent Guidance Git Workflow
 
