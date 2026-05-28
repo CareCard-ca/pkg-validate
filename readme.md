@@ -371,3 +371,8 @@ auth-table RLS contract: normal users are self-row only, JWT `roles: ["ad"]`
 is the auth super-admin signal, and public auth flows use narrow system
 contexts. Do not use validators as a replacement for service RLS or database
 context checks.
+
+Docs that mention `ms-auth` controller internals should use concise action
+names such as `loginUser`, `registerUser`, `getUserDetail`, and `renewJwt`.
+Access level is conveyed by route middleware and endpoint placement, not by
+`public`/`protected`/`admin`/`Handler` suffixes.
