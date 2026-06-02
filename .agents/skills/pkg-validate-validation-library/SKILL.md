@@ -1,6 +1,6 @@
 ---
 name: pkg-validate-validation-library
-description: Use when changing pkg-validate validators, sanitizers, whitelist behavior, nested path rules, bad-input errors, package exports, or tests.
+description: 'Use when changing pkg-validate validators, sanitizers, whitelist behavior, nested path rules, bad-input errors, package exports, or tests.'
 ---
 
 # Package Validate
