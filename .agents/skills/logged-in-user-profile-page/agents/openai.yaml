@@ -1,0 +1,4 @@
+interface:
+    display_name: 'Logged-In User Profile Page'
+    short_description: 'Guide shared validator support for profile/settings fields'
+    default_prompt: 'Use $logged-in-user-profile-page when changing shared validation for dashboard profile/settings request fields.'
