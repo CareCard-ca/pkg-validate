@@ -121,7 +121,7 @@ where the package supports both.
 
 `validateWhitelistProperties` extracts only the required and optional property
 paths you provide, validates each leaf through `validateProperties`, and returns
-a `Promise<Record<string, any>>` with the sanitized output.
+a `Promise<ValidatePropertiesResult>` with the sanitized output.
 
 ```js
 const body = {
@@ -333,10 +333,11 @@ await validateWhitelistProperties(input, ['name', 'user.name', 'user.email'], {
 The package ships `index.d.ts` and declares types for the CommonJS exports.
 
 ```ts
-import { validateWhitelistProperties, isEmailString } from '@carecard/validate';
+import { validateWhitelistProperties, isEmailString, ValidatePropertiesResult } from '@carecard/validate';
 
 const valid: boolean = isEmailString('jane@example.com');
-const output: Record<string, any> = await validateWhitelistProperties({ first_name: 'Jane' }, ['first_name']);
+const output: ValidatePropertiesResult = await validateWhitelistProperties({ first_name: 'Jane' }, ['first_name']);
+const maxDepth: 5 = validateWhitelistProperties.MAX_NESTING_DEPTH;
 ```
 
 ## Project Layout
