@@ -1,0 +1,4 @@
+interface:
+    display_name: 'Package Validate Validation Library'
+    short_description: 'CareCard validation package for deterministic validators, sanitization, whitelist validation, nested paths, error mapping, exports, and t...'
+    default_prompt: 'Use $pkg-validate-validation-library when this task matches the skill scope.'

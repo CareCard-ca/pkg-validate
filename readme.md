@@ -106,6 +106,7 @@ where the package supports both.
 | `isString6To16CharacterLong` and `isPasswordString`       | `strong_password`, `strongPassword`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
 | `isEmailString`                                           | `email`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
 | `isPhoneNumber`                                           | `phone_number`, `phoneNumber`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| `isCountryCodeString`                                     | `country_code`, `countryCode`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
 | `isUrlSafeString`                                         | `token`, `email_confirm_token`, `emailConfirmToken`, `verification_token`, `verificationToken`                                                                                                                                                                                                                                                                                                                                                                                                                                              |
 | `isValidUuidString`                                       | `uuid`, `item_id`, `itemId`, `user_id`, `userId`, `address_id`, `addressId`, `image_id`, `imageId`, `order_id`, `orderId`, `category_id`, `categoryId`, `parent_id`, `parentId`, `college_id`, `collegeId`, `campus_id`, `campusId`, `program_id`, `programId`, `id`, `institution_id`, `institutionId`, `role_assignment_id`, `roleAssignmentId`, `user_role_id`, `userRoleId`, `phone_number_id`, `phoneNumberId`, `entity_id`, `entityId`, `changed_by`, `changedBy`, `request_id`, `requestId`                                          |
 | `isValidIntegerString`                                    | `offset_number`, `offsetNumber`, `number_of_orders`, `numberOfOrders`, `price`, `from`, `number`, `limit`, `offset`                                                                                                                                                                                                                                                                                                                                                                                                                         |
@@ -363,3 +364,16 @@ npm run format:check
 
 CI runs on Node.js 25 and executes `npm run test:All`. Publishing to npm happens
 from `main` through the `Publish to npm` GitHub workflow.
+
+## Auth Boundary
+
+Validation protects request shape, not authorization. `ms-auth` owns its
+auth-table RLS contract: normal users are self-row only, JWT `roles: ["ad"]`
+is the auth super-admin signal, and public auth flows use narrow system
+contexts. Do not use validators as a replacement for service RLS or database
+context checks.
+
+Docs that mention `ms-auth` controller internals should use concise action
+names such as `loginUser`, `registerUser`, `getUserDetail`, and `renewJwt`.
+Access level is conveyed by route middleware and endpoint placement, not by
+`public`/`protected`/`admin`/`Handler` suffixes.

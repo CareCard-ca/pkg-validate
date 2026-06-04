@@ -182,6 +182,18 @@ describe('ValidateProperties test', function () {
         });
     });
 
+    describe('Country code fields (isCountryCodeString)', function () {
+        ['country_code', 'countryCode'].forEach(key => {
+            it(`accepts a valid country code for "${key}"`, function () {
+                assertAccepts(key, '+1');
+            });
+
+            it(`rejects an invalid country code for "${key}"`, function () {
+                assertRejects(key, '1');
+            });
+        });
+    });
+
     describe('User role request text fields (isTextString)', function () {
         const textKeys = [
             'requested_by_name',

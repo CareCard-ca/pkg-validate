@@ -13,10 +13,18 @@ export interface ValidateWhitelistPropertiesOptions {
     convertToSnakeCase?: boolean;
     /**
      * When true, the returned object is flattened so that every validated leaf
-     * becomes a top-level key, joined by `.` (e.g. `{ 'user.first_name': 'Jane' }`).
-     * No nested objects remain in the output. Applied after snake_case conversion.
+     * becomes a top-level key. No nested objects remain in the output. Applied
+     * after snake_case conversion.
      */
     flattenOutput?: boolean;
+    /**
+     * Controls flattened key naming when `flattenOutput` is true.
+     * - `path` uses full dot-notation paths, e.g. `{ "user.email": "Jane" }`.
+     * - `leaf` uses only leaf names, e.g. `{ email: "Jane" }`.
+     *
+     * Defaults to `path`.
+     */
+    flattenKeyStyle?: 'path' | 'leaf';
 }
 
 /**
@@ -38,10 +46,11 @@ export interface ValidateWhitelistPropertiesOptions {
  *   validated elements (e.g. `{ name: ["First", "Other"] }` is validated like
  *   `{ name: "First" }` and `{ name: "Other" }` individually).
  * - Optionally converts the resulting keys (including nested keys) to snake_case.
+ * - Optionally flattens the result after snake_case conversion.
  *
  * @param inputObject The input object (e.g. `req.body` or `req.params`).
  * @param requiredProperties Leaf paths that must be present and valid. Dot-notation supported.
- * @param options Optional list of additional allowed leaf paths and case-conversion flag.
+ * @param options Optional additional leaf paths plus output transformation flags.
  */
 export function validateWhitelistProperties(
     inputObject: Record<string, any>,

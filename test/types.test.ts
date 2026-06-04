@@ -76,7 +76,12 @@ expectType<
 expectType<Promise<Record<string, any>>>(validateWhitelistProperties({ a: 1 }));
 expectType<Promise<Record<string, any>>>(validateWhitelistProperties({ a: 1 }, ['a']));
 expectType<Promise<Record<string, any>>>(
-    validateWhitelistProperties({ a: 1 }, ['a'], { optionalProperties: ['b'], convertToSnakeCase: true }),
+    validateWhitelistProperties({ a: 1 }, ['a'], {
+        optionalProperties: ['b'],
+        convertToSnakeCase: true,
+        flattenOutput: true,
+        flattenKeyStyle: 'path',
+    }),
 );
 
 // Options interface: all fields optional.
@@ -85,12 +90,16 @@ const optsPartial: ValidateWhitelistPropertiesOptions = { optionalProperties: ['
 const optsFull: ValidateWhitelistPropertiesOptions = {
     optionalProperties: ['x', 'y'],
     convertToSnakeCase: false,
+    flattenOutput: true,
+    flattenKeyStyle: 'leaf',
 };
 expectType<ValidateWhitelistPropertiesOptions>(optsEmpty);
 expectType<ValidateWhitelistPropertiesOptions>(optsPartial);
 expectType<ValidateWhitelistPropertiesOptions>(optsFull);
 expectType<string[] | undefined>(optsFull.optionalProperties);
 expectType<boolean | undefined>(optsFull.convertToSnakeCase);
+expectType<boolean | undefined>(optsFull.flattenOutput);
+expectType<'path' | 'leaf' | undefined>(optsFull.flattenKeyStyle);
 
 // ---------------------------------------------------------------------------
 // validateProperties
