@@ -1,6 +1,6 @@
 ---
 name: github-pr-create-update
-description: "Use only when the user explicitly asks for remote Git or GitHub PR work: pushing a branch, creating or updating a PR, or marking a PR ready from the current repository branch into development or main."
+description: 'Use only when the user explicitly asks for remote Git or GitHub PR work: pushing a branch, creating or updating a PR, or marking a PR ready from the current repository branch into development or main.'
 ---
 
 # Pull Request Create
@@ -57,110 +57,110 @@ Do not continue automatically when:
 
 1. Capture the source branch and run preflight checks:
 
-   ```sh
-   branch="$(git branch --show-current)"
-   test -n "$branch"
-   test "$branch" != "development"
-   test "$branch" != "main"
-   test "$branch" != "master"
-   git status --short
-   gh auth status
-   ```
+    ```sh
+    branch="$(git branch --show-current)"
+    test -n "$branch"
+    test "$branch" != "development"
+    test "$branch" != "main"
+    test "$branch" != "master"
+    git status --short
+    gh auth status
+    ```
 
 2. Select the pull request base branch. Prefer `development`; use `main` only
    when `origin/development` is absent:
 
-   ```sh
-   if git ls-remote --exit-code --heads origin development >/dev/null 2>&1; then
-     base="development"
-   elif git ls-remote --exit-code --heads origin main >/dev/null 2>&1; then
-     base="main"
-   else
-     echo "No origin/development or origin/main branch exists."
-     exit 1
-   fi
-   git fetch origin "$base" --prune
-   ```
+    ```sh
+    if git ls-remote --exit-code --heads origin development >/dev/null 2>&1; then
+      base="development"
+    elif git ls-remote --exit-code --heads origin main >/dev/null 2>&1; then
+      base="main"
+    else
+      echo "No origin/development or origin/main branch exists."
+      exit 1
+    fi
+    git fetch origin "$base" --prune
+    ```
 
 3. Check whether the current branch can merge with the latest base without
    changing the worktree:
 
-   ```sh
-   if git merge-tree --write-tree HEAD "origin/$base" >/tmp/pull-request-create-merge-tree.out
-   then
-     merge_conflict_detected=false
-   else
-     merge_conflict_detected=true
-   fi
-   ```
+    ```sh
+    if git merge-tree --write-tree HEAD "origin/$base" >/tmp/pull-request-create-merge-tree.out
+    then
+      merge_conflict_detected=false
+    else
+      merge_conflict_detected=true
+    fi
+    ```
 
 4. If a merge conflict is detected, try rebasing on the latest base:
 
-   ```sh
-   if [ "$merge_conflict_detected" = true ]; then
-     if git rebase "origin/$base"; then
-       git push --force-with-lease -u origin "$branch"
-     else
-       git rebase --abort
-       echo "Rebase conflicted; aborted without pushing."
-       exit 1
-     fi
-   else
-     git push -u origin "$branch"
-   fi
-   ```
+    ```sh
+    if [ "$merge_conflict_detected" = true ]; then
+      if git rebase "origin/$base"; then
+        git push --force-with-lease -u origin "$branch"
+      else
+        git rebase --abort
+        echo "Rebase conflicted; aborted without pushing."
+        exit 1
+      fi
+    else
+      git push -u origin "$branch"
+    fi
+    ```
 
-   Do not use `--no-verify`; pre-push hooks must run. Do not resolve rebase
-   conflicts unless the user explicitly asks.
+    Do not use `--no-verify`; pre-push hooks must run. Do not resolve rebase
+    conflicts unless the user explicitly asks.
 
 5. Verify the remote branch matches local `HEAD`:
 
-   ```sh
-   local_sha="$(git rev-parse HEAD)"
-   remote_sha="$(git ls-remote --heads origin "$branch" | awk '{print $1}')"
-   test "$local_sha" = "$remote_sha"
-   ```
+    ```sh
+    local_sha="$(git rev-parse HEAD)"
+    remote_sha="$(git ls-remote --heads origin "$branch" | awk '{print $1}')"
+    test "$local_sha" = "$remote_sha"
+    ```
 
 6. Inspect the branch changes before writing the PR title:
 
-   ```sh
-   git log --reverse --format='%s' "origin/$base..HEAD"
-   git diff --stat "origin/$base...HEAD"
-   ```
+    ```sh
+    git log --reverse --format='%s' "origin/$base..HEAD"
+    git diff --stat "origin/$base...HEAD"
+    ```
 
 7. Reuse an existing open PR for this exact branch/base pair when present:
 
-   ```sh
-   pr_number="$(gh pr list \
-     --head "$branch" \
-     --base "$base" \
-     --state open \
-     --json number \
-     --jq '.[0].number // empty')"
-   ```
+    ```sh
+    pr_number="$(gh pr list \
+      --head "$branch" \
+      --base "$base" \
+      --state open \
+      --json number \
+      --jq '.[0].number // empty')"
+    ```
 
 8. If there is no PR, create one against the selected base and capture the new
    PR number:
 
-   ```sh
-   pr_url="$(gh pr create \
-     --base "$base" \
-     --head "$branch" \
-     --title "$title" \
-     --body "$body")"
-   pr_number="$(gh pr view "$pr_url" --json number --jq '.number')"
-   ```
+    ```sh
+    pr_url="$(gh pr create \
+      --base "$base" \
+      --head "$branch" \
+      --title "$title" \
+      --body "$body")"
+    pr_number="$(gh pr view "$pr_url" --json number --jq '.number')"
+    ```
 
 9. If a PR exists, mark it ready when it is a draft, then keep the title
    descriptive:
 
-   ```sh
-   is_draft="$(gh pr view "$pr_number" --json isDraft --jq '.isDraft')"
-   if [ "$is_draft" = "true" ]; then
-     gh pr ready "$pr_number"
-   fi
-   gh pr edit "$pr_number" --title "$title"
-   ```
+    ```sh
+    is_draft="$(gh pr view "$pr_number" --json isDraft --jq '.isDraft')"
+    if [ "$is_draft" = "true" ]; then
+      gh pr ready "$pr_number"
+    fi
+    gh pr edit "$pr_number" --title "$title"
+    ```
 
 10. Final response should include the PR URL, selected base branch, whether a
     rebase was performed, whether an existing PR was reused or marked ready,

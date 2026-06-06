@@ -1,6 +1,6 @@
 ---
 name: github-pr-merge-cleanup
-description: "Use only when the user explicitly asks for remote Git or GitHub PR work: pushing a branch, creating a missing PR, reviewing mergeability, validating, merging, deleting, or cleaning up a pull request branch."
+description: 'Use only when the user explicitly asks for remote Git or GitHub PR work: pushing a branch, creating a missing PR, reviewing mergeability, validating, merging, deleting, or cleaning up a pull request branch.'
 ---
 
 # Pull Request Merge Close
@@ -66,97 +66,97 @@ completion.
 
 1. Capture the base branch, target branch, and authentication state:
 
-   ```sh
-   gh auth status
-   if git ls-remote --exit-code --heads origin development >/dev/null 2>&1; then
-     base="development"
-   elif git ls-remote --exit-code --heads origin main >/dev/null 2>&1; then
-     base="main"
-   else
-     echo "No origin/development or origin/main branch exists."
-     exit 1
-   fi
-   target_branch="$(git branch --show-current)"
-   test -n "$target_branch"
-   test "$target_branch" != "$base"
-   git status --short
-   ```
+    ```sh
+    gh auth status
+    if git ls-remote --exit-code --heads origin development >/dev/null 2>&1; then
+      base="development"
+    elif git ls-remote --exit-code --heads origin main >/dev/null 2>&1; then
+      base="main"
+    else
+      echo "No origin/development or origin/main branch exists."
+      exit 1
+    fi
+    target_branch="$(git branch --show-current)"
+    test -n "$target_branch"
+    test "$target_branch" != "$base"
+    git status --short
+    ```
 
-   If the user names a target branch, use that branch instead of the current
-   branch. If the target branch is not local but exists on `origin`, create a
-   local branch from the remote head before continuing:
+    If the user names a target branch, use that branch instead of the current
+    branch. If the target branch is not local but exists on `origin`, create a
+    local branch from the remote head before continuing:
 
-   ```sh
-   if ! git show-ref --verify --quiet "refs/heads/$target_branch"; then
-     git fetch origin "$target_branch:$target_branch"
-   fi
-   git switch "$target_branch"
-   git fetch origin "$base" --prune
-   ```
+    ```sh
+    if ! git show-ref --verify --quiet "refs/heads/$target_branch"; then
+      git fetch origin "$target_branch:$target_branch"
+    fi
+    git switch "$target_branch"
+    git fetch origin "$base" --prune
+    ```
 
 2. Push the target branch to the same remote branch name. Do not use
    `--no-verify`; pre-push hooks must run.
 
-   ```sh
-   git push -u origin "$target_branch"
-   local_sha="$(git rev-parse HEAD)"
-   remote_sha="$(git ls-remote --heads origin "$target_branch" | awk '{print $1}')"
-   test "$local_sha" = "$remote_sha"
-   ```
+    ```sh
+    git push -u origin "$target_branch"
+    local_sha="$(git rev-parse HEAD)"
+    remote_sha="$(git ls-remote --heads origin "$target_branch" | awk '{print $1}')"
+    test "$local_sha" = "$remote_sha"
+    ```
 
 3. Reuse an existing open PR for this exact branch/base pair, or create one
    when none exists:
 
-   ```sh
-   pr_number="$(gh pr list \
-     --head "$target_branch" \
-     --base "$base" \
-     --state open \
-     --json number \
-     --jq '.[0].number // empty')"
+    ```sh
+    pr_number="$(gh pr list \
+      --head "$target_branch" \
+      --base "$base" \
+      --state open \
+      --json number \
+      --jq '.[0].number // empty')"
 
-   if [ -z "$pr_number" ]; then
-     git log --reverse --format='%s' "origin/$base..HEAD"
-     git diff --stat "origin/$base...HEAD"
-     pr_url="$(gh pr create \
-       --base "$base" \
-       --head "$target_branch" \
-       --title "$title" \
-       --body "$body")"
-     pr_number="$(gh pr view "$pr_url" --json number --jq '.number')"
-   fi
-   ```
+    if [ -z "$pr_number" ]; then
+      git log --reverse --format='%s' "origin/$base..HEAD"
+      git diff --stat "origin/$base...HEAD"
+      pr_url="$(gh pr create \
+        --base "$base" \
+        --head "$target_branch" \
+        --title "$title" \
+        --body "$body")"
+      pr_number="$(gh pr view "$pr_url" --json number --jq '.number')"
+    fi
+    ```
 
 4. Mark draft PRs ready and check mergeability before changing history:
 
-   ```sh
-   is_draft="$(gh pr view "$pr_number" --json isDraft --jq '.isDraft')"
-   if [ "$is_draft" = "true" ]; then
-     gh pr ready "$pr_number"
-   fi
-   gh pr view "$pr_number" --json mergeStateStatus,mergeable,headRefName,baseRefName
-   if git merge-tree --write-tree HEAD "origin/$base" >/tmp/pull-request-merge-close-merge-tree.out
-   then
-     merge_conflict_detected=false
-   else
-     merge_conflict_detected=true
-   fi
-   ```
+    ```sh
+    is_draft="$(gh pr view "$pr_number" --json isDraft --jq '.isDraft')"
+    if [ "$is_draft" = "true" ]; then
+      gh pr ready "$pr_number"
+    fi
+    gh pr view "$pr_number" --json mergeStateStatus,mergeable,headRefName,baseRefName
+    if git merge-tree --write-tree HEAD "origin/$base" >/tmp/pull-request-merge-close-merge-tree.out
+    then
+      merge_conflict_detected=false
+    else
+      merge_conflict_detected=true
+    fi
+    ```
 
 5. If a merge conflict is detected, rebase the target branch on the fresh base
    branch. Abort and stop if the rebase conflicts:
 
-   ```sh
-   if [ "$merge_conflict_detected" = true ]; then
-     if git rebase "origin/$base"; then
-       git push --force-with-lease -u origin "$target_branch"
-     else
-       git rebase --abort
-       echo "Rebase conflicted; aborted without merging."
-       exit 1
-     fi
-   fi
-   ```
+    ```sh
+    if [ "$merge_conflict_detected" = true ]; then
+      if git rebase "origin/$base"; then
+        git push --force-with-lease -u origin "$target_branch"
+      else
+        git rebase --abort
+        echo "Rebase conflicted; aborted without merging."
+        exit 1
+      fi
+    fi
+    ```
 
 6. Load and apply all relevant repository skills before merging, then confirm
    the PR is still mergeable after any validation changes.
@@ -164,33 +164,33 @@ completion.
 7. Merge the PR with GitHub CLI. Delete the remote target branch only when it is
    not protected:
 
-   ```sh
-   protected="$(gh api "repos/{owner}/{repo}/branches/$target_branch" --jq '.protected' 2>/dev/null || echo false)"
-   if [ "$protected" = true ]; then
-     gh pr merge "$pr_number" --squash --admin
-   else
-     gh pr merge "$pr_number" --squash --admin --delete-branch
-   fi
-   ```
+    ```sh
+    protected="$(gh api "repos/{owner}/{repo}/branches/$target_branch" --jq '.protected' 2>/dev/null || echo false)"
+    if [ "$protected" = true ]; then
+      gh pr merge "$pr_number" --squash --admin
+    else
+      gh pr merge "$pr_number" --squash --admin --delete-branch
+    fi
+    ```
 
 8. If the merge succeeded and the remote branch still exists while unprotected,
    delete it explicitly:
 
-   ```sh
-   if [ "$protected" != true ] && git ls-remote --exit-code --heads origin "$target_branch" >/dev/null 2>&1; then
-     git push origin --delete "$target_branch"
-   fi
-   ```
+    ```sh
+    if [ "$protected" != true ] && git ls-remote --exit-code --heads origin "$target_branch" >/dev/null 2>&1; then
+      git push origin --delete "$target_branch"
+    fi
+    ```
 
 9. Clean up the local repository after merge:
 
-   ```sh
-   git fetch origin --prune
-   git switch "$base"
-   git pull --ff-only origin "$base"
-   git branch -d "$target_branch" || git branch -D "$target_branch"
-   git ls-remote --heads origin "$target_branch"
-   ```
+    ```sh
+    git fetch origin --prune
+    git switch "$base"
+    git pull --ff-only origin "$base"
+    git branch -d "$target_branch" || git branch -D "$target_branch"
+    git ls-remote --heads origin "$target_branch"
+    ```
 
 10. Final response should include the PR URL, selected base branch, whether a
     rebase was performed, what validation and skill checks ran, whether any
