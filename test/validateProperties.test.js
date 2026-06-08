@@ -202,6 +202,8 @@ describe('ValidateProperties test', function () {
             'requestedByName',
             'document_description',
             'documentDescription',
+            'nick_name',
+            'nickName',
             'requested_by_email',
             'requestedByEmail',
             'requested_by_phone',
@@ -435,6 +437,10 @@ describe('ValidateProperties test', function () {
             'effectiveStartDate',
             'effective_end_date',
             'effectiveEndDate',
+            'valid_until_date',
+            'validUntilDate',
+            'renew_date',
+            'renewDate',
         ];
 
         dateKeys.forEach(key => {
@@ -583,6 +589,12 @@ describe('ValidateProperties test', function () {
                 effectiveStartDate: '2026-01-01',
                 effective_end_date: '2030-01-01',
                 effectiveEndDate: '2030-01-01',
+                valid_until_date: '2027-06-08',
+                validUntilDate: '2027-06-08',
+                renew_date: '2027-05-08',
+                renewDate: '2027-05-08',
+                nick_name: 'CPR certificate - wallet card',
+                nickName: 'CPR certificate - wallet card',
                 from: '0',
                 number: '10',
                 period: 'Monthly',
