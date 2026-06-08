@@ -181,6 +181,8 @@ export const isValidDomainName: BoolValidator;
 export const isValidTimestampzString: BoolValidator;
 /** Checks if the string is a valid ISO 8601 timestamp without time zone. */
 export const isValidTimestampString: BoolValidator;
+/** Checks if the string is a valid ISO date in YYYY-MM-DD format. */
+export const isValidDateString: BoolValidator;
 /** Checks if the string is a valid URL. */
 export const isValidUrl: BoolValidator;
 /** Checks if the array contains only safe strings. */
@@ -223,6 +225,7 @@ export const validate: {
     isValidDomainName: typeof isValidDomainName;
     isValidTimestampzString: typeof isValidTimestampzString;
     isValidTimestampString: typeof isValidTimestampString;
+    isValidDateString: typeof isValidDateString;
     isValidUrl: typeof isValidUrl;
     isValidArrayOfStrings: typeof isValidArrayOfStrings;
 };

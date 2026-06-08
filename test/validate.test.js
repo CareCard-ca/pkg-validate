@@ -46,6 +46,7 @@ describe('AuthUtil test', function () {
                 'isUserRoleRequestStatusString',
                 'isUsernameString',
                 'isValidArrayOfStrings',
+                'isValidDateString',
                 'isValidDomainName',
                 'isValidIntegerString',
                 'isValidJsonString',
@@ -109,6 +110,16 @@ describe('AuthUtil test', function () {
             assert.ok(!validate.isValidJsonString(badString), 'Bad string test failed');
             assert.ok(!validate.isValidJsonString(badStringTwo), 'Bad string test failed');
             assert.ok(validate.isValidJsonString(goodString), 'Good string test failed');
+            done();
+        });
+
+        it('isValidDateString returns true for a real ISO date and false otherwise', function (done) {
+            assert.ok(validate.isValidDateString('2026-09-01'), 'Good date test failed');
+            assert.ok(!validate.isValidDateString('2026-02-30'), 'Impossible date test failed');
+            assert.ok(!validate.isValidDateString('2026/09/01'), 'Non-ISO date test failed');
+            assert.ok(!validate.isValidDateString('2026-09-01T00:00:00'), 'Timestamp date test failed');
+            assert.ok(!validate.isValidDateString(''), 'Empty date test failed');
+            assert.ok(!validate.isValidDateString(123), 'Non-string date test failed');
             done();
         });
 
