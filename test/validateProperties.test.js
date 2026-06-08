@@ -48,8 +48,10 @@ describe('ValidateProperties test', function () {
             'programName',
             'role_name',
             'roleName',
-            'document_type',
-            'documentType',
+            'document_name',
+            'documentName',
+            'document_required_for_role_name',
+            'documentRequiredForRoleName',
             'reason',
             'entity_type',
             'entityType',
@@ -101,7 +103,7 @@ describe('ValidateProperties test', function () {
     });
 
     describe('Boolean fields (isBoolValue)', function () {
-        ['is_primary', 'isPrimary', 'active'].forEach(key => {
+        ['is_primary', 'isPrimary', 'active', 'document_optional', 'documentOptional'].forEach(key => {
             it(`accepts boolean true for "${key}"`, function () {
                 assertAccepts(key, true);
             });
@@ -198,6 +200,8 @@ describe('ValidateProperties test', function () {
         const textKeys = [
             'requested_by_name',
             'requestedByName',
+            'document_description',
+            'documentDescription',
             'requested_by_email',
             'requestedByEmail',
             'requested_by_phone',
@@ -286,6 +290,8 @@ describe('ValidateProperties test', function () {
             'campusId',
             'program_id',
             'programId',
+            'program_document_id',
+            'programDocumentId',
             'id',
             'institution_id',
             'institutionId',
@@ -421,6 +427,27 @@ describe('ValidateProperties test', function () {
         });
     });
 
+    describe('Date fields (isValidDateString)', function () {
+        const dateKeys = [
+            'document_required_by_date',
+            'documentRequiredByDate',
+            'effective_start_date',
+            'effectiveStartDate',
+            'effective_end_date',
+            'effectiveEndDate',
+        ];
+
+        dateKeys.forEach(key => {
+            it(`accepts an ISO date for "${key}"`, function () {
+                assertAccepts(key, '2026-09-01');
+            });
+
+            it(`rejects an invalid date for "${key}"`, function () {
+                assertRejects(key, '2026-02-30');
+            });
+        });
+    });
+
     describe('General behaviour', function () {
         it('returns an empty object for null input', function () {
             assert.deepStrictEqual(validateProperties(null), {});
@@ -483,8 +510,12 @@ describe('ValidateProperties test', function () {
                 programName: 'Program',
                 role_name: 'Admin',
                 roleName: 'Admin',
-                document_type: 'PDF',
-                documentType: 'PDF',
+                document_name: 'Clinical Placement Form',
+                documentName: 'Clinical Placement Form',
+                document_description: 'Required before placement',
+                documentDescription: 'Required before placement',
+                document_required_for_role_name: 'student',
+                documentRequiredForRoleName: 'student',
                 reason: 'Reason',
                 type: 'Type',
                 street: '103, main market',
@@ -495,6 +526,8 @@ describe('ValidateProperties test', function () {
                 postalCode: '492001',
                 is_primary: true,
                 isPrimary: true,
+                document_optional: false,
+                documentOptional: false,
                 role: 'Role',
                 role_id: 'RoleID',
                 roleId: 'RoleID',
@@ -541,7 +574,15 @@ describe('ValidateProperties test', function () {
                 campusId: VALID_UUID,
                 program_id: VALID_UUID,
                 programId: VALID_UUID,
+                program_document_id: VALID_UUID,
+                programDocumentId: VALID_UUID,
                 id: VALID_UUID,
+                document_required_by_date: '2026-09-01',
+                documentRequiredByDate: '2026-09-01',
+                effective_start_date: '2026-01-01',
+                effectiveStartDate: '2026-01-01',
+                effective_end_date: '2030-01-01',
+                effectiveEndDate: '2030-01-01',
                 from: '0',
                 number: '10',
                 period: 'Monthly',
@@ -630,6 +671,8 @@ describe('ValidateProperties test', function () {
                 postalCode: [],
                 is_primary: 'yes',
                 isPrimary: 'invalid',
+                document_optional: 'invalid',
+                documentOptional: 'invalid',
                 address_id: 'invalid-uuid',
                 addressId: 'invalid-uuid',
                 phone_number_id: 'invalid-uuid',
@@ -651,6 +694,12 @@ describe('ValidateProperties test', function () {
                 active: 'not a bool',
                 aliases: 'not an array',
                 expires_at: 'invalid-date',
+                document_required_by_date: '2026-02-30',
+                documentRequiredByDate: '2026-02-30',
+                effective_start_date: 'invalid-date',
+                effectiveStartDate: 'invalid-date',
+                effective_end_date: '2030-02-30',
+                effectiveEndDate: '2030-02-30',
                 unknown_key: 'any value',
             };
             const validatedObject = validateProperties(testObject);

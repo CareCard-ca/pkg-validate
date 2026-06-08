@@ -48,6 +48,7 @@ import {
     isValidDomainName,
     isValidIntegerString,
     isValidJsonString,
+    isValidDateString,
     isValidTimestampString,
     isValidTimestampzString,
     isValidUrl,
@@ -105,6 +106,7 @@ type ExpectedRuntimeExportKey =
     | 'isUsernameString'
     | 'isValidArrayOfStrings'
     | 'isValidDomainName'
+    | 'isValidDateString'
     | 'isValidIntegerString'
     | 'isValidJsonString'
     | 'isValidTimestampString'
@@ -203,6 +205,7 @@ expectType<BoolValidator>(isCountryCodeString);
 expectType<BoolValidator>(isUserRoleRequestRoleString);
 expectType<BoolValidator>(isUserRoleRequestStatusString);
 expectType<BoolValidator>(isValidDomainName);
+expectType<BoolValidator>(isValidDateString);
 expectType<BoolValidator>(isValidTimestampzString);
 expectType<BoolValidator>(isValidTimestampString);
 expectType<BoolValidator>(isValidUrl);
@@ -217,6 +220,7 @@ expectType<boolean>(isTextString('free text'));
 expectType<boolean>(isUserRoleRequestRoleString('student'));
 expectType<boolean>(isUserRoleRequestStatusString('pending'));
 expectType<boolean>(isBoolValue(true));
+expectType<boolean>(isValidDateString('2026-06-08'));
 expectType<boolean>(isValidArrayOfStrings(['a']));
 
 // ---------------------------------------------------------------------------
