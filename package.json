@@ -1,6 +1,6 @@
 {
     "name": "@carecard/validate",
-    "version": "3.2.0",
+    "version": "3.3.0",
     "repository": {
         "type": "git",
         "url": "git+https://github.com/CareCard-ca/pkg-validate.git"
@@ -38,7 +38,7 @@
         "typescript": "6.0.3"
     },
     "dependencies": {
-        "@carecard/common-util": "3.1.15"
+        "@carecard/common-util": "3.2.0"
     },
     "nyc": {
         "all": true,
