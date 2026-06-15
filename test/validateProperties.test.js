@@ -52,6 +52,8 @@ describe('ValidateProperties test', function () {
             'documentName',
             'document_required_for_role_name',
             'documentRequiredForRoleName',
+            'document_type',
+            'documentType',
             'reason',
             'entity_type',
             'entityType',
@@ -524,6 +526,8 @@ describe('ValidateProperties test', function () {
                 documentDescription: 'Required before placement',
                 document_required_for_role_name: 'student',
                 documentRequiredForRoleName: 'student',
+                document_type: 'PDF',
+                documentType: 'PDF',
                 reason: 'Reason',
                 type: 'Type',
                 street: '103, main market',
@@ -677,6 +681,8 @@ describe('ValidateProperties test', function () {
         it('rejects every supported key when given invalid values', function () {
             const testObject = {
                 first_name: 123,
+                document_type: 123,
+                documentType: 123,
                 last_name: 123,
                 lastName: 123,
                 street: 123,
