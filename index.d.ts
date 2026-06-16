@@ -108,7 +108,7 @@ export interface ValidateNewUserRoleRequestPayload extends Record<string, unknow
 }
 
 /**
- * Normalizes and validates a carecard.new_user_role_request payload.
+ * Normalizes and validates an institutions.new_user_role_request payload.
  * Only student, intern, and volunteer are accepted. When scope is required,
  * both institution_id and campus_id must be provided.
  */
