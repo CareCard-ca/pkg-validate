@@ -8,6 +8,4 @@ module.exports = {
     tabWidth: 4,
     useTabs: false,
     endOfLine: 'auto',
-    importOrderSeparation: true,
-    importOrderSortSpecifiers: true,
 };
