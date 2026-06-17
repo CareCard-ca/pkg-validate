@@ -326,6 +326,21 @@ describe('ValidateProperties test', function () {
         });
     });
 
+    describe('CareCard ID fields (isCcIdString)', function () {
+        ['cc_id', 'ccId'].forEach(key => {
+            it(`accepts a valid CareCard ID for "${key}"`, function () {
+                assertAccepts(key, 'a1b2c3d4');
+            });
+
+            it(`rejects an invalid CareCard ID for "${key}"`, function () {
+                assertRejects(key, 'A1B2C3D4');
+                assertRejects(key, 'a1b2c3d');
+                assertRejects(key, 'a1b2c3d45');
+                assertRejects(key, 'a1b2-c3d');
+            });
+        });
+    });
+
     describe('Integer string fields (isValidIntegerString)', function () {
         ['offset_number', 'offsetNumber', 'number_of_orders', 'numberOfOrders', 'price', 'from', 'number', 'limit', 'offset'].forEach(
             key => {

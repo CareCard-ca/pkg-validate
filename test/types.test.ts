@@ -22,6 +22,7 @@ import {
     ValidatePropertiesResult,
     ValidateWhitelistPropertiesFunction,
     isBoolValue,
+    isCcIdString,
     isCharactersString,
     isCountryCodeString,
     isEmailString,
@@ -79,6 +80,7 @@ type ExpectedRuntimeExportKey =
     | 'DEFAULT_USER_ROLE_REQUEST_ROLE'
     | 'REQUIRE_SCOPE_WHEN_ROLE_OR_SCOPE_PRESENT'
     | 'isBoolValue'
+    | 'isCcIdString'
     | 'isCharactersString'
     | 'isCountryCodeString'
     | 'isEmailString'
@@ -183,6 +185,7 @@ expectType<BoolValidator>(isInteger);
 expectType<BoolValidator>(isValidJsonString);
 expectType<BoolValidator>(isValidIntegerString);
 expectType<BoolValidator>(isValidUuidString);
+expectType<BoolValidator>(isCcIdString);
 expectType<BoolValidator>(isCharactersString);
 expectType<BoolValidator>(isStreetString);
 expectType<BoolValidator>(isNameString);
@@ -215,6 +218,7 @@ expectType<BoolValidator>(isValidArrayOfStrings);
 expectType<boolean>(isEmailString('a@b.com'));
 expectType<boolean>(isInteger(1));
 expectType<boolean>(isValidUuidString('x'));
+expectType<boolean>(isCcIdString('a1b2c3d4'));
 expectType<boolean>(isStreetString('103 Main Street'));
 expectType<boolean>(isTextString('free text'));
 expectType<boolean>(isUserRoleRequestRoleString('student'));
@@ -267,6 +271,7 @@ expectType<typeof isInteger>(validate.isInteger);
 expectType<typeof isValidJsonString>(validate.isValidJsonString);
 expectType<typeof isValidIntegerString>(validate.isValidIntegerString);
 expectType<typeof isValidUuidString>(validate.isValidUuidString);
+expectType<typeof isCcIdString>(validate.isCcIdString);
 expectType<typeof isCharactersString>(validate.isCharactersString);
 expectType<typeof isStreetString>(validate.isStreetString);
 expectType<typeof isNameString>(validate.isNameString);

@@ -108,7 +108,7 @@ export interface ValidateNewUserRoleRequestPayload extends Record<string, unknow
 }
 
 /**
- * Normalizes and validates a carecard.new_user_role_request payload.
+ * Normalizes and validates an institutions.new_user_role_request payload.
  * Only student, intern, and volunteer are accepted. When scope is required,
  * both institution_id and campus_id must be provided.
  */
@@ -127,6 +127,8 @@ export const isValidJsonString: BoolValidator;
 export const isValidIntegerString: BoolValidator;
 /** Checks if the string is a valid UUID. */
 export const isValidUuidString: BoolValidator;
+/** Checks if the string is a valid lowercase 8-character CareCard ID. */
+export const isCcIdString: BoolValidator;
 /** Checks if the string contains only alphanumeric characters, spaces, underscores, or hyphens. */
 export const isCharactersString: BoolValidator;
 /** Checks if the string is a valid street address format. */
@@ -198,6 +200,7 @@ export const validate: {
     isValidJsonString: typeof isValidJsonString;
     isValidIntegerString: typeof isValidIntegerString;
     isValidUuidString: typeof isValidUuidString;
+    isCcIdString: typeof isCcIdString;
     isCharactersString: typeof isCharactersString;
     isStreetString: typeof isStreetString;
     isNameString: typeof isNameString;
