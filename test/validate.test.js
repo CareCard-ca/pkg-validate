@@ -20,6 +20,7 @@ describe('AuthUtil test', function () {
                 'DEFAULT_USER_ROLE_REQUEST_ROLE',
                 'REQUIRE_SCOPE_WHEN_ROLE_OR_SCOPE_PRESENT',
                 'isBoolValue',
+                'isCcIdString',
                 'isCharactersString',
                 'isCountryCodeString',
                 'isEmailString',
@@ -147,6 +148,20 @@ describe('AuthUtil test', function () {
             assert.ok(!validate.isValidUuidString(''), 'Empty string test failed');
             assert.ok(!validate.isValidUuidString(badUuid), 'Bad string test failed');
             assert.ok(validate.isValidUuidString(goodUuid), 'Good string test failed');
+            done();
+        });
+
+        it('isCcIdString returns true for exactly eight lowercase alphanumeric characters only', function (done) {
+            assert.ok(validate.isCcIdString('a1b2c3d4'), 'Good ccId test failed');
+            assert.ok(validate.isCcIdString('12345678'), 'Numeric ccId test failed');
+            assert.ok(validate.isCcIdString('abcdefgh'), 'Alpha ccId test failed');
+            assert.ok(!validate.isCcIdString('A1B2C3D4'), 'Uppercase ccId test failed');
+            assert.ok(!validate.isCcIdString('a1b2c3d'), 'Short ccId test failed');
+            assert.ok(!validate.isCcIdString('a1b2c3d45'), 'Long ccId test failed');
+            assert.ok(!validate.isCcIdString('a1b2-c3d'), 'Punctuation ccId test failed');
+            assert.ok(!validate.isCcIdString(''), 'Empty ccId test failed');
+            assert.ok(!validate.isCcIdString(undefined), 'Undefined ccId test failed');
+            assert.ok(!validate.isCcIdString(null), 'Null ccId test failed');
             done();
         });
 
