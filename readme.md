@@ -9,6 +9,10 @@ invalid values from `validateProperties`, and throws CareCard `BAD_INPUT` errors
 from `validateWhitelistProperties` when required or provided whitelist values do
 not pass validation.
 
+## Development Rule
+
+Non-negotiable TDD rule: Always write the failing test first, run it to confirm it fails for the intended reason, then implement the code and rerun the test until it passes. Test Driven Development is required for all coding work and must not be skipped. For documentation- or skill-only edits, add or update the relevant validation check before changing the prose.
+
 ## Installation
 
 ```sh
