@@ -1,5 +1,7 @@
 # Codex Instructions For pkg-validate
 
+Non-negotiable code organization rule: Functions with the same or equivalent behavior must use the same or clearly corresponding descriptive names across CareCard repositories, and equivalent functionality must live in files with the same names within each repository's established architecture. No backward compatibility names, aliases, or duplicate locations are allowed.
+
 These instructions apply to the `pkg-validate` repository. This file is self-contained:
 it includes the workspace-level instructions that were previously read from
 `/Users/pankajpriscilla/SO_CareCardCa/.codex/AGENTS.md`, followed by
