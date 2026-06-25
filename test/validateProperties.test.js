@@ -292,6 +292,8 @@ describe('ValidateProperties test', function () {
             'campusId',
             'program_id',
             'programId',
+            'program_term_id',
+            'programTermId',
             'template_id',
             'templateId',
             'program_template_id',
