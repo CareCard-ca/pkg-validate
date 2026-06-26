@@ -98,6 +98,8 @@ export interface ValidateNewUserRoleRequestInput extends Record<string, unknown>
     campusId?: unknown;
     program_id?: unknown;
     programId?: unknown;
+    program_term_id?: unknown;
+    programTermId?: unknown;
 }
 
 export interface ValidateNewUserRoleRequestPayload extends Record<string, unknown> {
@@ -105,6 +107,7 @@ export interface ValidateNewUserRoleRequestPayload extends Record<string, unknow
     institution_id?: string;
     campus_id?: string;
     program_id?: string;
+    program_term_id?: string;
 }
 
 /**
