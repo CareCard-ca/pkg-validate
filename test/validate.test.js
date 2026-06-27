@@ -655,12 +655,18 @@ describe('AuthUtil test', function () {
                 role: 'intern',
                 institutionId: '2c76ea46-a212-4cc5-9031-a9a28d927c4c',
                 campusId: '3c76ea46-a212-4cc5-9031-a9a28d927c4c',
+                programId: '4c76ea46-a212-4cc5-9031-a9a28d927c4c',
+                programTermId: '5c76ea46-a212-4cc5-9031-a9a28d927c4c',
             });
 
             assert.strictEqual(roleRequest.role_name, 'intern');
             assert.strictEqual(roleRequest.institution_id, '2c76ea46-a212-4cc5-9031-a9a28d927c4c');
             assert.strictEqual(roleRequest.campus_id, '3c76ea46-a212-4cc5-9031-a9a28d927c4c');
+            assert.strictEqual(roleRequest.program_id, '4c76ea46-a212-4cc5-9031-a9a28d927c4c');
+            assert.strictEqual(roleRequest.program_term_id, '5c76ea46-a212-4cc5-9031-a9a28d927c4c');
             assert.strictEqual(roleRequest.role, undefined);
+            assert.strictEqual(roleRequest.programId, undefined);
+            assert.strictEqual(roleRequest.programTermId, undefined);
             done();
         });
 
