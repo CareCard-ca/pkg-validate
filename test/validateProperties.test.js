@@ -376,7 +376,7 @@ describe('ValidateProperties test', function () {
     });
 
     describe('JSON object fields (isValidJsonString on JSON.stringify)', function () {
-        ['weight', 'dimensions', 'permission', 'scope_data', 'scopeData', 'meta_data', 'metaData'].forEach(key => {
+        ['weight', 'dimensions', 'permission', 'scope_data', 'scopeData', 'meta_data', 'metaData', 'metadata'].forEach(key => {
             it(`accepts a valid object for "${key}"`, function () {
                 assertAccepts(key, { a: 1, b: 'two' });
             });
@@ -644,6 +644,7 @@ describe('ValidateProperties test', function () {
                 scopeData: { a: 1 },
                 meta_data: { b: 2 },
                 metaData: { b: 2 },
+                metadata: { b: 2 },
                 image_url: 'http://example.com/image.jpg',
                 imageUrl: 'http://example.com/image.jpg',
                 website: 'http://example.com',
