@@ -276,10 +276,8 @@ describe('ValidateProperties test', function () {
             'user_id',
             'address_id',
             'addressId',
-            'image_id',
             'itemId',
             'userId',
-            'imageId',
             'order_id',
             'orderId',
             'category_id',
@@ -333,6 +331,11 @@ describe('ValidateProperties test', function () {
             it(`rejects an invalid UUID for "${key}"`, function () {
                 assertRejects(key, INVALID_UUID);
             });
+        });
+
+        it('rejects removed image id fields', function () {
+            assertRejects('image_id', VALID_UUID);
+            assertRejects('imageId', VALID_UUID);
         });
     });
 
@@ -582,8 +585,6 @@ describe('ValidateProperties test', function () {
                 itemId: VALID_UUID,
                 address_id: VALID_UUID,
                 addressId: VALID_UUID,
-                image_id: VALID_UUID,
-                imageId: VALID_UUID,
                 userId: VALID_UUID,
                 order_id: VALID_UUID,
                 orderId: VALID_UUID,
