@@ -41,7 +41,7 @@ These instructions apply to the whole workspace. The workspace is a collection o
 
 ### Repo Workflow
 
-- Work from the specific project directory you are changing, such as `api-auth`, `api-contact-us`, `api-institutions`, `pkg-common-util`, or `app-dashboard`.
+- Work from the specific project directory you are changing, such as `api-auth`, `api-messages`, `api-institutions`, `pkg-common-util`, or `app-dashboard`.
 - Check local status inside the affected project before editing. These directories are independent Git repositories.
 - Do not revert or overwrite changes you did not make.
 - Before finishing a code change, run the relevant tests and lint/format checks for the affected project.
@@ -53,7 +53,7 @@ These instructions apply to the whole workspace. The workspace is a collection o
 
 ### Backend Microservices
 
-The `api-*` directories are independent Express/Postgres backend services. Most JavaScript services use CommonJS, Mocha, Supertest, Docker Compose database tests, `@carecard/*` packages, and `sub-apps` controller/router/model patterns. TypeScript services such as `api-contact-us` and `api-template-ts` use Jest or TypeScript tooling and should keep their existing TS style.
+The `api-*` directories are independent Express/Postgres backend services. Most JavaScript services use CommonJS, Mocha, Supertest, Docker Compose database tests, `@carecard/*` packages, and `sub-apps` controller/router/model patterns. TypeScript services such as `api-messages` and `api-template-ts` use Jest or TypeScript tooling and should keep their existing TS style.
 
 - Keep service-specific controllers thin. Controllers should read as a clear workflow: parse input, authorize, validate, call domain/model logic, build response, and pass errors to `next`.
 - Extract multiline chunks into descriptively named functions in the appropriate `controllerLib`, `commonLib`, `sub-apps/lib`, model helper, or shared `pkg-*` package.
@@ -108,7 +108,7 @@ The `pkg-*` directories are reusable CareCard packages. Shared API response, err
 
 ### Dashboard Frontend
 
-`app-dashboard` is a Next.js App Router TypeScript app using MUI, React Query, `next-intl`, and shared CareCard utilities. It consumes `api-auth`, `api-institutions`, `api-contact-us`, and `api-user-profiles` through service modules.
+`app-dashboard` is a Next.js App Router TypeScript app using MUI, React Query, `next-intl`, and shared CareCard utilities. It consumes `api-auth`, `api-institutions`, `api-messages`, and `api-user-profiles` through service modules.
 
 - Keep backend URL definitions centralized in `src/services/api.routes.ts`.
 - Keep fetch behavior centralized in `src/services/common/api`, especially `appFetch`, `api.client`, and `parseApiResponse`.
