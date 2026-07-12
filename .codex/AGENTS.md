@@ -2,6 +2,8 @@
 
 Non-negotiable code organization rule: Functions with the same or equivalent behavior must use the same or clearly corresponding descriptive names across CareCard repositories, and equivalent functionality must live in files with the same names within each repository's established architecture. No backward compatibility names, aliases, or duplicate locations are allowed.
 
+Non-negotiable repository isolation rule: Every repository must run its Husky hooks and tests using only files, code, fixtures, dependencies, and services contained within that repository. Tests and Husky scripts must not import, require, read, execute, or otherwise depend on sibling repositories or paths outside the repository root. app-e2e-tests is the only exception because cross-repository end-to-end testing is its explicit responsibility.
+
 These instructions apply to the `pkg-validate` repository. This file is self-contained:
 it includes the workspace-level instructions that were previously read from
 `/Users/pankajpriscilla/SO_CareCardCa/.codex/AGENTS.md`, followed by
