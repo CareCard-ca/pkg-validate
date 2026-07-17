@@ -114,6 +114,23 @@ describe('AuthUtil test', function () {
             done();
         });
 
+        it('isValidJsonString rethrows unexpected JSON parser failures', function () {
+            const originalJsonParse = JSON.parse;
+            const parserFailure = new RangeError('unexpected parser failure');
+            JSON.parse = () => {
+                throw parserFailure;
+            };
+
+            try {
+                assert.throws(
+                    () => validate.isValidJsonString('{"value":true}'),
+                    error => error === parserFailure,
+                );
+            } finally {
+                JSON.parse = originalJsonParse;
+            }
+        });
+
         it('isValidDateString returns true for a real ISO date and false otherwise', function (done) {
             assert.ok(validate.isValidDateString('2026-09-01'), 'Good date test failed');
             assert.ok(!validate.isValidDateString('2026-02-30'), 'Impossible date test failed');
