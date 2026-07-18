@@ -6,6 +6,19 @@ Non-negotiable repository isolation rule: Every repository must run its Husky ho
 
 Non-negotiable error and warning rule: Never suppress, silence, hide, downgrade, filter, ignore, skip, or bypass errors or warnings from code, tests, tools, compilers, linters, or validation. Fix the root cause, then rerun the affected check and require a clean result. Expected error-path tests may assert errors, but must not conceal unexpected failures.
 
+This requirement is non-negotiable and may be overridden only with the user's
+explicit, direct approval.
+
+A pre-existing test—defined as any test present before work on the current task
+begins—must not be deleted, disabled, skipped, weakened, excluded from execution,
+or otherwise removed. A pre-existing test must not be modified without the
+user's explicit approval for the exact proposed change. If changing a
+pre-existing test is believed necessary, stop before making the change and
+request approval. The request must identify every affected test, describe the
+precise proposed modification, provide detailed technical justification, and
+explain all known or reasonably foreseeable regression risks. Until approval is
+granted, leave every pre-existing test unchanged.
+
 These instructions apply to the `pkg-validate` repository. This file is self-contained:
 it includes the workspace-level instructions that were previously read from
 `/Users/pankajpriscilla/SO_CareCardCa/.codex/AGENTS.md`, followed by
