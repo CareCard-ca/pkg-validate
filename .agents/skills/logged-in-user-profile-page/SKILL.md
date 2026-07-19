@@ -3,7 +3,7 @@ name: logged-in-user-profile-page
 description: 'Use when changing shared validation behavior for app-dashboard logged-in profile/settings fields, especially phone number and country-code request aliases.'
 ---
 
-Non-negotiable root-cause solution rule: Always identify and solve the verified root cause with a correct, durable, production-quality solution. Never treat a temporary workaround, resource increase, retry, suppression, bypass, or symptom-only patch as completion. Validate the root-cause fix against the real failing workflow and prove the end state.
+Non-negotiable root-cause solution rule: Always identify and solve the verified root cause, use the stronger solution, and deliver a correct, durable, production-quality result. Never treat a temporary workaround, resource increase, retry, suppression, bypass, or symptom-only patch as completion. Validate the root-cause fix against the real failing workflow and prove the end state.
 
 # Logged-In User Profile Page
 

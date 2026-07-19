@@ -3,7 +3,7 @@ name: pkg-validate-validation-library
 description: 'Use when changing pkg-validate validators, sanitizers, whitelist behavior, nested path rules, bad-input errors, package exports, or tests.'
 ---
 
-Non-negotiable root-cause solution rule: Always identify and solve the verified root cause with a correct, durable, production-quality solution. Never treat a temporary workaround, resource increase, retry, suppression, bypass, or symptom-only patch as completion. Validate the root-cause fix against the real failing workflow and prove the end state.
+Non-negotiable root-cause solution rule: Always identify and solve the verified root cause, use the stronger solution, and deliver a correct, durable, production-quality result. Never treat a temporary workaround, resource increase, retry, suppression, bypass, or symptom-only patch as completion. Validate the root-cause fix against the real failing workflow and prove the end state.
 
 # Package Validate
 
