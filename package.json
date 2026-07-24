@@ -10,7 +10,7 @@
     "types": "index.d.ts",
     "scripts": {
         "test": "npm run test:order && mocha --require ./scripts/testOrder/randomizeTestOrder.cjs --recursive",
-        "test:order": "node --test --test-randomize ${TEST_ORDER_SEED:+--test-random-seed=$TEST_ORDER_SEED} scripts/testOrder/randomizeTestOrder.test.mjs",
+        "test:order": "node --test scripts/testOrder/randomizeTestOrder.test.mjs scripts/testOrder/testOrderPolicy.test.mjs",
         "test:types": "tsc --noEmit && echo \"\\n  ✔ Type tests passed: tsc --noEmit reported 0 errors across index.d.ts and test/**/*.ts\\n\"",
         "test:coverage": "npm run test:order && tsc --noEmit && export NODE_ENV=test && nyc mocha --require ./scripts/testOrder/randomizeTestOrder.cjs --recursive",
         "test:All": "npm run test:coverage && npm run test:types",
