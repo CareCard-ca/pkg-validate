@@ -1,6 +1,6 @@
 {
     "name": "@carecard/validate",
-    "version": "3.11.0",
+    "version": "3.14.0",
     "repository": {
         "type": "git",
         "url": "git+https://github.com/CareCard-ca/pkg-validate.git"
@@ -9,9 +9,10 @@
     "main": "index.js",
     "types": "index.d.ts",
     "scripts": {
-        "test": "mocha --recursive",
+        "test": "npm run test:order && node test/index.test.js",
+        "test:order": "node --test scripts/testOrder/randomizeTestOrder.test.mjs scripts/testOrder/testOrderPolicy.test.mjs scripts/testParallel/runIndexedMochaTests.test.mjs scripts/testParallel/parallelTestPolicy.test.mjs",
         "test:types": "tsc --noEmit && echo \"\\n  ✔ Type tests passed: tsc --noEmit reported 0 errors across index.d.ts and test/**/*.ts\\n\"",
-        "test:coverage": "tsc --noEmit && export NODE_ENV=test && nyc mocha --recursive",
+        "test:coverage": "npm run test:order && tsc --noEmit && nyc node test/index.test.js",
         "test:All": "npm run test:coverage && npm run test:types",
         "format": "prettier --write .",
         "format:check": "prettier --check .",
@@ -38,7 +39,7 @@
         "typescript": "6.0.3"
     },
     "dependencies": {
-        "@carecard/common-util": "3.11.0"
+        "@carecard/common-util": "3.14.0"
     },
     "nyc": {
         "all": true,
@@ -55,7 +56,8 @@
     "overrides": {
         "diff": "8.0.4",
         "glob": "13.0.6",
+        "minimatch": "10.2.5",
         "serialize-javascript": "7.0.5",
-        "js-yaml": "4.2.0"
+        "js-yaml": "4.3.0"
     }
 }
