@@ -1,0 +1,4 @@
+interface:
+    display_name: 'Pkg Validate Coding Standards'
+    short_description: 'Apply mandatory validation package standards'
+    default_prompt: 'Use $pkg-validate-coding-standards-and-best-practices before every pkg-validate task and apply all narrower skills that the task requires.'
