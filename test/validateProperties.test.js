@@ -256,7 +256,7 @@ describe('ValidateProperties test', function () {
     });
 
     describe('URL-safe token fields (isUrlSafeString)', function () {
-        const tokenKeys = ['token', 'email_confirm_token', 'emailConfirmToken', 'verification_token', 'verificationToken'];
+        const tokenKeys = ['token', 'email_verification_token', 'emailVerificationToken', 'verification_token', 'verificationToken'];
 
         tokenKeys.forEach(key => {
             it(`accepts a valid url-safe token for "${key}"`, function () {
@@ -575,8 +575,8 @@ describe('ValidateProperties test', function () {
                 phone_number: '123-456-7890',
                 phoneNumber: '123-456-7890',
                 token: 'abc.123',
-                email_confirm_token: 'abc.123',
-                emailConfirmToken: 'abc.123',
+                email_verification_token: 'abc.123',
+                emailVerificationToken: 'abc.123',
                 verification_token: 'abc.123',
                 verificationToken: 'abc.123',
                 uuid: VALID_UUID,
