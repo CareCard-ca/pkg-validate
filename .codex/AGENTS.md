@@ -155,7 +155,7 @@ The `pkg-*` directories are reusable CareCard packages. Shared API response, err
 
 ### Security Requirements
 
-- Treat authentication, authorization, JWT, password, email confirmation, recovery, file upload, CORS, rate limits, and error response behavior as security-sensitive.
+- Treat authentication, authorization, JWT, password, email verification, recovery, file upload, CORS, rate limits, and error response behavior as security-sensitive.
 - Never log or return secrets, tokens, passwords, credentials, private keys, full JWT payloads, or sensitive personal data.
 - Use safe error messages for users and structured details only when they do not reveal sensitive implementation or data.
 - Keep body-size limits, Helmet, CORS allow-lists, and rate-limit behavior intact unless a task explicitly changes them.
