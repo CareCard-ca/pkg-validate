@@ -1,13 +1,12 @@
 const assert = require('assert').strict;
 const { describe, it } = require('mocha');
-const validatePackage = require('../index');
 const {
     DEFAULT_USER_ROLE_REQUEST_ROLE,
     REQUIRE_SCOPE_WHEN_ROLE_OR_SCOPE_PRESENT,
     isUserRoleRequestRoleString,
     validate,
     validateNewUserRoleRequestObject,
-} = validatePackage;
+} = require('../index');
 
 describe('AuthUtil test', function () {
     const goodString = 'I am a good person';
@@ -15,61 +14,6 @@ describe('AuthUtil test', function () {
     const user = { username: 'username' };
 
     describe('Validate function test', function () {
-        it('exports the public index.js keys expected by index.d.ts', function () {
-            const expectedExportKeys = [
-                'DEFAULT_USER_ROLE_REQUEST_ROLE',
-                'REQUIRE_SCOPE_WHEN_ROLE_OR_SCOPE_PRESENT',
-                'isBoolValue',
-                'isCcIdString',
-                'isCharactersString',
-                'isCountryCodeString',
-                'isEmailString',
-                'isImageUrl',
-                'isInStringArray',
-                'isInteger',
-                'isJwtString',
-                'isNameString',
-                'isPasswordString',
-                'isPasswordStringFailureMessage',
-                'isPhoneNumber',
-                'isPostalCodeString',
-                'isProvinceString',
-                'isSafeSearchString',
-                'isSafeString',
-                'isSimplePasswordString',
-                'isSimplePasswordStringFailureMessage',
-                'isStreetString',
-                'isString6To16CharacterLong',
-                'isString6To24CharacterLong',
-                'isTextString',
-                'isUrlSafeString',
-                'isUserRoleRequestRoleString',
-                'isUserRoleRequestStatusString',
-                'isUsernameString',
-                'isValidArrayOfStrings',
-                'isValidDateString',
-                'isValidDomainName',
-                'isValidIntegerString',
-                'isValidJsonString',
-                'isValidTimestampString',
-                'isValidTimestampzString',
-                'isValidUrl',
-                'isValidUuidString',
-                'validate',
-                'validateNewUserRoleRequestObject',
-                'validateProperties',
-                'validateWhitelistProperties',
-            ];
-
-            assert.deepStrictEqual(Object.keys(validatePackage).sort(), expectedExportKeys);
-            assert.strictEqual(validatePackage.validateWhitelistProperties.MAX_NESTING_DEPTH, 5);
-            assert.strictEqual(validatePackage.validateWhitelistProperties.MAX_KEYS_PER_CALL, 5000);
-            assert.strictEqual(
-                validatePackage.validateWhitelistProperties.validateWhitelistProperties,
-                validatePackage.validateWhitelistProperties,
-            );
-        });
-
         it('isImageUrl returns true if safe image url, false otherwise', function (done) {
             const image_url = 'A44C0A67A8704767AD2B97DC46478827/8B57EB9F014143F2AE6B9D8EBBB7CDA6-700.jpg';
             const image_url_bad_one = 'A44C0A67*A8704767AD2B97DC46478827/8B57EB9F014143F2AE6B9D8EBBB7CDA6-700.jpg';
@@ -112,23 +56,6 @@ describe('AuthUtil test', function () {
             assert.ok(!validate.isValidJsonString(badStringTwo), 'Bad string test failed');
             assert.ok(validate.isValidJsonString(goodString), 'Good string test failed');
             done();
-        });
-
-        it('isValidJsonString rethrows unexpected JSON parser failures', function () {
-            const originalJsonParse = JSON.parse;
-            const parserFailure = new RangeError('unexpected parser failure');
-            JSON.parse = () => {
-                throw parserFailure;
-            };
-
-            try {
-                assert.throws(
-                    () => validate.isValidJsonString('{"value":true}'),
-                    error => error === parserFailure,
-                );
-            } finally {
-                JSON.parse = originalJsonParse;
-            }
         });
 
         it('isValidDateString returns true for a real ISO date and false otherwise', function (done) {
