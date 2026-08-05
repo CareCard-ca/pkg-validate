@@ -1,6 +1,6 @@
 'use strict';
 
-const { runIndexedMochaTests } = require('../scripts/testParallel/runIndexedMochaTests.cjs');
+const { runIndexedMochaTests } = require('./testParallel/runIndexedMochaTests.cjs');
 
 const parallelTestFiles = ['test/validate.test.js', 'test/validateProperties.test.js', 'test/validateWhitelistProperties.test.js'];
 
