@@ -16,8 +16,9 @@ Non-negotiable repository isolation rule: Every repository must run its Husky ho
 
 Non-negotiable error and warning rule: Never suppress, silence, hide, downgrade, filter, ignore, skip, or bypass errors or warnings from code, tests, tools, compilers, linters, or validation. Fix the root cause, then rerun the affected check and require a clean result. Expected error-path tests may assert errors, but must not conceal unexpected failures.
 
-This requirement is non-negotiable and may be overridden only with the user's
-explicit, direct approval.
+The TDD and validation requirements are non-negotiable and cannot be
+overridden. The separate pre-existing-test protection still requires the
+user's fresh, explicit permission for each exact proposed test modification.
 
 A pre-existing test—defined as any test present before work on the current task
 begins—must not be deleted, disabled, skipped, weakened, excluded from execution,
@@ -28,6 +29,11 @@ request approval. The request must identify every affected test, describe the
 precise proposed modification, provide detailed technical justification, and
 explain all known or reasonably foreseeable regression risks. Until approval is
 granted, leave every pre-existing test unchanged.
+
+An implementation-detail test remains invalid under the authoritative TDD and
+validation policy. Identify the exact test and obtain the user's explicit
+approval before rewriting or removing it. Until approval is granted, leave the
+test unchanged and report the blocked correction.
 
 These instructions apply to the `pkg-validate` repository. This file is self-contained:
 it includes the workspace-level instructions that were previously read from
@@ -45,7 +51,7 @@ These instructions apply to the whole workspace. The workspace is a collection o
 - **Always follow the owner's coding style.** Preserve the existing style in the file and repository you are editing.
 - **Always follow the owner's naming conventions.** Use meaningful function, variable, file, test, and type names that match the surrounding code.
 - **Always follow the existing project structure.** Put code, tests, docs, services, validation, transforms, components, and helpers where the current repository already expects them.
-- **Always use Test-Driven Development.** Write or update focused tests first, verify they fail for the missing behavior when practical, then implement the code.
+- **Always use Test-Driven Development.** Write a focused functional test first or, after fresh permission for the exact change, update a pre-existing test. Run the selected test, confirm it fails for the missing behavior, then implement the code.
 - **Never suppress errors, TypeScript errors, linter warnings, or failing tests.** Do not add `eslint-disable`, `@ts-ignore`, broad catches, empty catches, or other suppression. Fix the root cause.
 - **Do not add new dependencies unless they are clearly necessary.** If a dependency might be needed, stop and ask for confirmation first, with a clear reason, tradeoff, and why existing code cannot reasonably solve it.
 - **Before finalizing any response for a repository, run every script in that repository's `.husky` directory.** Do not bypass hooks. If a `.husky` script fails, fix the underlying issue and rerun it. If it cannot run because of environment constraints, report the exact script and reason.
@@ -57,7 +63,10 @@ These instructions apply to the whole workspace. The workspace is a collection o
 - Explain architectural tradeoffs before major changes, especially changes that affect shared packages, API contracts, security, persistence, authentication, or frontend/backend boundaries.
 - Favor readable, maintainable code over short clever code.
 - Preserve the existing project style, file structure, naming style, module system, and test framework.
-- Use Test-Driven Development: write or update focused tests first, then implement the code.
+- Use Test-Driven Development: write a new focused functional test through a
+  public interface first, confirm the intended behavioral failure, then
+  implement the code. Modify a pre-existing test only after the user grants
+  fresh, explicit permission for that exact change.
 - Use meaningful function and variable names. Names should expose intent and domain behavior.
 - Use specific types everywhere. Do not use `any`.
 - Keep changes scoped and easy to review. Avoid unrelated formatting churn or opportunistic refactors.
@@ -119,9 +128,9 @@ The `pkg-*` directories are reusable CareCard packages. Shared API response, err
 
 ### Tests
 
-- Write or update tests before implementation whenever changing behavior.
+- Write a focused functional test before implementation whenever behavior changes. Modify a pre-existing test only after the user grants fresh, explicit permission for that exact change.
 - Testing is mandatory before finalizing code changes. Do not stop after implementation if tests, `.junie`, or `.husky` checks remain unrun.
-- Code coverage must never be lower than the previous commit. When coverage tooling exists, compare against the previous commit or recorded baseline before finalizing, add tests to maintain or improve coverage, and never reduce coverage thresholds to make checks pass.
+- Use coverage reports only as diagnostics for potentially untested observable behavior. Percentages for lines, branches, functions, and statements are not functional evidence and must not determine test assertions. Never add implementation-detail tests to preserve a metric or lower thresholds to hide a failing check; report any conflict with the behavior-only policy.
 - Keep tests readable and domain-specific. Prefer explicit helper names over generic test utilities that hide important behavior.
 - Use existing test frameworks and layouts:
     - JavaScript `api-*`: usually Mocha, Supertest, `test/index.test.js`, and Docker-backed Postgres scripts.
@@ -130,7 +139,7 @@ The `pkg-*` directories are reusable CareCard packages. Shared API response, err
     - `app-dashboard`: Vitest, React Testing Library, mock API tests, and Selenium for end-to-end flows.
 - For database tests, use existing seed, migration, rollback, and cleanup patterns. Keep tests isolated and make cleanup reliable even after failures.
 - Add tests for API success responses, validation errors, auth/authz errors, JWT errors, not-found/conflict cases, and unexpected error handling when those paths change.
-- For frontend changes, test validation, transforms, query/mutation wrappers, components, and user-visible flows at the narrowest practical level first.
+- For frontend changes, test rendered UI, public HTTP or network outcomes, navigation, accessibility, and user-visible flows at the narrowest practical level first. Use focused non-test dependency checks for validation, transform, query, mutation, hook, and module organization.
 - If any test or repository check fails, fix the issue and rerun the failing command. Only finalize with failing checks when the failure is unrelated to the change or blocked by environment constraints, and document that explicitly.
 
 ### Dashboard Frontend
@@ -167,7 +176,10 @@ The `pkg-*` directories are reusable CareCard packages. Shared API response, err
 
 - Never use TypeScript type `any`. Use specific value, record, validator, option, result, generic, or `unknown` types with narrowing.
 - Always follow this repository's coding style, naming conventions, and CommonJS project structure.
-- Always use Test-Driven Development: add or update the relevant Mocha or type tests before changing behavior.
+- Always use Test-Driven Development: add a new failing consumer-facing Mocha
+  or type test through the supported package root before changing behavior.
+  Modify a pre-existing test only after the user grants fresh, explicit
+  permission for that exact change.
 - Never suppress errors, linter warnings, TypeScript errors, or failing tests. Handle the underlying issue.
 - Do not add new dependencies unless they are absolutely needed. Ask for confirmation first with the reason and tradeoff.
 - Before finalizing work in this repository, run every script in `.husky/` and fix anything they report.
@@ -197,13 +209,32 @@ The `pkg-*` directories are reusable CareCard packages. Shared API response, err
 
 - Model input and output records, whitelist options, flattened output behavior, validators, and failure-message helpers explicitly in `index.d.ts`.
 - When existing declarations are too loose, improve them with specific types as part of the touched change instead of adding new loose types.
-- Update `test/types.test.ts` whenever public types, exports, options, return values, or validators change.
+- When public types, options, return values, or validator behavior changes, compile realistic consumer usage through the supported package root. Do not assert that named exports or declaration nodes exist.
 - Keep runtime exports, README examples, and type declarations in sync.
 
 ### Tests
 
 - Use Mocha for runtime tests under `test/`.
-- Use `test/types.test.ts` for TypeScript declaration coverage through `npm run test:types`.
+- Use `npm run test:types` to compile realistic consumer code through the supported package root and verify externally visible declaration behavior.
 - Add focused tests for valid input, invalid input, missing fields, optional fields, array handling, nested paths, casing conversion, flattening, and error messages when those areas change.
 - Keep tests deterministic and avoid relying on real external services.
 - Before pushing or finalizing, run `.husky/pre-commit`; it runs lint fixing, formatting, and `npm run test:All`.
+
+## TDD And Validation
+
+Test Driven Development is a non-negotiable requirement.
+
+The sole purpose of automated tests is to verify observable functionality and externally visible behavior.
+Tests must validate what the system does through its public interfaces and expected outcomes.
+
+Tests must not assert, inspect, or depend on implementation details, including but not limited to:
+
+- The existence of specific lines of code, statements, functions, classes, files, or modules.
+- Specific algorithms, control flow, variable names, method calls, code snippets, or internal implementation choices.
+- Any internal structure that can change without changing externally observable behavior.
+
+A correct implementation may be completely rewritten or refactored without requiring changes to functional tests, provided its externally observable behavior remains unchanged.
+
+Any test that fails solely because the implementation changed while the externally observable behavior remained correct is incorrectly designed and must be rewritten or removed.
+
+This requirement is mandatory for all new tests and must be applied whenever existing tests are modified.
