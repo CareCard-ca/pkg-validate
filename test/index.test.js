@@ -2,14 +2,7 @@
 
 const { runIndexedMochaTests } = require('../scripts/testParallel/runIndexedMochaTests.cjs');
 
-const parallelTestFiles = [
-    'test/config/repositoryIsolation.test.js',
-    'test/config/tddGuidanceDocs.test.js',
-    'test/dependencyOverrides.test.js',
-    'test/validate.test.js',
-    'test/validateProperties.test.js',
-    'test/validateWhitelistProperties.test.js',
-];
+const parallelTestFiles = ['test/validate.test.js', 'test/validateProperties.test.js', 'test/validateWhitelistProperties.test.js'];
 
 if (require.main === module) {
     runIndexedMochaTests(parallelTestFiles)

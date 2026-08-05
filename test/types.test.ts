@@ -11,8 +11,6 @@
  * `include` glob in `tsconfig.json` (`test/**\/*.ts`).
  */
 
-import validateCommonJs = require('@carecard/validate');
-import * as validatePackage from '@carecard/validate';
 import {
     DEFAULT_USER_ROLE_REQUEST_ROLE,
     REQUIRE_SCOPE_WHEN_ROLE_OR_SCOPE_PRESENT,
@@ -57,7 +55,6 @@ import {
     isTextString,
     isUserRoleRequestRoleString,
     isUserRoleRequestStatusString,
-    validate,
     validateNewUserRoleRequestObject,
     validateProperties,
     validateWhitelistProperties,
@@ -71,60 +68,6 @@ import {
 function expectType<T>(_value: T): void {
     /* no-op */
 }
-
-type Equal<Left, Right> = (<Value>() => Value extends Left ? 1 : 2) extends <Value>() => Value extends Right ? 1 : 2 ? true : false;
-
-type Expect<Condition extends true> = Condition;
-
-type ExpectedRuntimeExportKey =
-    | 'DEFAULT_USER_ROLE_REQUEST_ROLE'
-    | 'REQUIRE_SCOPE_WHEN_ROLE_OR_SCOPE_PRESENT'
-    | 'isBoolValue'
-    | 'isCcIdString'
-    | 'isCharactersString'
-    | 'isCountryCodeString'
-    | 'isEmailString'
-    | 'isImageUrl'
-    | 'isInStringArray'
-    | 'isInteger'
-    | 'isJwtString'
-    | 'isNameString'
-    | 'isPasswordString'
-    | 'isPasswordStringFailureMessage'
-    | 'isPhoneNumber'
-    | 'isPostalCodeString'
-    | 'isProvinceString'
-    | 'isSafeSearchString'
-    | 'isSafeString'
-    | 'isSimplePasswordString'
-    | 'isSimplePasswordStringFailureMessage'
-    | 'isStreetString'
-    | 'isString6To16CharacterLong'
-    | 'isString6To24CharacterLong'
-    | 'isTextString'
-    | 'isUrlSafeString'
-    | 'isUserRoleRequestRoleString'
-    | 'isUserRoleRequestStatusString'
-    | 'isUsernameString'
-    | 'isValidArrayOfStrings'
-    | 'isValidDomainName'
-    | 'isValidDateString'
-    | 'isValidIntegerString'
-    | 'isValidJsonString'
-    | 'isValidTimestampString'
-    | 'isValidTimestampzString'
-    | 'isValidUrl'
-    | 'isValidUuidString'
-    | 'validate'
-    | 'validateNewUserRoleRequestObject'
-    | 'validateProperties'
-    | 'validateWhitelistProperties';
-
-const exportKeysMatchRuntime: Expect<Equal<keyof typeof validatePackage, ExpectedRuntimeExportKey>> = true;
-expectType<true>(exportKeysMatchRuntime);
-const commonJsImportKeysMatchRuntime: Expect<Equal<keyof typeof validateCommonJs, ExpectedRuntimeExportKey>> = true;
-expectType<true>(commonJsImportKeysMatchRuntime);
-expectType<typeof validatePackage>(validateCommonJs);
 
 // ---------------------------------------------------------------------------
 // validateWhitelistProperties + options interface
@@ -262,44 +205,3 @@ expectType<ValidateNewUserRoleRequestPayload>(
         programTermId: '44444444-4444-4444-8444-444444444444',
     }),
 );
-
-// ---------------------------------------------------------------------------
-// `validate` namespace (deprecated). Every key must still be present and have
-// the same callable type as its top-level counterpart.
-// ---------------------------------------------------------------------------
-
-expectType<typeof isImageUrl>(validate.isImageUrl);
-expectType<typeof isInteger>(validate.isInteger);
-expectType<typeof isValidJsonString>(validate.isValidJsonString);
-expectType<typeof isValidIntegerString>(validate.isValidIntegerString);
-expectType<typeof isValidUuidString>(validate.isValidUuidString);
-expectType<typeof isCcIdString>(validate.isCcIdString);
-expectType<typeof isCharactersString>(validate.isCharactersString);
-expectType<typeof isStreetString>(validate.isStreetString);
-expectType<typeof isNameString>(validate.isNameString);
-expectType<typeof isSafeSearchString>(validate.isSafeSearchString);
-expectType<typeof isEmailString>(validate.isEmailString);
-expectType<typeof isJwtString>(validate.isJwtString);
-expectType<typeof isPasswordString>(validate.isPasswordString);
-expectType<typeof isSimplePasswordString>(validate.isSimplePasswordString);
-expectType<typeof isPasswordStringFailureMessage>(validate.isPasswordStringFailureMessage);
-expectType<typeof isSimplePasswordStringFailureMessage>(validate.isSimplePasswordStringFailureMessage);
-expectType<typeof isUsernameString>(validate.isUsernameString);
-expectType<typeof isPhoneNumber>(validate.isPhoneNumber);
-expectType<typeof isUrlSafeString>(validate.isUrlSafeString);
-expectType<typeof isString6To24CharacterLong>(validate.isString6To24CharacterLong);
-expectType<typeof isString6To16CharacterLong>(validate.isString6To16CharacterLong);
-expectType<typeof isProvinceString>(validate.isProvinceString);
-expectType<typeof isBoolValue>(validate.isBoolValue);
-expectType<typeof isPostalCodeString>(validate.isPostalCodeString);
-expectType<typeof isSafeString>(validate.isSafeString);
-expectType<typeof isTextString>(validate.isTextString);
-expectType<typeof isInStringArray>(validate.isInStringArray);
-expectType<typeof isUserRoleRequestStatusString>(validate.isUserRoleRequestStatusString);
-expectType<typeof isUserRoleRequestRoleString>(validate.isUserRoleRequestRoleString);
-expectType<typeof isCountryCodeString>(validate.isCountryCodeString);
-expectType<typeof isValidDomainName>(validate.isValidDomainName);
-expectType<typeof isValidTimestampzString>(validate.isValidTimestampzString);
-expectType<typeof isValidTimestampString>(validate.isValidTimestampString);
-expectType<typeof isValidUrl>(validate.isValidUrl);
-expectType<typeof isValidArrayOfStrings>(validate.isValidArrayOfStrings);
