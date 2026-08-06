@@ -1,6 +1,6 @@
 const assert = require('assert').strict;
 const { describe, it } = require('mocha');
-const { validateProperties } = require('../index');
+const { validateProperties } = require('../lib/validateProperties');
 
 const VALID_UUID = '1c76ea46-a212-4cc5-9031-a9a28d927c4c';
 const INVALID_UUID = 'not-a-uuid';
