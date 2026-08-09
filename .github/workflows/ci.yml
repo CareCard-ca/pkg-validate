@@ -37,6 +37,3 @@ jobs:
 
             - name: Run tests
               run: npm run test:All
-
-            - name: Run tests with coverage
-              run: npm run test:coverage
