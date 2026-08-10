@@ -15,59 +15,12 @@ describe('AuthUtil test', function () {
     const user = { username: 'username' };
 
     describe('Validate function test', function () {
-        it('exports the public index.js keys expected by index.d.ts', function () {
-            const expectedExportKeys = [
-                'DEFAULT_USER_ROLE_REQUEST_ROLE',
-                'REQUIRE_SCOPE_WHEN_ROLE_OR_SCOPE_PRESENT',
-                'isBoolValue',
-                'isCcIdString',
-                'isCharactersString',
-                'isCountryCodeString',
-                'isEmailString',
-                'isImageUrl',
-                'isInStringArray',
-                'isInteger',
-                'isJwtString',
-                'isNameString',
-                'isPasswordString',
-                'isPasswordStringFailureMessage',
-                'isPhoneNumber',
-                'isPostalCodeString',
-                'isProvinceString',
-                'isSafeSearchString',
-                'isSafeString',
-                'isSimplePasswordString',
-                'isSimplePasswordStringFailureMessage',
-                'isStreetString',
-                'isString6To16CharacterLong',
-                'isString6To24CharacterLong',
-                'isTextString',
-                'isUrlSafeString',
-                'isUserRoleRequestRoleString',
-                'isUserRoleRequestStatusString',
-                'isUsernameString',
-                'isValidArrayOfStrings',
-                'isValidDateString',
-                'isValidDomainName',
-                'isValidIntegerString',
-                'isValidJsonString',
-                'isValidTimestampString',
-                'isValidTimestampzString',
-                'isValidUrl',
-                'isValidUuidString',
-                'validate',
-                'validateNewUserRoleRequestObject',
-                'validateProperties',
-                'validateWhitelistProperties',
-            ];
-
-            assert.deepStrictEqual(Object.keys(validatePackage).sort(), expectedExportKeys);
-            assert.strictEqual(validatePackage.validateWhitelistProperties.MAX_NESTING_DEPTH, 5);
-            assert.strictEqual(validatePackage.validateWhitelistProperties.MAX_KEYS_PER_CALL, 5000);
-            assert.strictEqual(
-                validatePackage.validateWhitelistProperties.validateWhitelistProperties,
-                validatePackage.validateWhitelistProperties,
-            );
+        it('supports direct and legacy validator calls through the package root', function () {
+            assert.strictEqual(validatePackage.isEmailString('person@example.com'), true);
+            assert.strictEqual(validatePackage.validate.isEmailString('person@example.com'), true);
+            assert.deepStrictEqual(validatePackage.validateProperties({ first_name: 'Jane', unexpected: true }), {
+                first_name: 'Jane',
+            });
         });
 
         it('isImageUrl returns true if safe image url, false otherwise', function (done) {

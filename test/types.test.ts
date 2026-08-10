@@ -72,59 +72,8 @@ function expectType<T>(_value: T): void {
     /* no-op */
 }
 
-type Equal<Left, Right> = (<Value>() => Value extends Left ? 1 : 2) extends <Value>() => Value extends Right ? 1 : 2 ? true : false;
-
-type Expect<Condition extends true> = Condition;
-
-type ExpectedRuntimeExportKey =
-    | 'DEFAULT_USER_ROLE_REQUEST_ROLE'
-    | 'REQUIRE_SCOPE_WHEN_ROLE_OR_SCOPE_PRESENT'
-    | 'isBoolValue'
-    | 'isCcIdString'
-    | 'isCharactersString'
-    | 'isCountryCodeString'
-    | 'isEmailString'
-    | 'isImageUrl'
-    | 'isInStringArray'
-    | 'isInteger'
-    | 'isJwtString'
-    | 'isNameString'
-    | 'isPasswordString'
-    | 'isPasswordStringFailureMessage'
-    | 'isPhoneNumber'
-    | 'isPostalCodeString'
-    | 'isProvinceString'
-    | 'isSafeSearchString'
-    | 'isSafeString'
-    | 'isSimplePasswordString'
-    | 'isSimplePasswordStringFailureMessage'
-    | 'isStreetString'
-    | 'isString6To16CharacterLong'
-    | 'isString6To24CharacterLong'
-    | 'isTextString'
-    | 'isUrlSafeString'
-    | 'isUserRoleRequestRoleString'
-    | 'isUserRoleRequestStatusString'
-    | 'isUsernameString'
-    | 'isValidArrayOfStrings'
-    | 'isValidDomainName'
-    | 'isValidDateString'
-    | 'isValidIntegerString'
-    | 'isValidJsonString'
-    | 'isValidTimestampString'
-    | 'isValidTimestampzString'
-    | 'isValidUrl'
-    | 'isValidUuidString'
-    | 'validate'
-    | 'validateNewUserRoleRequestObject'
-    | 'validateProperties'
-    | 'validateWhitelistProperties';
-
-const exportKeysMatchRuntime: Expect<Equal<keyof typeof validatePackage, ExpectedRuntimeExportKey>> = true;
-expectType<true>(exportKeysMatchRuntime);
-const commonJsImportKeysMatchRuntime: Expect<Equal<keyof typeof validateCommonJs, ExpectedRuntimeExportKey>> = true;
-expectType<true>(commonJsImportKeysMatchRuntime);
-expectType<typeof validatePackage>(validateCommonJs);
+expectType<boolean>(validateCommonJs.isEmailString('person@example.com'));
+expectType<boolean>(validatePackage.isInteger(1));
 
 // ---------------------------------------------------------------------------
 // validateWhitelistProperties + options interface

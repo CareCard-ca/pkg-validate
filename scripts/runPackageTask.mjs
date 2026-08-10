@@ -4,6 +4,29 @@ import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 export const packageTasks = Object.freeze({
+    'validate:audits': [
+        {
+            command: 'node',
+            arguments: [
+                '--test',
+                'scripts/packageTaskRunner.audit.mjs',
+                'scripts/testOrder/testOrderPolicy.audit.mjs',
+                'scripts/testParallel/parallelTestPolicy.audit.mjs',
+            ],
+        },
+        {
+            command: 'mocha',
+            arguments: [
+                '--reporter',
+                'spec',
+                '--timeout',
+                '5000',
+                'test/config/repositoryIsolation.audit.js',
+                'test/config/tddGuidanceDocs.audit.js',
+                'test/dependencyOverrides.audit.js',
+            ],
+        },
+    ],
     test: [
         { command: 'npm', arguments: ['run', 'test:order'] },
         { command: 'node', arguments: ['test/index.test.js'] },
@@ -24,6 +47,7 @@ export const packageTasks = Object.freeze({
         { command: 'nyc', arguments: ['node', 'test/index.test.js'] },
     ],
     'test:All': [
+        { command: 'npm', arguments: ['run', 'validate:audits'] },
         { command: 'npm', arguments: ['run', 'test:coverage'] },
         { command: 'npm', arguments: ['run', 'test:types'] },
     ],
