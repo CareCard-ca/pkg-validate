@@ -33,8 +33,9 @@ test('keeps runtime test selection in the index and package scripts short', () =
     assert.match(testIndexSource, /if \(require\.main === module\)/);
 });
 
-test('runs the parallel execution contract in the test-order gate', () => {
-    assert.match(packageJson.scripts['test:order'], /scripts\/testParallel\/parallelTestPolicy\.test\.mjs/);
+test('runs static parallel policy in the audit gate and callable runner behavior in the test-order gate', () => {
+    assert.equal(packageJson.scripts['validate:audits'], 'node scripts/runPackageTask.mjs validate:audits');
+    assert.match(packageTaskRunnerSource, /scripts\/testParallel\/parallelTestPolicy\.audit\.mjs/);
     assert.match(packageJson.scripts['test:order'], /scripts\/testParallel\/runIndexedMochaTests\.test\.mjs/);
 });
 
