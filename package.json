@@ -10,7 +10,8 @@
     "types": "index.d.ts",
     "scripts": {
         "test": "node scripts/runPackageTask.mjs test",
-        "test:order": "node --test scripts/testOrder/randomizeTestOrder.test.mjs scripts/testOrder/testOrderPolicy.test.mjs scripts/testParallel/runIndexedMochaTests.test.mjs scripts/testParallel/parallelTestPolicy.test.mjs scripts/packageTaskRunner.test.mjs",
+        "test:order": "node --test scripts/testOrder/randomizeTestOrder.test.mjs scripts/testParallel/runIndexedMochaTests.test.mjs scripts/packageTaskRunner.test.mjs",
+        "validate:audits": "node scripts/runPackageTask.mjs validate:audits",
         "test:types": "node scripts/runPackageTask.mjs test:types",
         "test:coverage": "node scripts/runPackageTask.mjs test:coverage",
         "test:All": "node scripts/runPackageTask.mjs test:All",
@@ -54,10 +55,11 @@
         "statements": 100
     },
     "overrides": {
+        "brace-expansion": "5.0.9",
         "diff": "8.0.4",
         "glob": "13.0.6",
         "minimatch": "10.2.5",
         "serialize-javascript": "7.0.5",
-        "js-yaml": "4.3.0"
+        "js-yaml": "4.3.1"
     }
 }

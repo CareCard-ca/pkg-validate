@@ -3,7 +3,6 @@
 const assert = require('assert').strict;
 const { describe, it } = require('mocha');
 const { validateWhitelistProperties } = require('../index');
-const validateWhitelistPropertiesModule = require('../lib/validateWhitelistProperties');
 
 const VALID_EMAIL = 'jane.doe@example.com';
 const VALID_NAME = 'Jane';
@@ -739,7 +738,7 @@ describe('validateWhitelistProperties', function () {
     describe('validation limits', function () {
         describe('MAX_NESTING_DEPTH', function () {
             it('exposes MAX_NESTING_DEPTH = 5 on the module', function () {
-                assert.strictEqual(validateWhitelistPropertiesModule.MAX_NESTING_DEPTH, MAX_NESTING_DEPTH);
+                assert.strictEqual(validateWhitelistProperties.MAX_NESTING_DEPTH, MAX_NESTING_DEPTH);
             });
 
             it('accepts a required path at exactly the maximum depth of 5', async function () {
@@ -768,7 +767,7 @@ describe('validateWhitelistProperties', function () {
 
         describe('MAX_KEYS_PER_CALL', function () {
             it('exposes MAX_KEYS_PER_CALL = 5000 on the module', function () {
-                assert.strictEqual(validateWhitelistPropertiesModule.MAX_KEYS_PER_CALL, MAX_KEYS_PER_CALL);
+                assert.strictEqual(validateWhitelistProperties.MAX_KEYS_PER_CALL, MAX_KEYS_PER_CALL);
             });
 
             it('accepts when requiredProperties.length equals exactly 5000', async function () {
