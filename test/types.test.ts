@@ -14,54 +14,54 @@
 import validateCommonJs = require('@carecard/validate');
 import * as validatePackage from '@carecard/validate';
 import {
-    DEFAULT_USER_ROLE_REQUEST_ROLE,
-    REQUIRE_SCOPE_WHEN_ROLE_OR_SCOPE_PRESENT,
-    ValidateNewUserRoleRequestOptions,
-    ValidateNewUserRoleRequestPayload,
-    ValidatePropertiesInput,
-    ValidatePropertiesResult,
-    ValidateWhitelistPropertiesFunction,
-    isBoolValue,
-    isCcIdString,
-    isCharactersString,
-    isCountryCodeString,
-    isEmailString,
-    isImageUrl,
-    isInStringArray,
-    isInteger,
-    isJwtString,
-    isNameString,
-    isPasswordString,
-    isPasswordStringFailureMessage,
-    isPhoneNumber,
-    isPostalCodeString,
-    isProvinceString,
-    isSafeSearchString,
-    isSafeString,
-    isSimplePasswordString,
-    isSimplePasswordStringFailureMessage,
-    isStreetString,
-    isString6To16CharacterLong,
-    isString6To24CharacterLong,
-    isUrlSafeString,
-    isUsernameString,
-    isValidArrayOfStrings,
-    isValidDomainName,
-    isValidIntegerString,
-    isValidJsonString,
-    isValidDateString,
-    isValidTimestampString,
-    isValidTimestampzString,
-    isValidUrl,
-    isValidUuidString,
-    isTextString,
-    isUserRoleRequestRoleString,
-    isUserRoleRequestStatusString,
-    validate,
-    validateNewUserRoleRequestObject,
-    validateProperties,
-    validateWhitelistProperties,
-    ValidateWhitelistPropertiesOptions,
+  DEFAULT_USER_ROLE_REQUEST_ROLE,
+  REQUIRE_SCOPE_WHEN_ROLE_OR_SCOPE_PRESENT,
+  ValidateNewUserRoleRequestOptions,
+  ValidateNewUserRoleRequestPayload,
+  ValidatePropertiesInput,
+  ValidatePropertiesResult,
+  ValidateWhitelistPropertiesFunction,
+  isBoolValue,
+  isCcIdString,
+  isCharactersString,
+  isCountryCodeString,
+  isEmailString,
+  isImageUrl,
+  isInStringArray,
+  isInteger,
+  isJwtString,
+  isNameString,
+  isPasswordString,
+  isPasswordStringFailureMessage,
+  isPhoneNumber,
+  isPostalCodeString,
+  isProvinceString,
+  isSafeSearchString,
+  isSafeString,
+  isSimplePasswordString,
+  isSimplePasswordStringFailureMessage,
+  isStreetString,
+  isString6To16CharacterLong,
+  isString6To24CharacterLong,
+  isUrlSafeString,
+  isUsernameString,
+  isValidArrayOfStrings,
+  isValidDomainName,
+  isValidIntegerString,
+  isValidJsonString,
+  isValidDateString,
+  isValidTimestampString,
+  isValidTimestampzString,
+  isValidUrl,
+  isValidUuidString,
+  isTextString,
+  isUserRoleRequestRoleString,
+  isUserRoleRequestStatusString,
+  validate,
+  validateNewUserRoleRequestObject,
+  validateProperties,
+  validateWhitelistProperties,
+  ValidateWhitelistPropertiesOptions,
 } from '@carecard/validate';
 
 /**
@@ -69,7 +69,7 @@ import {
  * to the explicit generic type parameter `T`. It is a no-op at runtime.
  */
 function expectType<T>(_value: T): void {
-    /* no-op */
+  /* no-op */
 }
 
 expectType<boolean>(validateCommonJs.isEmailString('person@example.com'));
@@ -83,28 +83,30 @@ expectType<boolean>(validatePackage.isInteger(1));
 expectType<ValidateWhitelistPropertiesFunction>(validateWhitelistProperties);
 expectType<5>(validateWhitelistProperties.MAX_NESTING_DEPTH);
 expectType<5000>(validateWhitelistProperties.MAX_KEYS_PER_CALL);
-expectType<typeof validateWhitelistProperties>(validateWhitelistProperties.validateWhitelistProperties);
+expectType<typeof validateWhitelistProperties>(
+  validateWhitelistProperties.validateWhitelistProperties,
+);
 
 // Return type is a Promise of an object.
 expectType<Promise<ValidatePropertiesResult>>(validateWhitelistProperties({ a: 1 }));
 expectType<Promise<ValidatePropertiesResult>>(validateWhitelistProperties({ a: 1 }, ['a']));
 expectType<Promise<ValidatePropertiesResult>>(
-    validateWhitelistProperties({ a: 1 }, ['a'], {
-        optionalProperties: ['b'],
-        convertToSnakeCase: true,
-        flattenOutput: true,
-        flattenKeyStyle: 'path',
-    }),
+  validateWhitelistProperties({ a: 1 }, ['a'], {
+    optionalProperties: ['b'],
+    convertToSnakeCase: true,
+    flattenOutput: true,
+    flattenKeyStyle: 'path',
+  }),
 );
 
 // Options interface: all fields optional.
 const optsEmpty: ValidateWhitelistPropertiesOptions = {};
 const optsPartial: ValidateWhitelistPropertiesOptions = { optionalProperties: ['x'] };
 const optsFull: ValidateWhitelistPropertiesOptions = {
-    optionalProperties: ['x', 'y'],
-    convertToSnakeCase: false,
-    flattenOutput: true,
-    flattenKeyStyle: 'leaf',
+  optionalProperties: ['x', 'y'],
+  convertToSnakeCase: false,
+  flattenOutput: true,
+  flattenKeyStyle: 'leaf',
 };
 expectType<ValidateWhitelistPropertiesOptions>(optsEmpty);
 expectType<ValidateWhitelistPropertiesOptions>(optsPartial);
@@ -201,15 +203,17 @@ expectType<'whenRoleOrScopePresent'>(REQUIRE_SCOPE_WHEN_ROLE_OR_SCOPE_PRESENT);
 expectType<ValidateNewUserRoleRequestOptions>({});
 expectType<ValidateNewUserRoleRequestOptions>({ defaultRole: 'student' });
 expectType<ValidateNewUserRoleRequestOptions>({ defaultRole: undefined, requireScope: false });
-expectType<ValidateNewUserRoleRequestOptions>({ requireScope: REQUIRE_SCOPE_WHEN_ROLE_OR_SCOPE_PRESENT });
+expectType<ValidateNewUserRoleRequestOptions>({
+  requireScope: REQUIRE_SCOPE_WHEN_ROLE_OR_SCOPE_PRESENT,
+});
 expectType<ValidateNewUserRoleRequestPayload>(
-    validateNewUserRoleRequestObject({
-        roleName: 'student',
-        institutionId: '11111111-1111-4111-8111-111111111111',
-        campusId: '22222222-2222-4222-8222-222222222222',
-        programId: '33333333-3333-4333-8333-333333333333',
-        programTermId: '44444444-4444-4444-8444-444444444444',
-    }),
+  validateNewUserRoleRequestObject({
+    roleName: 'student',
+    institutionId: '11111111-1111-4111-8111-111111111111',
+    campusId: '22222222-2222-4222-8222-222222222222',
+    programId: '33333333-3333-4333-8333-333333333333',
+    programTermId: '44444444-4444-4444-8444-444444444444',
+  }),
 );
 
 // ---------------------------------------------------------------------------
@@ -232,7 +236,9 @@ expectType<typeof isJwtString>(validate.isJwtString);
 expectType<typeof isPasswordString>(validate.isPasswordString);
 expectType<typeof isSimplePasswordString>(validate.isSimplePasswordString);
 expectType<typeof isPasswordStringFailureMessage>(validate.isPasswordStringFailureMessage);
-expectType<typeof isSimplePasswordStringFailureMessage>(validate.isSimplePasswordStringFailureMessage);
+expectType<typeof isSimplePasswordStringFailureMessage>(
+  validate.isSimplePasswordStringFailureMessage,
+);
 expectType<typeof isUsernameString>(validate.isUsernameString);
 expectType<typeof isPhoneNumber>(validate.isPhoneNumber);
 expectType<typeof isUrlSafeString>(validate.isUrlSafeString);
