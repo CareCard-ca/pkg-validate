@@ -4,10 +4,10 @@ const validateWhitelistProperties = require('./lib/validateWhitelistProperties')
 const validateNewUserRoleRequest = require('./lib/validateNewUserRoleRequest');
 
 module.exports = {
-    validate,
-    validateProperties,
-    validateWhitelistProperties,
-    ...validateNewUserRoleRequest,
-    ...validate,
-    ...validateProperties,
+  validate,
+  validateProperties,
+  validateWhitelistProperties,
+  ...validateNewUserRoleRequest,
+  ...validate,
+  ...validateProperties,
 };
