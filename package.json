@@ -1,65 +1,76 @@
 {
-    "name": "@carecard/validate",
-    "version": "3.18.0",
-    "repository": {
-        "type": "git",
-        "url": "git+https://github.com/CareCard-ca/pkg-validate.git"
-    },
-    "description": "Validate data",
-    "main": "index.js",
-    "types": "index.d.ts",
-    "scripts": {
-        "test": "node scripts/runPackageTask.mjs test",
-        "test:order": "node --test scripts/testOrder/randomizeTestOrder.test.mjs scripts/testParallel/runIndexedMochaTests.test.mjs scripts/packageTaskRunner.test.mjs",
-        "validate:audits": "node scripts/runPackageTask.mjs validate:audits",
-        "test:types": "node scripts/runPackageTask.mjs test:types",
-        "test:coverage": "node scripts/runPackageTask.mjs test:coverage",
-        "test:All": "node scripts/runPackageTask.mjs test:All",
-        "format": "prettier --write .",
-        "format:check": "prettier --check .",
-        "prepare": "husky",
-        "lint:fix": "eslint --fix",
-        "lint": "eslint"
-    },
-    "keywords": [
-        "validate",
-        "data"
+  "name": "@carecard/validate",
+  "version": "3.18.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CareCard-ca/pkg-validate.git"
+  },
+  "description": "Validate data",
+  "main": "index.js",
+  "types": "index.d.ts",
+  "scripts": {
+    "test": "node scripts/runPackageTask.mjs test",
+    "test:order": "node --test scripts/testOrder/randomizeTestOrder.test.mjs scripts/testParallel/runIndexedMochaTests.test.mjs scripts/packageTaskRunner.test.mjs",
+    "validate:audits": "node scripts/runPackageTask.mjs validate:audits",
+    "test:types": "node scripts/runPackageTask.mjs test:types",
+    "test:coverage": "node scripts/runPackageTask.mjs test:coverage",
+    "test:All": "node scripts/runPackageTask.mjs test:All",
+    "format": "prettier --write \"**/*.{js,jsx,mjs,cjs,ts,tsx,mts,cts}\"",
+    "format:check": "prettier --check \"**/*.{js,jsx,mjs,cjs,ts,tsx,mts,cts}\"",
+    "lint-staged": "lint-staged",
+    "prepare": "husky",
+    "lint:fix": "eslint . --fix --max-warnings 0",
+    "lint": "eslint . --max-warnings 0"
+  },
+  "keywords": [
+    "validate",
+    "data"
+  ],
+  "author": "CareCard team",
+  "license": "ISC",
+  "lint-staged": {
+    "*.{js,jsx,mjs,cjs,ts,tsx,mts,cts}": [
+      "eslint --fix --max-warnings 0",
+      "prettier --write"
     ],
-    "author": "CareCard team",
-    "license": "ISC",
-    "devDependencies": {
-        "@types/mocha": "10.0.10",
-        "@types/node": "25.9.3",
-        "eslint": "9.39.4",
-        "husky": "9.1.7",
-        "lint-staged": "17.0.7",
-        "mocha": "11.7.6",
-        "nyc": "18.0.0",
-        "prettier": "3.8.4",
-        "ts-node": "10.9.2",
-        "typescript": "6.0.3"
-    },
-    "dependencies": {
-        "@carecard/common-util": "3.18.0"
-    },
-    "nyc": {
-        "all": true,
-        "include": [
-            "index.js",
-            "lib/**/*.js"
-        ],
-        "check-coverage": true,
-        "branches": 100,
-        "functions": 100,
-        "lines": 100,
-        "statements": 100
-    },
-    "overrides": {
-        "brace-expansion": "5.0.9",
-        "diff": "8.0.4",
-        "glob": "13.0.6",
-        "minimatch": "10.2.5",
-        "serialize-javascript": "7.0.5",
-        "js-yaml": "4.3.1"
-    }
+    "*.{json,jsonc,md,mdx,css,scss,yaml,yml}": [
+      "prettier --write"
+    ]
+  },
+  "devDependencies": {
+    "@types/mocha": "10.0.10",
+    "@types/node": "25.9.3",
+    "@typescript-eslint/parser": "8.67.0",
+    "eslint": "9.39.5",
+    "husky": "9.1.7",
+    "lint-staged": "17.2.0",
+    "mocha": "11.7.6",
+    "nyc": "18.0.0",
+    "prettier": "3.9.6",
+    "ts-node": "10.9.2",
+    "typescript": "6.0.3"
+  },
+  "dependencies": {
+    "@carecard/common-util": "3.18.0"
+  },
+  "nyc": {
+    "all": true,
+    "include": [
+      "index.js",
+      "lib/**/*.js"
+    ],
+    "check-coverage": true,
+    "branches": 100,
+    "functions": 100,
+    "lines": 100,
+    "statements": 100
+  },
+  "overrides": {
+    "brace-expansion": "5.0.9",
+    "diff": "8.0.4",
+    "glob": "13.0.6",
+    "minimatch": "10.2.6",
+    "serialize-javascript": "7.0.5",
+    "js-yaml": "4.3.1"
+  }
 }
