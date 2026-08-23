@@ -4,6 +4,7 @@ const { runIndexedMochaTests } = require('../scripts/testParallel/runIndexedMoch
 
 const parallelTestFiles = [
   'test/validate.test.js',
+  'test/validationEdgeCases.test.js',
   'test/validateProperties.test.js',
   'test/validateWhitelistProperties.test.js',
 ];
