@@ -20,6 +20,7 @@ import {
   ValidateNewUserRoleRequestPayload,
   ValidatePropertiesInput,
   ValidatePropertiesResult,
+  PasswordValidationResult,
   ValidateWhitelistPropertiesFunction,
   isBoolValue,
   isCcIdString,
@@ -31,18 +32,12 @@ import {
   isInteger,
   isJwtString,
   isNameString,
-  isPasswordString,
-  isPasswordStringFailureMessage,
   isPhoneNumber,
   isPostalCodeString,
   isProvinceString,
   isSafeSearchString,
   isSafeString,
-  isSimplePasswordString,
-  isSimplePasswordStringFailureMessage,
   isStreetString,
-  isString6To16CharacterLong,
-  isString6To24CharacterLong,
   isUrlSafeString,
   isUsernameString,
   isValidArrayOfStrings,
@@ -58,6 +53,7 @@ import {
   isUserRoleRequestRoleString,
   isUserRoleRequestStatusString,
   validate,
+  validatePassword,
   validateNewUserRoleRequestObject,
   validateProperties,
   validateWhitelistProperties,
@@ -143,13 +139,9 @@ expectType<BoolValidator>(isNameString);
 expectType<BoolValidator>(isSafeSearchString);
 expectType<BoolValidator>(isEmailString);
 expectType<BoolValidator>(isJwtString);
-expectType<BoolValidator>(isPasswordString);
-expectType<BoolValidator>(isSimplePasswordString);
 expectType<BoolValidator>(isUsernameString);
 expectType<BoolValidator>(isPhoneNumber);
 expectType<BoolValidator>(isUrlSafeString);
-expectType<BoolValidator>(isString6To24CharacterLong);
-expectType<BoolValidator>(isString6To16CharacterLong);
 expectType<BoolValidator>(isProvinceString);
 expectType<BoolValidator>(isBoolValue);
 expectType<BoolValidator>(isPostalCodeString);
@@ -179,13 +171,19 @@ expectType<boolean>(isValidDateString('2026-06-08'));
 expectType<boolean>(isValidArrayOfStrings(['a']));
 
 // ---------------------------------------------------------------------------
-// String-or-null validators
+// Password validation result
 // ---------------------------------------------------------------------------
 
-expectType<(password: unknown) => string | null>(isPasswordStringFailureMessage);
-expectType<(password: unknown) => string | null>(isSimplePasswordStringFailureMessage);
-expectType<string | null>(isPasswordStringFailureMessage('short'));
-expectType<string | null>(isSimplePasswordStringFailureMessage('short'));
+expectType<(password: unknown) => PasswordValidationResult>(validatePassword);
+expectType<PasswordValidationResult>(validateCommonJs.validatePassword('a password value'));
+const passwordResult = validatePassword('a password value');
+if (passwordResult.isValid) {
+  expectType<string>(passwordResult.value);
+} else {
+  expectType<'invalid_type' | 'invalid_unicode' | 'too_short' | 'too_long' | 'blocked'>(
+    passwordResult.reason,
+  );
+}
 
 // ---------------------------------------------------------------------------
 // Two-argument validator: isInStringArray
@@ -233,17 +231,9 @@ expectType<typeof isNameString>(validate.isNameString);
 expectType<typeof isSafeSearchString>(validate.isSafeSearchString);
 expectType<typeof isEmailString>(validate.isEmailString);
 expectType<typeof isJwtString>(validate.isJwtString);
-expectType<typeof isPasswordString>(validate.isPasswordString);
-expectType<typeof isSimplePasswordString>(validate.isSimplePasswordString);
-expectType<typeof isPasswordStringFailureMessage>(validate.isPasswordStringFailureMessage);
-expectType<typeof isSimplePasswordStringFailureMessage>(
-  validate.isSimplePasswordStringFailureMessage,
-);
 expectType<typeof isUsernameString>(validate.isUsernameString);
 expectType<typeof isPhoneNumber>(validate.isPhoneNumber);
 expectType<typeof isUrlSafeString>(validate.isUrlSafeString);
-expectType<typeof isString6To24CharacterLong>(validate.isString6To24CharacterLong);
-expectType<typeof isString6To16CharacterLong>(validate.isString6To16CharacterLong);
 expectType<typeof isProvinceString>(validate.isProvinceString);
 expectType<typeof isBoolValue>(validate.isBoolValue);
 expectType<typeof isPostalCodeString>(validate.isPostalCodeString);

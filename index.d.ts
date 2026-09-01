@@ -6,8 +6,15 @@
 export type ValidatePropertiesInput = Record<string, unknown> | null | undefined;
 export type ValidatePropertiesResult = Record<string, unknown>;
 export type BoolValidator = (input: unknown) => boolean;
-export type FailureMessageValidator = (input: unknown) => string | null;
 export type InStringArrayValidator = (stringArray: readonly string[], input: unknown) => boolean;
+
+export type PasswordValidationFailureReason =
+  'invalid_type' | 'invalid_unicode' | 'too_short' | 'too_long' | 'blocked';
+export type PasswordValidationResult =
+  { isValid: true; value: string } | { isValid: false; reason: PasswordValidationFailureReason };
+
+/** Validates and NFC-normalizes a new password using the CareCard password policy. */
+export function validatePassword(input: unknown): PasswordValidationResult;
 
 /**
  * Utility function to validate multiple properties of an object at once.
@@ -145,24 +152,12 @@ export const isSafeSearchString: BoolValidator;
 export const isEmailString: BoolValidator;
 /** Checks if the string is a valid JWT format. */
 export const isJwtString: BoolValidator;
-/** Checks if the string is a valid strong password. */
-export const isPasswordString: BoolValidator;
-/** Checks if the string is a valid simple password. */
-export const isSimplePasswordString: BoolValidator;
-/** Returns a failure message if the password is not strong enough. */
-export const isPasswordStringFailureMessage: FailureMessageValidator;
-/** Returns a failure message if the password is not valid as a simple password. */
-export const isSimplePasswordStringFailureMessage: FailureMessageValidator;
 /** Checks if the string is a valid username. */
 export const isUsernameString: BoolValidator;
 /** Checks if the string is a valid phone number. */
 export const isPhoneNumber: BoolValidator;
 /** Checks if the string is URL-safe. */
 export const isUrlSafeString: BoolValidator;
-/** Checks if the string length is between 6 and 24 characters. */
-export const isString6To24CharacterLong: BoolValidator;
-/** Checks if the string length is between 6 and 16 characters. */
-export const isString6To16CharacterLong: BoolValidator;
 /** Checks if the string is a valid Canadian province abbreviation (ON, QC). */
 export const isProvinceString: BoolValidator;
 /** Checks if the value is a boolean. */
@@ -211,15 +206,9 @@ export const validate: {
   isSafeSearchString: typeof isSafeSearchString;
   isEmailString: typeof isEmailString;
   isJwtString: typeof isJwtString;
-  isPasswordString: typeof isPasswordString;
-  isSimplePasswordString: typeof isSimplePasswordString;
-  isPasswordStringFailureMessage: typeof isPasswordStringFailureMessage;
-  isSimplePasswordStringFailureMessage: typeof isSimplePasswordStringFailureMessage;
   isUsernameString: typeof isUsernameString;
   isPhoneNumber: typeof isPhoneNumber;
   isUrlSafeString: typeof isUrlSafeString;
-  isString6To24CharacterLong: typeof isString6To24CharacterLong;
-  isString6To16CharacterLong: typeof isString6To16CharacterLong;
   isProvinceString: typeof isProvinceString;
   isBoolValue: typeof isBoolValue;
   isPostalCodeString: typeof isPostalCodeString;

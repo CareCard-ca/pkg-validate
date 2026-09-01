@@ -8,10 +8,14 @@ Non-negotiable root-cause solution rule: Always identify and solve the verified 
 services. It exposes individual value validators, a bulk property sanitizer, and
 a whitelist validator for request-like payloads.
 
-The package returns booleans from the low-level validators, strips unknown or
-invalid values from `validateProperties`, and throws CareCard `BAD_INPUT` errors
-from `validateWhitelistProperties` when required or provided whitelist values do
-not pass validation.
+The package returns booleans from general low-level validators, returns a
+structured result from the single `validatePassword` policy boundary, strips
+unknown or invalid values from `validateProperties`, and throws CareCard
+`BAD_INPUT` errors from `validateWhitelistProperties` when required or provided
+whitelist values do not pass validation.
+
+Use Node.js 24.20.0. The package accepts compatible Node.js releases from
+24.20.0 up to, but not including, Node.js 25.
 
 ## Development Rule
 
@@ -36,11 +40,19 @@ npm install @carecard/validate
 ## Importing
 
 ```js
-const { validate, validateProperties, validateWhitelistProperties, isEmailString, isValidUuidString } = require('@carecard/validate');
+const {
+  validate,
+  validatePassword,
+  validateProperties,
+  validateWhitelistProperties,
+  isEmailString,
+  isValidUuidString,
+} = require('@carecard/validate');
 ```
 
-The validators are available both as top-level exports and under the deprecated
-`validate` namespace.
+General validators are available both as top-level exports and under the
+deprecated `validate` namespace. `validatePassword` is intentionally available
+only as one direct export.
 
 ```js
 isEmailString('jane@example.com'); // true
@@ -49,43 +61,37 @@ validate.isEmailString('jane@example.com'); // true
 
 ## Direct Validators
 
-Every direct validator returns `true` or `false`. Failure message helpers return
-a string on failure and `null` on success.
+General direct validators return `true` or `false`.
 
-| Function                                      | Accepted value                                                                                                                                                                          |
-| --------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `isImageUrl(value)`                           | Non-empty string up to 2048 chars using letters, numbers, `-`, `_`, `.`, and `/`. Intended for safe image/file paths.                                                                   |
-| `isInteger(value)`                            | JavaScript integer number. String numbers are rejected.                                                                                                                                 |
-| `isValidJsonString(value)`                    | Non-empty string up to 10000 chars that parses to a non-null JSON object or array. JSON primitives are rejected.                                                                        |
-| `isValidIntegerString(value)`                 | Digit-only string, 1 to 20 chars. No signs or decimals.                                                                                                                                 |
-| `isValidUuidString(value)`                    | Canonical UUID string in `8-4-4-4-12` format, case-insensitive.                                                                                                                         |
-| `isCharactersString(value)`                   | 1 to 1000 chars containing letters, numbers, spaces, `_`, or `-`.                                                                                                                       |
-| `isStreetString(value)`                       | Non-empty street-like string up to 1000 chars using letters, numbers, spaces, `,`, `.`, `/`, `#`, or `-`, and not starting with `,`, `_`, or `-`.                                       |
-| `isNameString(value)`                         | 1 to 1000 char string that starts with a letter and uses letters, numbers, spaces, `_`, `-`, `.`, `,`, `'`, `(`, or `)`. Leading/trailing spaces are trimmed before pattern validation. |
-| `isSafeSearchString(value)`                   | Trimmed string that starts with a letter and then uses letters, numbers, spaces, `_`, `-`, `.`, `,`, `'`, `(`, `)`, or `@`.                                                             |
-| `isEmailString(value)`                        | Email-like string up to 320 chars using the package email regex.                                                                                                                        |
-| `isJwtString(value)`                          | Non-blank JWT-like string up to 8192 chars that starts with `eyJ` and contains only letters, numbers, `-`, `_`, and `.`.                                                                |
-| `isPasswordString(value)`                     | 6 to 32 chars from letters, numbers, and `!@#$%^&*_-`, with at least one alphanumeric char and one listed special char.                                                                 |
-| `isSimplePasswordString(value)`               | 6 to 32 chars from letters, numbers, and `!@#$%^&*_-`.                                                                                                                                  |
-| `isPasswordStringFailureMessage(value)`       | `null` when `isPasswordString` passes, otherwise a human-readable failure message.                                                                                                      |
-| `isSimplePasswordStringFailureMessage(value)` | `null` when `isSimplePasswordString` passes, otherwise a human-readable failure message.                                                                                                |
-| `isUsernameString(value)`                     | 1 to 200 alphanumeric chars.                                                                                                                                                            |
-| `isPhoneNumber(value)`                        | North American 10-digit phone number with optional parentheses around the area code and optional space, `-`, or `.` separators.                                                         |
-| `isUrlSafeString(value)`                      | Non-blank string up to 2048 chars using letters, numbers, `-`, `_`, and `.`.                                                                                                            |
-| `isString6To24CharacterLong(value)`           | String with length from 6 to 24.                                                                                                                                                        |
-| `isString6To16CharacterLong(value)`           | String with length from 6 to 16.                                                                                                                                                        |
-| `isProvinceString(value)`                     | `ON` or `QC`, case-insensitive.                                                                                                                                                         |
-| `isBoolValue(value)`                          | Boolean `true`/`false` or strings `"true"`/`"false"`.                                                                                                                                   |
-| `isPostalCodeString(value)`                   | Canadian postal code format, case-insensitive, with optional middle space.                                                                                                              |
-| `isSafeString(value)`                         | 1 to 10000 chars using letters, numbers, spaces, `-`, `_`, `.`, `,`, `#`, `*`, `'`, `(`, `)`, `[`, `]`, or `:`.                                                                         |
-| `isInStringArray(array, value)`               | `value`, after lowercase/trim validation as a name string, is included in the supplied array.                                                                                           |
-| `isCountryCodeString(value)`                  | Country dialing code in `+1` to `+999` format.                                                                                                                                          |
-| `isValidDomainName(value)`                    | Domain name with at least one dot, valid DNS-like labels, and max total length 253.                                                                                                     |
-| `isValidTimestampzString(value)`              | ISO 8601 timestamp with `Z` or `+/-HH:MM` timezone offset.                                                                                                                              |
-| `isValidTimestampString(value)`               | ISO 8601 timestamp without timezone offset.                                                                                                                                             |
-| `isValidDateString(value)`                    | ISO date in `YYYY-MM-DD` format.                                                                                                                                                        |
-| `isValidUrl(value)`                           | Absolute `http://` or `https://` URL up to 2048 chars.                                                                                                                                  |
-| `isValidArrayOfStrings(value)`                | Array where every element passes `isSafeString`.                                                                                                                                        |
+| Function                         | Accepted value                                                                                                                                                                                                                                                                                                           |
+| -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `isImageUrl(value)`              | Non-empty string up to 2048 chars using letters, numbers, `-`, `_`, `.`, and `/`. Intended for safe image/file paths.                                                                                                                                                                                                    |
+| `isInteger(value)`               | JavaScript integer number. String numbers are rejected.                                                                                                                                                                                                                                                                  |
+| `isValidJsonString(value)`       | Non-empty string up to 10000 chars that parses to a non-null JSON object or array. JSON primitives are rejected.                                                                                                                                                                                                         |
+| `isValidIntegerString(value)`    | Digit-only string, 1 to 20 chars. No signs or decimals.                                                                                                                                                                                                                                                                  |
+| `isValidUuidString(value)`       | Canonical UUID string in `8-4-4-4-12` format, case-insensitive.                                                                                                                                                                                                                                                          |
+| `isCharactersString(value)`      | 1 to 1000 chars containing letters, numbers, spaces, `_`, or `-`.                                                                                                                                                                                                                                                        |
+| `isStreetString(value)`          | Non-empty street-like string up to 1000 chars using letters, numbers, spaces, `,`, `.`, `/`, `#`, or `-`, and not starting with `,`, `_`, or `-`.                                                                                                                                                                        |
+| `isNameString(value)`            | 1 to 1000 char string that starts with a letter and uses letters, numbers, spaces, `_`, `-`, `.`, `,`, `'`, `(`, or `)`. Leading/trailing spaces are trimmed before pattern validation.                                                                                                                                  |
+| `isSafeSearchString(value)`      | Trimmed string that starts with a letter and then uses letters, numbers, spaces, `_`, `-`, `.`, `,`, `'`, `(`, `)`, or `@`.                                                                                                                                                                                              |
+| `isEmailString(value)`           | Email-like string up to 320 chars using the package email regex.                                                                                                                                                                                                                                                         |
+| `isJwtString(value)`             | Non-blank JWT-like string up to 8192 chars that starts with `eyJ` and contains only letters, numbers, `-`, `_`, and `.`.                                                                                                                                                                                                 |
+| `validatePassword(value)`        | A well-formed Unicode password from 15 to 128 code points after NFC normalization that is not an exact case-sensitive blocklist match. Returns a discriminated result with the normalized value or a stable failure reason. All Unicode characters, including spaces and emoji, are permitted without composition rules. |
+| `isUsernameString(value)`        | 1 to 200 alphanumeric chars.                                                                                                                                                                                                                                                                                             |
+| `isPhoneNumber(value)`           | North American 10-digit phone number with optional parentheses around the area code and optional space, `-`, or `.` separators.                                                                                                                                                                                          |
+| `isUrlSafeString(value)`         | Non-blank string up to 2048 chars using letters, numbers, `-`, `_`, and `.`.                                                                                                                                                                                                                                             |
+| `isProvinceString(value)`        | `ON` or `QC`, case-insensitive.                                                                                                                                                                                                                                                                                          |
+| `isBoolValue(value)`             | Boolean `true`/`false` or strings `"true"`/`"false"`.                                                                                                                                                                                                                                                                    |
+| `isPostalCodeString(value)`      | Canadian postal code format, case-insensitive, with optional middle space.                                                                                                                                                                                                                                               |
+| `isSafeString(value)`            | 1 to 10000 chars using letters, numbers, spaces, `-`, `_`, `.`, `,`, `#`, `*`, `'`, `(`, `)`, `[`, `]`, or `:`.                                                                                                                                                                                                          |
+| `isInStringArray(array, value)`  | `value`, after lowercase/trim validation as a name string, is included in the supplied array.                                                                                                                                                                                                                            |
+| `isCountryCodeString(value)`     | Country dialing code in `+1` to `+999` format.                                                                                                                                                                                                                                                                           |
+| `isValidDomainName(value)`       | Domain name with at least one dot, valid DNS-like labels, and max total length 253.                                                                                                                                                                                                                                      |
+| `isValidTimestampzString(value)` | ISO 8601 timestamp with `Z` or `+/-HH:MM` timezone offset.                                                                                                                                                                                                                                                               |
+| `isValidTimestampString(value)`  | ISO 8601 timestamp without timezone offset.                                                                                                                                                                                                                                                                              |
+| `isValidDateString(value)`       | ISO date in `YYYY-MM-DD` format.                                                                                                                                                                                                                                                                                         |
+| `isValidUrl(value)`              | Absolute `http://` or `https://` URL up to 2048 chars.                                                                                                                                                                                                                                                                   |
+| `isValidArrayOfStrings(value)`   | Array where every element passes `isSafeString`.                                                                                                                                                                                                                                                                         |
 
 ## `validateProperties(obj)`
 
@@ -96,10 +102,10 @@ argument returns `{}`.
 
 ```js
 const input = {
-    first_name: 'Jane',
-    email: 'jane@example.com',
-    phone_number: '123',
-    unknown_key: 'ignored',
+  first_name: 'Jane',
+  email: 'jane@example.com',
+  phone_number: '123',
+  unknown_key: 'ignored',
 };
 
 validateProperties(input);
@@ -114,30 +120,29 @@ validateProperties(input);
 Keys are matched exactly. Both snake_case and camelCase variants are listed
 where the package supports both.
 
-| Validator                                                 | Keys                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
-| --------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `isNameString`                                            | `first_name`, `firstName`, `last_name`, `lastName`, `username`, `new_status`, `newStatus`, `description`, `comment`, `status`, `name`, `title`, `brand`, `short_description`, `shortDescription`, `college_name`, `collegeName`, `campus_name`, `campusName`, `role`, `role_id`, `roleId`, `campus`, `institution_name`, `institutionName`, `program_name`, `programName`, `role_name`, `roleName`, `document_name`, `documentName`, `document_required_for_role_name`, `documentRequiredForRoleName`, `reason`, `entity_type`, `entityType`, `action_type`, `actionType`, `city`, `state`, `country`, `type`                                                                                                                                             |
-| `isStreetString`                                          | `street`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
-| `isCharactersString`                                      | `postal_code`, `postalCode`, `period`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
-| `isBoolValue`                                             | `is_primary`, `isPrimary`, `active`, `document_optional`, `documentOptional`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
-| `isSafeSearchString`                                      | `search_string`, `searchString`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
-| `isString6To16CharacterLong` and `isSimplePasswordString` | `password`, `new_password`, `newPassword`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
-| `isString6To16CharacterLong` and `isPasswordString`       | `strong_password`, `strongPassword`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
-| `isEmailString`                                           | `email`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
-| `isPhoneNumber`                                           | `phone_number`, `phoneNumber`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
-| `isCountryCodeString`                                     | `country_code`, `countryCode`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
-| `isUrlSafeString`                                         | `token`, `email_verification_token`, `emailVerificationToken`, `verification_token`, `verificationToken`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
-| `isValidUuidString`                                       | `uuid`, `item_id`, `itemId`, `user_id`, `userId`, `address_id`, `addressId`, `order_id`, `orderId`, `category_id`, `categoryId`, `parent_id`, `parentId`, `college_id`, `collegeId`, `campus_id`, `campusId`, `program_id`, `programId`, `program_term_id`, `programTermId`, `template_id`, `templateId`, `program_template_id`, `programTemplateId`, `user_item_id`, `userItemId`, `user_item_status_id`, `userItemStatusId`, `requirement_item_id`, `requirementItemId`, `program_document_id`, `programDocumentId`, `id`, `institution_id`, `institutionId`, `role_assignment_id`, `roleAssignmentId`, `user_role_id`, `userRoleId`, `phone_number_id`, `phoneNumberId`, `entity_id`, `entityId`, `changed_by`, `changedBy`, `request_id`, `requestId` |
-| `isCcIdString`                                            | `cc_id`, `ccId`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
-| `isValidIntegerString`                                    | `offset_number`, `offsetNumber`, `number_of_orders`, `numberOfOrders`, `price`, `from`, `number`, `limit`, `offset`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
-| `isValidJsonString` on the raw value                      | `about`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
-| `isValidJsonString(JSON.stringify(value))`                | `weight`, `dimensions`, `permission`, `scope_data`, `scopeData`, `meta_data`, `metaData`, `metadata`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
-| `isTextString`                                            | `document_description`, `documentDescription`, `nick_name`, `nickName`, `requested_by_name`, `requestedByName`, `requested_by_email`, `requestedByEmail`, `requested_by_phone`, `requestedByPhone`, `approved_by_name`, `approvedByName`, `approved_by_email`, `approvedByEmail`, `approved_by_phone`, `approvedByPhone`                                                                                                                                                                                                                                                                                                                                                                                                                                  |
-| `isValidArrayOfStrings`                                   | `aliases`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
-| `isImageUrl` or `isValidUrl`                              | `image_url`, `imageUrl`, `website`, `file_url`, `fileUrl`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
-| `isValidDomainName`                                       | `domain_name`, `domainName`, `domain`, `email_domain`, `emailDomain`, `email_domain_name`, `emailDomainName`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
-| `isValidTimestampzString` or `isValidTimestampString`     | `expires_at`, `expiresAt`, `start_time`, `startTime`, `end_time`, `endTime`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
-| `isValidDateString`                                       | `effective_start_date`, `effectiveStartDate`, `effective_end_date`, `effectiveEndDate`, `valid_until_date`, `validUntilDate`, `renew_date`, `renewDate`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| Validator                                             | Keys                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+| ----------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `isNameString`                                        | `first_name`, `firstName`, `last_name`, `lastName`, `username`, `new_status`, `newStatus`, `description`, `comment`, `status`, `name`, `title`, `brand`, `short_description`, `shortDescription`, `college_name`, `collegeName`, `campus_name`, `campusName`, `role`, `role_id`, `roleId`, `campus`, `institution_name`, `institutionName`, `program_name`, `programName`, `role_name`, `roleName`, `document_name`, `documentName`, `document_required_for_role_name`, `documentRequiredForRoleName`, `reason`, `entity_type`, `entityType`, `action_type`, `actionType`, `city`, `state`, `country`, `type`                                                                                                                                             |
+| `isStreetString`                                      | `street`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| `isCharactersString`                                  | `postal_code`, `postalCode`, `period`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| `isBoolValue`                                         | `is_primary`, `isPrimary`, `active`, `document_optional`, `documentOptional`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| `isSafeSearchString`                                  | `search_string`, `searchString`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| `validatePassword`                                    | `password`, `new_password`, `newPassword`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| `isEmailString`                                       | `email`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| `isPhoneNumber`                                       | `phone_number`, `phoneNumber`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| `isCountryCodeString`                                 | `country_code`, `countryCode`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| `isUrlSafeString`                                     | `token`, `email_verification_token`, `emailVerificationToken`, `verification_token`, `verificationToken`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| `isValidUuidString`                                   | `uuid`, `item_id`, `itemId`, `user_id`, `userId`, `address_id`, `addressId`, `order_id`, `orderId`, `category_id`, `categoryId`, `parent_id`, `parentId`, `college_id`, `collegeId`, `campus_id`, `campusId`, `program_id`, `programId`, `program_term_id`, `programTermId`, `template_id`, `templateId`, `program_template_id`, `programTemplateId`, `user_item_id`, `userItemId`, `user_item_status_id`, `userItemStatusId`, `requirement_item_id`, `requirementItemId`, `program_document_id`, `programDocumentId`, `id`, `institution_id`, `institutionId`, `role_assignment_id`, `roleAssignmentId`, `user_role_id`, `userRoleId`, `phone_number_id`, `phoneNumberId`, `entity_id`, `entityId`, `changed_by`, `changedBy`, `request_id`, `requestId` |
+| `isCcIdString`                                        | `cc_id`, `ccId`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| `isValidIntegerString`                                | `offset_number`, `offsetNumber`, `number_of_orders`, `numberOfOrders`, `price`, `from`, `number`, `limit`, `offset`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| `isValidJsonString` on the raw value                  | `about`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| `isValidJsonString(JSON.stringify(value))`            | `weight`, `dimensions`, `permission`, `scope_data`, `scopeData`, `meta_data`, `metaData`, `metadata`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+| `isTextString`                                        | `document_description`, `documentDescription`, `nick_name`, `nickName`, `requested_by_name`, `requestedByName`, `requested_by_email`, `requestedByEmail`, `requested_by_phone`, `requestedByPhone`, `approved_by_name`, `approvedByName`, `approved_by_email`, `approvedByEmail`, `approved_by_phone`, `approvedByPhone`                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| `isValidArrayOfStrings`                               | `aliases`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| `isImageUrl` or `isValidUrl`                          | `image_url`, `imageUrl`, `website`, `file_url`, `fileUrl`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| `isValidDomainName`                                   | `domain_name`, `domainName`, `domain`, `email_domain`, `emailDomain`, `email_domain_name`, `emailDomainName`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| `isValidTimestampzString` or `isValidTimestampString` | `expires_at`, `expiresAt`, `start_time`, `startTime`, `end_time`, `endTime`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| `isValidDateString`                                   | `effective_start_date`, `effectiveStartDate`, `effective_end_date`, `effectiveEndDate`, `valid_until_date`, `validUntilDate`, `renew_date`, `renewDate`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
 
 ## `validateWhitelistProperties(inputObject, requiredProperties, options)`
 
@@ -147,14 +152,14 @@ a `Promise<ValidatePropertiesResult>` with the sanitized output.
 
 ```js
 const body = {
-    first_name: 'Jane',
-    email: 'jane@example.com',
-    role: 'Admin',
-    extra: '<script>',
+  first_name: 'Jane',
+  email: 'jane@example.com',
+  role: 'Admin',
+  extra: '<script>',
 };
 
 const out = await validateWhitelistProperties(body, ['first_name', 'email'], {
-    optionalProperties: ['role'],
+  optionalProperties: ['role'],
 });
 
 // {
@@ -182,10 +187,10 @@ The default output preserves the nested shape described by whitelisted dot paths
 
 ```js
 const input = {
-    user: {
-        first_name: 'Jane',
-        contact: { email: 'jane@example.com' },
-    },
+  user: {
+    first_name: 'Jane',
+    contact: { email: 'jane@example.com' },
+  },
 };
 
 await validateWhitelistProperties(input, ['user.first_name', 'user.contact.email']);
@@ -209,16 +214,22 @@ await validateWhitelistProperties(input, ['user.first_name', 'user.contact.email
 Example with only the default options:
 
 ```js
-await validateWhitelistProperties({ first_name: 'Jane', email: 'jane@example.com', ignored: 'x' }, ['first_name']);
+await validateWhitelistProperties({ first_name: 'Jane', email: 'jane@example.com', ignored: 'x' }, [
+  'first_name',
+]);
 // { first_name: 'Jane' }
 ```
 
 Example with optional properties:
 
 ```js
-await validateWhitelistProperties({ first_name: 'Jane', phone_number: '4165551234' }, ['first_name'], {
+await validateWhitelistProperties(
+  { first_name: 'Jane', phone_number: '4165551234' },
+  ['first_name'],
+  {
     optionalProperties: ['phone_number'],
-});
+  },
+);
 // { first_name: 'Jane', phone_number: '4165551234' }
 ```
 
@@ -241,7 +252,7 @@ Optional paths are ignored when absent, but invalid when present.
 
 ```js
 await validateWhitelistProperties({ first_name: 'Jane', email: 'bad' }, ['first_name'], {
-    optionalProperties: ['email'],
+  optionalProperties: ['email'],
 });
 // userMessage: 'Invalid property value: email'
 ```
@@ -253,13 +264,13 @@ used.
 
 ```js
 const out = await validateWhitelistProperties(
-    {
-        user: {
-            first_name: 'Jane',
-            contact: { email: 'jane@example.com', ignored: 'x' },
-        },
+  {
+    user: {
+      first_name: 'Jane',
+      contact: { email: 'jane@example.com', ignored: 'x' },
     },
-    ['user.first_name', 'user.contact.email'],
+  },
+  ['user.first_name', 'user.contact.email'],
 );
 
 // {
@@ -290,11 +301,15 @@ This array behavior is intended for repeated scalar fields such as `email` or
 ### Case Conversion And Flattening
 
 ```js
-const out = await validateWhitelistProperties({ userInfo: { firstName: 'Jane', phoneNumber: '4165551234' } }, ['userInfo.firstName'], {
+const out = await validateWhitelistProperties(
+  { userInfo: { firstName: 'Jane', phoneNumber: '4165551234' } },
+  ['userInfo.firstName'],
+  {
     optionalProperties: ['userInfo.phoneNumber'],
     convertToSnakeCase: true,
     flattenOutput: true,
-});
+  },
+);
 
 // {
 //   'user_info.first_name': 'Jane',
@@ -316,7 +331,7 @@ With `flattenOutput: true`, keys are full dot paths by default:
 ```js
 const input = { a: { b: { c: { d: { email: 'jane@example.com', name: 'Jane' } } } } };
 await validateWhitelistProperties(input, ['a.b.c.d.email', 'a.b.c.d.name'], {
-    flattenOutput: true,
+  flattenOutput: true,
 });
 // { 'a.b.c.d.email': 'jane@example.com', 'a.b.c.d.name': 'Jane' }
 ```
@@ -326,8 +341,8 @@ Use `flattenKeyStyle: 'leaf'` to return top-level leaf keys instead:
 ```js
 const input = { a: { b: { c: { d: { email: 'jane@example.com', name: 'Jane' } } } } };
 await validateWhitelistProperties(input, ['a.b.c.d.email', 'a.b.c.d.name'], {
-    flattenOutput: true,
-    flattenKeyStyle: 'leaf',
+  flattenOutput: true,
+  flattenKeyStyle: 'leaf',
 });
 // { email: 'jane@example.com', name: 'Jane' }
 ```
@@ -339,13 +354,13 @@ encountered:
 
 ```js
 const input = {
-    name: 'Top Level Name',
-    user: { name: 'Nested Name', email: 'jane@example.com' },
+  name: 'Top Level Name',
+  user: { name: 'Nested Name', email: 'jane@example.com' },
 };
 
 await validateWhitelistProperties(input, ['name', 'user.name', 'user.email'], {
-    flattenOutput: true,
-    flattenKeyStyle: 'leaf',
+  flattenOutput: true,
+  flattenKeyStyle: 'leaf',
 });
 // { name: 'Top Level Name', email: 'jane@example.com' }
 ```
@@ -355,10 +370,16 @@ await validateWhitelistProperties(input, ['name', 'user.name', 'user.email'], {
 The package ships `index.d.ts` and declares types for the CommonJS exports.
 
 ```ts
-import { validateWhitelistProperties, isEmailString, ValidatePropertiesResult } from '@carecard/validate';
+import {
+  validateWhitelistProperties,
+  isEmailString,
+  ValidatePropertiesResult,
+} from '@carecard/validate';
 
 const valid: boolean = isEmailString('jane@example.com');
-const output: ValidatePropertiesResult = await validateWhitelistProperties({ first_name: 'Jane' }, ['first_name']);
+const output: ValidatePropertiesResult = await validateWhitelistProperties({ first_name: 'Jane' }, [
+  'first_name',
+]);
 const maxDepth: 5 = validateWhitelistProperties.MAX_NESTING_DEPTH;
 ```
 
@@ -385,7 +406,7 @@ npm run lint
 npm run format:check
 ```
 
-CI runs on Node.js 25 and executes `npm run test:All`. Publishing to npm happens
+CI runs on Node.js 24.20.0 and executes `npm run test:All`. Publishing to npm happens
 from `main` through the `Publish to npm` GitHub workflow.
 
 ## Auth Boundary

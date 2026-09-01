@@ -108,10 +108,12 @@ depend on those folders being present.
 
 ## Validation Behavior
 
-- Low-level validators should be deterministic predicate functions that return
-  `true` or `false`.
-- Password failure-message helpers should return `null` for valid input and a
-  user-readable string for invalid input.
+- General low-level validators should be deterministic predicate functions that
+  return `true` or `false`.
+- `validatePassword` is the sole password-policy function and sole direct
+  password export. It returns the NFC-normalized accepted value or a stable
+  failure reason; do not add password predicates, aliases, failure-message
+  helpers, or a nested password export.
 - `validateProperties` should return a new sanitized object and omit unknown or
   invalid fields without mutating the input.
 - `validateWhitelistProperties` should reject missing or invalid required fields
@@ -204,20 +206,20 @@ repository's agents-only Git workflow:
    and mark the pull request ready for review with `gh pr ready <number>`.
 5. Squash-merge with administrator privileges and delete the remote branch:
 
-    ```sh
-    gh pr merge <number> --squash --admin --delete-branch
-    ```
+   ```sh
+   gh pr merge <number> --squash --admin --delete-branch
+   ```
 
 6. After merge, update the local base branch and remove the local feature
    branch:
 
-    ```sh
-    git fetch origin <base> --prune
-    git switch <base>
-    git pull --ff-only origin <base>
-    git branch -d feature/codex
-    git ls-remote --heads origin feature/codex
-    ```
+   ```sh
+   git fetch origin <base> --prune
+   git switch <base>
+   git pull --ff-only origin <base>
+   git branch -d feature/codex
+   git ls-remote --heads origin feature/codex
+   ```
 
 Do not commit or push `.agents` guidance changes directly from `development`
 or `main`. Do not stage unrelated files, generated output, dependency folders,

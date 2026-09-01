@@ -142,10 +142,10 @@ describe('ValidateProperties test', function () {
     });
   });
 
-  describe('Simple password fields', function () {
+  describe('Password fields', function () {
     ['password', 'new_password', 'newPassword'].forEach(key => {
-      it(`accepts a valid simple password for "${key}"`, function () {
-        assertAccepts(key, 'secret782*goo');
+      it(`accepts a valid Unicode password for "${key}"`, function () {
+        assertAccepts(key, 'mot de passe café');
       });
 
       it(`rejects a too-short password for "${key}"`, function () {
@@ -153,19 +153,19 @@ describe('ValidateProperties test', function () {
       });
 
       it(`rejects a too-long password for "${key}"`, function () {
-        assertRejects(key, 'thisPasswordIsWayTooLongToBeValid');
+        assertRejects(key, '🔐'.repeat(129));
       });
     });
-  });
 
-  describe('Strong password fields', function () {
-    ['strong_password', 'strongPassword'].forEach(key => {
-      it(`accepts a valid strong password for "${key}"`, function () {
-        assertAccepts(key, 'Password123!');
+    it('returns the NFC-normalized password', function () {
+      assert.deepStrictEqual(validateProperties({ password: `cafe\u0301 ${'x'.repeat(10)}` }), {
+        password: `café ${'x'.repeat(10)}`,
       });
+    });
 
-      it(`rejects a weak/short password for "${key}"`, function () {
-        assertRejects(key, 'short');
+    ['strong_password', 'strongPassword'].forEach(key => {
+      it(`does not retain the removed password alias "${key}"`, function () {
+        assertRejects(key, 'valid password phrase');
       });
     });
   });
@@ -605,11 +605,9 @@ describe('ValidateProperties test', function () {
         role_id: 'RoleID',
         roleId: 'RoleID',
         campus: 'Campus',
-        strong_password: 'Password123!',
-        strongPassword: 'Password123!',
-        new_password: 'Password123',
-        newPassword: 'Password123',
-        password: 'Password123',
+        new_password: 'Password phrase',
+        newPassword: 'Password phrase',
+        password: 'Password phrase',
         email: 'test@example.com',
         phone_number: '123-456-7890',
         phoneNumber: '123-456-7890',
@@ -765,7 +763,7 @@ describe('ValidateProperties test', function () {
         phoneNumberId: 'invalid-uuid',
         search_string: 123,
         password: 'short',
-        new_password: 'thisPasswordIsDefinitelyWayTooLong',
+        new_password: 'a'.repeat(129),
         strong_password: 'short',
         email: 'invalid-email',
         phone_number: '123',
