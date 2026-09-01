@@ -289,89 +289,61 @@ describe('AuthUtil test', function () {
       done();
     });
 
-    it('isPasswordString returns true if input is password string false otherwise', function (done) {
-      const badPassword_1 = 'I am a good person';
-      const badPassword_2 = '!@#$%^&*';
-      const badPassword_3 = 'I <script>am evil</script>';
-      const badPassword_4 = 'ha!lsw 3ol&*ler';
-      const badPassword_5 = 'pnka*';
-      const badPassword_6 = 'pnka*some654t#hinddtyte5dtytkugjh';
-      const goodPassword_1 = 'pankaj*';
-      const goodPassword_2 = 'pank!aj67';
-      const goodPassword_3 = 'some654t#hing#';
-      const goodPassword_4 = '82625%82726';
-      const goodPassword_5 = 'halsw3ol&*ler';
-      const goodPassword_6 = 'pnkaj*-hg';
-      const goodPassword_7 = 'pnkaj_hg';
+    it('validates one password policy through the direct package export', function () {
+      const acceptedPasswords = [
+        'fifteenlettersok',
+        'UPPER lower 123 !',
+        'mot de passe café',
+        '密碼 phrase 🔐 okay',
+        ' '.repeat(15),
+        '🔐'.repeat(128),
+      ];
 
-      assert.deepStrictEqual(
-        validate.isPasswordStringFailureMessage(badPassword_1),
-        'Total 6 to 32 characters, numbers and one of !@#$%^&*_-',
-      );
-      assert.deepStrictEqual(validate.isPasswordStringFailureMessage(goodPassword_1), null);
-
-      assert.ok(!validate.isPasswordString(badPassword_1), 'Bad Password validation failed');
-      assert.ok(!validate.isPasswordString(badPassword_2), 'Bad Password validation failed');
-      assert.ok(!validate.isPasswordString(badPassword_3), 'Bad Password validation failed');
-      assert.ok(!validate.isPasswordString(badPassword_4), 'Bad Password validation failed');
-      assert.ok(!validate.isPasswordString(badPassword_5), 'Bad Password validation failed');
-      assert.ok(!validate.isPasswordString(badPassword_6), 'Bad Password validation failed');
-      assert.ok(!validate.isPasswordString(''), 'Empty Password validation failed');
-      assert.ok(!validate.isPasswordString(123), 'Non-string Password validation failed');
-      assert.ok(!validate.isPasswordString('a'.repeat(129)), 'Long Password validation failed');
-      assert.ok(validate.isPasswordString(goodPassword_1), 'Password validation failed');
-      assert.ok(validate.isPasswordString(goodPassword_2), 'Password validation failed');
-      assert.ok(validate.isPasswordString(goodPassword_3), 'Password validation failed');
-      assert.ok(validate.isPasswordString(goodPassword_4), 'Password validation failed');
-      assert.ok(validate.isPasswordString(goodPassword_5), 'Password validation failed');
-      assert.ok(validate.isPasswordString(goodPassword_6), 'Password validation failed');
-      assert.ok(validate.isPasswordString(goodPassword_7), 'Password validation failed');
-      done();
+      for (const password of acceptedPasswords) {
+        assert.deepStrictEqual(validatePackage.validatePassword(password), {
+          isValid: true,
+          value: password,
+        });
+      }
     });
 
-    it('isSimplePasswordString returns true if input is password string false otherwise', function (done) {
-      const badPassword_1 = 'I am a good person';
-      const badPassword_2 = 'I <script>am evil</script>';
-      const badPassword_3 = 'ha!lsw 3ol&*ler';
-      const badPassword_4 = 'pnka*';
-      const badPassword_5 = 'pnka*some654t#hinjgiuffdytrrtsdjj';
-      const badPassword_6 = 'pnkad';
-      const goodPassword_1 = 'pankaj*e';
-      const goodPassword_2 = 'pank!aj67';
-      const goodPassword_3 = 'some654t#hing#';
-      const goodPassword_4 = '82625%82726';
-      const goodPassword_5 = 'halsw3ol&*ler';
-      const goodPassword_6 = 'pnkaj*sd';
-      const goodPassword_7 = 'pnkajchatpta';
-      const goodPassword_8 = '!@#$%^&*';
+    it('normalizes accepted passwords to NFC without trimming them', function () {
+      const password = `  cafe\u0301 ${'x'.repeat(8)}`;
 
-      assert.deepStrictEqual(
-        validate.isSimplePasswordStringFailureMessage(badPassword_1),
-        'Total 6 to 32 characters, numbers or !@#$%^&*_-',
-      );
-      assert.deepStrictEqual(validate.isSimplePasswordStringFailureMessage(goodPassword_1), null);
+      assert.deepStrictEqual(validatePackage.validatePassword(password), {
+        isValid: true,
+        value: `  café ${'x'.repeat(8)}`,
+      });
+    });
 
-      assert.ok(!validate.isSimplePasswordString(badPassword_1), 'Bad Password validation failed');
-      assert.ok(!validate.isSimplePasswordString(badPassword_2), 'Bad Password validation failed');
-      assert.ok(!validate.isSimplePasswordString(badPassword_3), 'Bad Password validation failed');
-      assert.ok(!validate.isSimplePasswordString(badPassword_4), 'Bad Password validation failed');
-      assert.ok(!validate.isSimplePasswordString(badPassword_5), 'Bad Password validation failed');
-      assert.ok(!validate.isSimplePasswordString(badPassword_6), 'Bad Password validation failed');
-      assert.ok(!validate.isSimplePasswordString(''), 'Empty Password validation failed');
-      assert.ok(!validate.isSimplePasswordString(123), 'Non-string Password validation failed');
-      assert.ok(
-        !validate.isSimplePasswordString('a'.repeat(129)),
-        'Long Password validation failed',
-      );
-      assert.ok(validate.isSimplePasswordString(goodPassword_1), 'Password validation failed');
-      assert.ok(validate.isSimplePasswordString(goodPassword_2), 'Password validation failed');
-      assert.ok(validate.isSimplePasswordString(goodPassword_3), 'Password validation failed');
-      assert.ok(validate.isSimplePasswordString(goodPassword_4), 'Password validation failed');
-      assert.ok(validate.isSimplePasswordString(goodPassword_5), 'Password validation failed');
-      assert.ok(validate.isSimplePasswordString(goodPassword_6), 'Password validation failed');
-      assert.ok(validate.isSimplePasswordString(goodPassword_7), 'Password validation failed');
-      assert.ok(validate.isSimplePasswordString(goodPassword_8), 'Password validation failed');
-      done();
+    it('returns stable reasons for invalid password input', function () {
+      assert.deepStrictEqual(validatePackage.validatePassword(123), {
+        isValid: false,
+        reason: 'invalid_type',
+      });
+      assert.deepStrictEqual(validatePackage.validatePassword('\ud800valid password'), {
+        isValid: false,
+        reason: 'invalid_unicode',
+      });
+      assert.deepStrictEqual(validatePackage.validatePassword('🔐'.repeat(14)), {
+        isValid: false,
+        reason: 'too_short',
+      });
+      assert.deepStrictEqual(validatePackage.validatePassword('🔐'.repeat(129)), {
+        isValid: false,
+        reason: 'too_long',
+      });
+    });
+
+    it('blocks exact compromised passwords after NFC normalization', function () {
+      assert.deepStrictEqual(validatePackage.validatePassword('films+pic+galeries'), {
+        isValid: false,
+        reason: 'blocked',
+      });
+      assert.deepStrictEqual(validatePackage.validatePassword('Films+pic+galeries'), {
+        isValid: true,
+        value: 'Films+pic+galeries',
+      });
     });
 
     it('isUsernameString returns true if input is username string false otherwise', function (done) {
@@ -406,34 +378,6 @@ describe('AuthUtil test', function () {
 
       assert.ok(!validate.isUrlSafeString(urlUnSafeString), 'Url unsafe test failed');
       assert.ok(validate.isUrlSafeString(urlSafeString), 'Url safe test failed');
-      done();
-    });
-
-    it('isPasswordLengthCorrect returns true if 6 <= password <= 24', function (done) {
-      const password = 'hbGciOiJzaGE1MTIiLCJ';
-
-      const badPassword =
-        'hbGciOiJzaGE1MTIiLCJ0eXAiOiJKV1QifQ.eyJ1c2VyX2lkIjoyNjg0LCJ0aW1lIjoxNjEwNzE2ODM0ODc2fQ.' +
-        '9o_7dM4YjjcNseH7Cw3IL_t8yD1hhs1hl=uTCWG_JzYEExYOp8/9Gd6k0AbU018x3EQXCrdMUE6KXfL0KNg2Li9g';
-
-      assert.ok(validate.isString6To24CharacterLong(password), 'Good password fail');
-      assert.ok(!validate.isString6To24CharacterLong(badPassword), 'Bad password fail');
-      assert.ok(!validate.isString6To24CharacterLong(''), 'Empty password fail');
-      assert.ok(!validate.isString6To24CharacterLong(undefined), 'Undefined password fail');
-      done();
-    });
-
-    it('isPasswordLengthCorrect returns true if 6 <= password <= 16', function (done) {
-      const password = 'hbGciOiJzaGE1MTI';
-
-      const badPassword =
-        'hbGciOiJzaGE1MTIiLCJ0eXAiOiJKV1QifQ.eyJ1c2VyX2lkIjoyNjg0LCJ0aW1lIjoxNjEwNzE2ODM0ODc2fQ.' +
-        '9o_7dM4YjjcNseH7Cw3IL_t8yD1hhs1hl=uTCWG_JzYEExYOp8/9Gd6k0AbU018x3EQXCrdMUE6KXfL0KNg2Li9g';
-
-      assert.ok(validate.isString6To16CharacterLong(password), 'Good password fail');
-      assert.ok(!validate.isString6To16CharacterLong(badPassword), 'Bad password fail');
-      assert.ok(!validate.isString6To16CharacterLong(''), 'Empty password fail');
-      assert.ok(!validate.isString6To16CharacterLong(undefined), 'Undefined password fail');
       done();
     });
 

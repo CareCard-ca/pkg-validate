@@ -1,63 +1,63 @@
 name: Publish to npm
 
 on:
-    push:
-        branches:
-            - development
-            - main
+  push:
+    branches:
+      - development
+      - main
 
 permissions:
-    id-token: write
-    contents: read
+  id-token: write
+  contents: read
 
 jobs:
-    publish:
-        runs-on: ubuntu-latest
-        steps:
-            - name: Checkout code
-              uses: actions/checkout@v7
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
 
-            - name: Setup Node.js
-              uses: actions/setup-node@v6
-              with:
-                  node-version: '25'
-                  registry-url: 'https://registry.npmjs.org'
-                  package-manager-cache: false
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version-file: '.nvmrc'
+          registry-url: 'https://registry.npmjs.org'
+          package-manager-cache: false
 
-            - name: Remove unsupported npm auth config
-              run: |
-                  npm_config_file="${NPM_CONFIG_USERCONFIG:-$HOME/.npmrc}"
-                  if [ -f "$npm_config_file" ]; then
-                    sed -i '/^[[:space:]]*always-auth[[:space:]]*=.*/d' "$npm_config_file"
-                  fi
+      - name: Remove unsupported npm auth config
+        run: |
+          npm_config_file="${NPM_CONFIG_USERCONFIG:-$HOME/.npmrc}"
+          if [ -f "$npm_config_file" ]; then
+            sed -i '/^[[:space:]]*always-auth[[:space:]]*=.*/d' "$npm_config_file"
+          fi
 
-            - name: Install dependencies
-              # Added HUSKY=0 to prevent the husky error in logs
-              run: npm ci
-              env:
-                  HUSKY: 0
+      - name: Install dependencies
+        # Added HUSKY=0 to prevent the husky error in logs
+        run: npm ci
+        env:
+          HUSKY: 0
 
-            - name: Check package version
-              id: package-version
-              run: |
-                  package_name="$(node -p "require('./package.json').name")"
-                  package_version="$(node -p "require('./package.json').version")"
+      - name: Check package version
+        id: package-version
+        run: |
+          package_name="$(node -p "require('./package.json').name")"
+          package_version="$(node -p "require('./package.json').version")"
 
-                  echo "package_name=${package_name}" >> "$GITHUB_OUTPUT"
-                  echo "package_version=${package_version}" >> "$GITHUB_OUTPUT"
+          echo "package_name=${package_name}" >> "$GITHUB_OUTPUT"
+          echo "package_version=${package_version}" >> "$GITHUB_OUTPUT"
 
-                  published_versions="$(npm view "${package_name}" versions --json)"
-                  if node -e 'const value=JSON.parse(process.argv[1]); const versions=Array.isArray(value) ? value : [value]; process.exit(versions.includes(process.argv[2]) ? 0 : 1);' "$published_versions" "$package_version"; then
-                    echo "${package_name}@${package_version} is already published."
-                    echo "should_publish=false" >> "$GITHUB_OUTPUT"
-                  else
-                    echo "${package_name}@${package_version} is not published yet."
-                    echo "should_publish=true" >> "$GITHUB_OUTPUT"
-                  fi
+          published_versions="$(npm view "${package_name}" versions --json)"
+          if node -e 'const value=JSON.parse(process.argv[1]); const versions=Array.isArray(value) ? value : [value]; process.exit(versions.includes(process.argv[2]) ? 0 : 1);' "$published_versions" "$package_version"; then
+            echo "${package_name}@${package_version} is already published."
+            echo "should_publish=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "${package_name}@${package_version} is not published yet."
+            echo "should_publish=true" >> "$GITHUB_OUTPUT"
+          fi
 
-            - name: Publish to npm
-              if: steps.package-version.outputs.should_publish == 'true'
-              run: npm publish --provenance --access public
-              env:
-                  HUSKY: 0
-                  NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - name: Publish to npm
+        if: steps.package-version.outputs.should_publish == 'true'
+        run: npm publish --provenance --access public
+        env:
+          HUSKY: 0
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
