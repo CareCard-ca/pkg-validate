@@ -54,6 +54,11 @@ General validators are available both as top-level exports and under the
 deprecated `validate` namespace. `validatePassword` is intentionally available
 only as one direct export.
 
+The package root is safe to import from browser bundles. Its whitelist and role
+request validators use the focused `@carecard/common-util/case-converter` and
+`@carecard/common-util/errors` entrypoints, so importing `isEmailString` does
+not load server-only request context or trace storage.
+
 ```js
 isEmailString('jane@example.com'); // true
 validate.isEmailString('jane@example.com'); // true
@@ -204,12 +209,12 @@ await validateWhitelistProperties(input, ['user.first_name', 'user.contact.email
 
 ### Options
 
-| Option               | Default  | Behavior                                                                                                                                                                           |
-| -------------------- | -------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `optionalProperties` | `[]`     | Additional property paths that may be present. Absent optional paths are ignored. Present optional paths must be valid.                                                            |
-| `convertToSnakeCase` | `false`  | When `true`, converts returned keys, including nested keys, to snake_case using `@carecard/common-util`. Conversion happens before flattening.                                     |
-| `flattenOutput`      | `false`  | When `true`, removes nested objects from the returned value so every validated leaf becomes a top-level key.                                                                       |
-| `flattenKeyStyle`    | `'path'` | Controls flattened key naming when `flattenOutput` is `true`. Use `'path'` for full dot-notation keys or `'leaf'` for direct leaf names. Invalid values throw a `BAD_INPUT` error. |
+| Option               | Default  | Behavior                                                                                                                                                                                  |
+| -------------------- | -------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `optionalProperties` | `[]`     | Additional property paths that may be present. Absent optional paths are ignored. Present optional paths must be valid.                                                                   |
+| `convertToSnakeCase` | `false`  | When `true`, converts returned keys, including nested keys, to snake_case using the browser-safe `@carecard/common-util/case-converter` entrypoint. Conversion happens before flattening. |
+| `flattenOutput`      | `false`  | When `true`, removes nested objects from the returned value so every validated leaf becomes a top-level key.                                                                              |
+| `flattenKeyStyle`    | `'path'` | Controls flattened key naming when `flattenOutput` is `true`. Use `'path'` for full dot-notation keys or `'leaf'` for direct leaf names. Invalid values throw a `BAD_INPUT` error.        |
 
 Example with only the default options:
 
