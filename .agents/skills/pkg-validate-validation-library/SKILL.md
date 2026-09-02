@@ -101,6 +101,9 @@ depend on those folders being present.
 - Keep key-based property sanitization in `lib/validateProperties.js`.
 - Keep whitelist, nested-path, casing, flattening, and CareCard bad-input
   behavior in `lib/validateWhitelistProperties.js`.
+- Import shared casing and bad-input behavior through the focused
+  `@carecard/common-util/case-converter` and `@carecard/common-util/errors`
+  entrypoints so the package root remains safe for browser bundles.
 - Preserve the package's CommonJS module style unless the repository is
   intentionally migrated.
 - Keep the deprecated `validate` namespace export backward-compatible while
@@ -124,7 +127,8 @@ depend on those folders being present.
 - `validateProperties` should return a new sanitized object and omit unknown or
   invalid fields without mutating the input.
 - `validateWhitelistProperties` should reject missing or invalid required fields
-  with CareCard `BAD_INPUT` errors through `@carecard/common-util`.
+  with CareCard `BAD_INPUT` errors through the focused
+  `@carecard/common-util/errors` entrypoint.
 - Optional whitelist fields should be ignored when absent and rejected when
   present but invalid.
 - Preserve supported snake_case and camelCase field aliases unless a task
