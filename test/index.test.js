@@ -3,6 +3,7 @@
 const { runIndexedMochaTests } = require('../scripts/testParallel/runIndexedMochaTests.cjs');
 
 const parallelTestFiles = [
+  'test/emailValidation.test.js',
   'test/validate.test.js',
   'test/validationEdgeCases.test.js',
   'test/validateProperties.test.js',

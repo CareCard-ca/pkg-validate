@@ -110,6 +110,13 @@ depend on those folders being present.
 
 - General low-level validators should be deterministic predicate functions that
   return `true` or `false`.
+- `isEmailString` is the sole CareCard email-format decision. It accepts an
+  unmodified ASCII address no longer than 254 characters, with one practical
+  dot-atom local part no longer than 64 characters and a valid multi-label
+  DNS/punycode domain. It rejects quoted local parts, domain literals, Unicode
+  EAI, whitespace, invalid or empty DNS labels, numeric final labels, and
+  single-label domains. Callers may map its boolean to domain errors but must
+  not apply another email-syntax predicate.
 - `validatePassword` is the sole password-policy function and sole direct
   password export. It returns the NFC-normalized accepted value or a stable
   failure reason; do not add password predicates, aliases, failure-message
