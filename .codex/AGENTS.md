@@ -1,5 +1,17 @@
 # Codex Instructions For pkg-validate
 
+## Mandatory startup for every agent
+
+Every agent, including Codex, Claude, other assistants, and delegated agents,
+must read and follow [carecard-must-do](../.agents/skills/carecard-must-do/SKILL.md)
+before beginning or resuming any task. This includes planning, questions,
+read-only investigation, coding, review, documentation, and validation.
+
+Then load the [repository engineering standards](../.agents/skills/pkg-validate-coding-standards-and-best-practices/SKILL.md)
+and the specialist skills relevant to the task.
+An agent without automatic skill discovery must open the skill explicitly;
+the requirement applies regardless of the agent platform.
+
 ## Non-negotiable Codex banked-reset requirement
 
 - Never use or consume a banked Codex rate-limit reset automatically.
@@ -133,10 +145,10 @@ The `pkg-*` directories are reusable CareCard packages. Shared API response, err
 - Use coverage reports only as diagnostics for potentially untested observable behavior. Percentages for lines, branches, functions, and statements are not functional evidence and must not determine test assertions. Never add implementation-detail tests to preserve a metric or lower thresholds to hide a failing check; report any conflict with the behavior-only policy.
 - Keep tests readable and domain-specific. Prefer explicit helper names over generic test utilities that hide important behavior.
 - Use existing test frameworks and layouts:
-    - JavaScript `api-*`: usually Mocha, Supertest, `test/index.test.js`, and Docker-backed Postgres scripts.
-    - TypeScript `api-*`: usually Jest and `tests/index.test.ts`.
-    - `pkg-*`: Mocha plus TypeScript type tests where present.
-    - `app-dashboard`: Vitest, React Testing Library, mock API tests, and Selenium for end-to-end flows.
+  - JavaScript `api-*`: usually Mocha, Supertest, `test/index.test.js`, and Docker-backed Postgres scripts.
+  - TypeScript `api-*`: usually Jest and `tests/index.test.ts`.
+  - `pkg-*`: Mocha plus TypeScript type tests where present.
+  - `app-dashboard`: Vitest, React Testing Library, mock API tests, and Selenium for end-to-end flows.
 - For database tests, use existing seed, migration, rollback, and cleanup patterns. Keep tests isolated and make cleanup reliable even after failures.
 - Add tests for API success responses, validation errors, auth/authz errors, JWT errors, not-found/conflict cases, and unexpected error handling when those paths change.
 - For frontend changes, test rendered UI, public HTTP or network outcomes, navigation, accessibility, and user-visible flows at the narrowest practical level first. Use focused non-test dependency checks for validation, transform, query, mutation, hook, and module organization.
