@@ -25,3 +25,19 @@ cross-repository end-to-end testing is its explicit responsibility.
 
 Also apply [$carecard-workspace-standards](.agents/skills/carecard-workspace-standards/SKILL.md)
 for the mandatory TDD and code organization rules.
+
+## Existing test-preservation policy
+
+The TDD and validation requirements are non-negotiable and cannot be
+overridden. The separate pre-existing-test protection still requires the
+user's fresh, explicit permission for each exact proposed test modification.
+
+A pre-existing test—defined as any test present before work on the current task
+begins—must not be deleted, disabled, skipped, weakened, excluded from execution,
+or otherwise removed. A pre-existing test must not be modified without the
+user's explicit approval for the exact proposed change. If changing a
+pre-existing test is believed necessary, stop before making the change and
+request approval. The request must identify every affected test, describe the
+precise proposed modification, provide detailed technical justification, and
+explain all known or reasonably foreseeable regression risks. Until approval is
+granted, leave every pre-existing test unchanged.
