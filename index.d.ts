@@ -84,7 +84,7 @@ export interface ValidateWhitelistPropertiesFunction {
 
 export const validateWhitelistProperties: ValidateWhitelistPropertiesFunction;
 
-export type UserRoleRequestRole = 'student' | 'intern' | 'volunteer';
+export type UserRoleRequestRole = 'student' | 'intern' | 'volunteer' | 'applicant';
 export type UserRoleRequestScopeRequirement =
   boolean | typeof REQUIRE_SCOPE_WHEN_ROLE_OR_SCOPE_PRESENT;
 
@@ -120,7 +120,7 @@ export interface ValidateNewUserRoleRequestPayload extends Record<string, unknow
 
 /**
  * Normalizes and validates an institutions.new_user_role_request payload.
- * Only student, intern, and volunteer are accepted. When scope is required,
+ * Only student, intern, volunteer, and applicant are accepted. When scope is required,
  * both institution_id and campus_id must be provided.
  */
 export function validateNewUserRoleRequestObject(

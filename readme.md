@@ -477,3 +477,10 @@ A correct implementation may be completely rewritten or refactored without requi
 Any test that fails solely because the implementation changed while the externally observable behavior remained correct is incorrectly designed and must be rewritten or removed.
 
 This requirement is mandatory for all new tests and must be applied whenever existing tests are modified.
+
+### Institution request roles
+
+`isUserRoleRequestRoleString`, `validateNewUserRoleRequest`, and the exported
+`UserRoleRequestRole` type accept student, intern, volunteer, and applicant.
+Institution and campus remain required. Provider-specific eligibility is owned
+by ms-institutions; accepting applicant here does not grant assignment authority.
