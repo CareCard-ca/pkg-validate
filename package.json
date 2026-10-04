@@ -1,6 +1,6 @@
 {
   "name": "@carecard/validate",
-  "version": "3.33.0",
+  "version": "3.34.0",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/CareCard-ca/pkg-validate.git"
@@ -34,15 +34,15 @@
   "devDependencies": {
     "@eslint/js": "9.39.5",
     "@types/mocha": "10.0.10",
-    "@types/node": "25.9.3",
-    "@typescript-eslint/parser": "8.67.0",
+    "@types/node": "25.9.9",
+    "@typescript-eslint/parser": "8.71.0",
     "eslint": "9.39.5",
-    "globals": "17.7.0",
+    "globals": "17.13.0",
     "husky": "9.1.7",
-    "lint-staged": "17.2.0",
-    "mocha": "11.7.6",
+    "lint-staged": "17.6.0",
+    "mocha": "11.8.0",
     "nyc": "18.0.0",
-    "prettier": "3.9.6",
+    "prettier": "3.9.9",
     "ts-node": "10.9.2",
     "typescript": "6.0.3"
   },
@@ -66,7 +66,7 @@
     "diff": "8.0.4",
     "glob": "13.0.6",
     "minimatch": "10.2.6",
-    "serialize-javascript": "7.0.5",
+    "serialize-javascript": "7.1.2",
     "js-yaml": "4.3.2"
   }
 }
