@@ -144,8 +144,10 @@ export const isCcIdString: BoolValidator;
 export const isCharactersString: BoolValidator;
 /** Checks if the string is a valid street address format. */
 export const isStreetString: BoolValidator;
-/** Checks if the string is a valid name format. */
+/** Checks visible, well-formed Unicode names up to 1000 UTF-16 code units. */
 export const isNameString: BoolValidator;
+/** Checks NFKC-trimmed filename metadata up to 255 code points, excluding paths and unsafe controls. */
+export const isFileNameString: BoolValidator;
 /** Checks if the string is safe for search queries. */
 export const isSafeSearchString: BoolValidator;
 /** Checks if the string is a valid email address. */
@@ -203,6 +205,7 @@ export const validate: {
   isCharactersString: typeof isCharactersString;
   isStreetString: typeof isStreetString;
   isNameString: typeof isNameString;
+  isFileNameString: typeof isFileNameString;
   isSafeSearchString: typeof isSafeSearchString;
   isEmailString: typeof isEmailString;
   isJwtString: typeof isJwtString;

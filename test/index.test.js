@@ -6,6 +6,7 @@ const parallelTestFiles = [
   'test/applicantRoleRequest.test.js',
   'test/browserCompatibleEmailValidation.test.js',
   'test/emailValidation.test.js',
+  'test/nameAndFileNameValidation.test.js',
   'test/validate.test.js',
   'test/validationEdgeCases.test.js',
   'test/validateProperties.test.js',

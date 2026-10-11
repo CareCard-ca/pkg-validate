@@ -197,8 +197,8 @@ describe('AuthUtil test', function () {
       const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
       const longName = chars.repeat(100);
       assert.ok(!validate.isNameString(longName), 'Long name test failed');
-      assert.ok(!validate.isNameString('Peter @ Singh'), 'Bad name');
-      assert.ok(!validate.isNameString('3Peter'), 'Bad name');
+      assert.ok(validate.isNameString('Peter @ Singh'), 'Name with punctuation');
+      assert.ok(validate.isNameString('3Peter'), 'Name starting with a number');
       assert.ok(!validate.isNameString(''), 'Empty name');
       assert.ok(!validate.isNameString(123), 'Non-string name');
       assert.ok(validate.isNameString('Peter (Singh)'), 'Good name');
