@@ -130,6 +130,16 @@ depend on those folders being present.
   such as `:reviewed:`. Do not use reaction-token syntax to relax human text.
 - General low-level validators should be deterministic predicate functions that
   return `true` or `false`.
+- Use the direct field-specific predicates from `lib/inputValidation.js` only
+  for the matching contract. Keep existing stricter character rules and
+  source-owned lengths, requiredness and nullability. Validate raw input before
+  trimming; multiline fields may accept LF and CRLF, never standalone CR.
+- Use `isHttpUrlString`, `isMimeTypeString`, `isIdempotencyKeyString` and
+  `isNonNegativeSafeInteger` at their structured boundaries. Do not parse a
+  numeric prefix or rely on a URL parser to discard unsafe raw characters.
+- Keep extensible metadata as safe JSON data through `isSafeJsonValue` or
+  `isSafeJsonString`. Reconstructed and flattened whitelist properties must be
+  own data, including reserved-looking keys; never follow inherited paths.
 - `isEmailString` is the sole CareCard email-format decision. It accepts an
   unmodified ASCII address no longer than 254 characters, with one practical
   dot-atom local part no longer than 64 characters and a valid multi-label

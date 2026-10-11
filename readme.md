@@ -64,9 +64,9 @@ const {
 } = require('@carecard/validate');
 ```
 
-General validators are available both as top-level exports and under the
-deprecated `validate` namespace. `validatePassword` is intentionally available
-only as one direct export.
+The original validators are available both as top-level exports and under the
+deprecated `validate` namespace. New field-specific validators and
+`validatePassword` use direct exports.
 
 The package root is safe to import from browser bundles. Its whitelist and role
 request validators use the focused `@carecard/common-util/case-converter` and
@@ -139,6 +139,46 @@ trimming ordinary spaces. Named tokens contain only letters, digits, `_` and
 Passwords, emails, URLs, JSON, addresses, phones and reaction tokens keep their own structured
 format contracts. This allowlist does not replace output encoding, parameterized
 queries, upload-content validation, or storage-path generation.
+
+### Field-specific input characters
+
+Use `isSingleLineTextString` for previously unrestricted human text and
+`isMultilineTextString` for comments that support line breaks. They check raw
+and NFKC-normalized characters before any trimming. They allow Unicode letters,
+marks, numbers, spaces, dashes, currency symbols, emoji and script/emoji joiners,
+plus `_ . , ' ’ ‘ “ ” " ( ) : ; ! ? / @ & # + % = [ ] { } *` and their
+explicitly supported compatibility forms. Both reject angle brackets,
+malformed Unicode, private-use characters, control and unwanted format
+characters. Multiline text permits LF and CRLF; standalone CR is rejected.
+Empty strings and ordinary spaces pass the lexical check so the owning field
+can retain its requiredness, nullability and length contract. Do not replace an
+existing stricter character rule with these predicates.
+
+`isHttpUrlString` checks an unmodified HTTP(S) URL, including its raw
+characters. It rejects whitespace, controls, backslashes and angle brackets
+instead of allowing a URL parser to discard or escape them. Keep the owning
+field's existing length limit. `isMimeTypeString` checks concrete registered
+type/subtype syntax and optional token or quoted parameters; see
+[RFC 6838](https://www.rfc-editor.org/rfc/rfc6838.html#section-4.2) and
+[RFC 9110](https://www.rfc-editor.org/rfc/rfc9110.html#section-8.3.1).
+
+`isIdempotencyKeyString` permits only ASCII letters, digits, `_ . : -`, at most
+128 code units. `isNonNegativeSafeInteger` accepts a safe integer number or a
+complete decimal integer string, with no signs, suffixes, hexadecimal or
+scientific notation. `isValidUuidV4String` retains version-four identifiers
+where the service contract requires them. `isDocumentationSearchString`
+permits single-line documentation queries with printable code punctuation,
+excluding angle brackets and unsafe Unicode/control characters.
+
+`isSafeJsonValue` preserves extensible JSON object/array metadata, including
+reserved-looking keys as data. It validates nested keys as single-line text,
+string values as multiline text, finite numbers, booleans, nulls, objects and
+arrays. It rejects cycles and values that JSON would silently discard, and
+retains the 10000-code-unit serialized budget. `isSafeJsonString` checks the
+same contract in an existing serialized JSON field without rewriting it.
+Whitelist output creates own data properties at every path and during
+flattening. Existing property rules additionally require raw single-line
+streets, safe HTTP(S) URL characters and safe nested JSON.
 
 ## `validateProperties(obj)`
 

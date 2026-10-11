@@ -8,6 +8,27 @@ export type ValidatePropertiesResult = Record<string, unknown>;
 export type BoolValidator = (input: unknown) => boolean;
 export type InStringArrayValidator = (stringArray: readonly string[], input: unknown) => boolean;
 
+/** Checks raw and NFKC single-line human text characters; callers own lengths and requiredness. */
+export const isSingleLineTextString: BoolValidator;
+/** Checks the human text character allowlist with LF or CRLF line endings. */
+export const isMultilineTextString: BoolValidator;
+/** Checks an unmodified HTTP(S) URL without whitespace, controls, backslashes or angle brackets. */
+export const isHttpUrlString: BoolValidator;
+/** Checks a concrete MIME type and optional token/quoted parameters. */
+export const isMimeTypeString: BoolValidator;
+/** Checks an ASCII idempotency key of 1 through 128 code units. */
+export const isIdempotencyKeyString: BoolValidator;
+/** Checks a nonnegative safe integer number or complete decimal integer string. */
+export const isNonNegativeSafeInteger: BoolValidator;
+/** Checks a version-four UUID with an RFC variant. */
+export const isValidUuidV4String: BoolValidator;
+/** Checks an extensible JSON object/array and nested text, with a 10000-code-unit serialized budget. */
+export const isSafeJsonValue: BoolValidator;
+/** Checks serialized JSON metadata without altering its representation or original length budget. */
+export const isSafeJsonString: BoolValidator;
+/** Checks single-line documentation search text, including printable code punctuation. */
+export const isDocumentationSearchString: BoolValidator;
+
 export type PasswordValidationFailureReason =
   'invalid_type' | 'invalid_unicode' | 'too_short' | 'too_long' | 'blocked';
 export type PasswordValidationResult =
