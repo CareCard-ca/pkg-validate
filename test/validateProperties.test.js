@@ -126,14 +126,15 @@ describe('ValidateProperties test', function () {
     });
   });
 
-  describe('Search string fields (isSafeSearchString)', function () {
+  describe('Search string fields (isNameString)', function () {
     ['search_string', 'searchString'].forEach(key => {
       it(`accepts a valid safe search string for "${key}"`, function () {
         assertAccepts(key, ' claudpsnd@yahoo.ca ');
       });
 
-      it(`rejects an invalid search string (UUID-like) for "${key}"`, function () {
-        assertRejects(key, VALID_UUID);
+      it(`accepts a numeric-leading search string (UUID-like) for "${key}"`, function () {
+        assertAccepts(key, VALID_UUID);
+        assertRejects(key, 'a\u0000b');
       });
 
       it(`rejects a non-string value for "${key}"`, function () {
