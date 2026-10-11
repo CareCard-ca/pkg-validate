@@ -70,6 +70,10 @@ describe('Field-specific input validation through the package API', () => {
     for (const value of ['First\rSecond', 'First\r', '\r\n\rText']) {
       assert.equal(isMultilineTextString(value), false);
     }
+    for (const value of ['\ud800\n\udc00', '\ud800\r\n\udc00']) {
+      assert.equal(isMultilineTextString(value), false);
+      assert.equal(isSafeJsonValue({ comment: value }), false);
+    }
   });
 
   it('accepts complete HTTP(S) URLs and rejects parser-discarded raw syntax', () => {
