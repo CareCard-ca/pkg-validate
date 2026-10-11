@@ -144,9 +144,9 @@ export const isCcIdString: BoolValidator;
 export const isCharactersString: BoolValidator;
 /** Checks if the string is a valid street address format. */
 export const isStreetString: BoolValidator;
-/** Checks visible, well-formed Unicode names up to 1000 UTF-16 code units. */
+/** Checks allowlisted visible Unicode names up to 1000 UTF-16 code units, including raw input edges. */
 export const isNameString: BoolValidator;
-/** Checks NFKC-trimmed filename metadata up to 255 code points, excluding paths and unsafe controls. */
+/** Checks the plain-text allowlist and NFKC-trimmed filename metadata up to 255 code points. */
 export const isFileNameString: BoolValidator;
 /** Checks if the string is safe for search queries. */
 export const isSafeSearchString: BoolValidator;
@@ -158,6 +158,8 @@ export const isJwtString: BoolValidator;
 export const isUsernameString: BoolValidator;
 /** Checks if the string is a valid phone number. */
 export const isPhoneNumber: BoolValidator;
+/** Checks national or international phone contact snapshots with at most 15 international digits. */
+export const isPhoneContactString: BoolValidator;
 /** Checks if the string is URL-safe. */
 export const isUrlSafeString: BoolValidator;
 /** Checks if the string is a valid Canadian province abbreviation (ON, QC). */
@@ -168,8 +170,10 @@ export const isBoolValue: BoolValidator;
 export const isPostalCodeString: BoolValidator;
 /** Checks if the string contains only allowed "safe" characters. */
 export const isSafeString: BoolValidator;
-/** Checks if the value is non-empty text up to the supported maximum length. */
+/** Checks allowlisted visible Unicode text up to 10000 UTF-16 code units. */
 export const isTextString: BoolValidator;
+/** Checks allowlisted text or ASCII named reaction tokens, at most 64 trimmed code units. */
+export const isReactionString: BoolValidator;
 /** Checks if a string exists within a given array of strings, case-insensitive. */
 export const isInStringArray: InStringArrayValidator;
 /** Checks if the string is one of the supported user role request statuses. */
@@ -211,12 +215,14 @@ export const validate: {
   isJwtString: typeof isJwtString;
   isUsernameString: typeof isUsernameString;
   isPhoneNumber: typeof isPhoneNumber;
+  isPhoneContactString: typeof isPhoneContactString;
   isUrlSafeString: typeof isUrlSafeString;
   isProvinceString: typeof isProvinceString;
   isBoolValue: typeof isBoolValue;
   isPostalCodeString: typeof isPostalCodeString;
   isSafeString: typeof isSafeString;
   isTextString: typeof isTextString;
+  isReactionString: typeof isReactionString;
   isInStringArray: typeof isInStringArray;
   isUserRoleRequestStatusString: typeof isUserRoleRequestStatusString;
   isUserRoleRequestRoleString: typeof isUserRoleRequestRoleString;

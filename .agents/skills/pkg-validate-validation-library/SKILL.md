@@ -111,6 +111,23 @@ depend on those folders being present.
 
 ## Validation Behavior
 
+- `isNameString`, `isFileNameString`, and `isTextString` share a character
+  allowlist: Unicode letters, marks, numbers, space separators, dashes, emoji,
+  script/emoji joiners, and `_ . , ' ’ ( ) @ &`. Require a visible letter,
+  number, or emoji. Check the complete raw input and its NFKC representation
+  before trimming; reject controls, malformed Unicode, private-use characters,
+  tags, paths, and syntax outside the allowlist. Preserve accepted display
+  names; only filename metadata is returned NFKC-normalized and trimmed.
+  Permit only the explicitly allowlisted compatibility punctuation forms and
+  check their normalized characters too; do not admit unrelated symbols merely
+  because NFKC converts them to letters.
+- `isSafeString` keeps its narrower ASCII subset and `isSafeSearchString`
+  keeps its existing search grammar. Neither may hide invalid edge characters
+  by trimming before validation. Use format-specific validators for passwords,
+  emails, URLs, JSON, addresses, and phones. Role-request phone snapshots use
+  `isPhoneContactString`, including an optional international dialing prefix.
+- `isReactionString` preserves allowlisted text and bounded ASCII named tokens
+  such as `:reviewed:`. Do not use reaction-token syntax to relax human text.
 - General low-level validators should be deterministic predicate functions that
   return `true` or `false`.
 - `isEmailString` is the sole CareCard email-format decision. It accepts an

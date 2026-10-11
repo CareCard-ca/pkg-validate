@@ -205,7 +205,7 @@ describe('ValidateProperties test', function () {
     });
   });
 
-  describe('User role request text fields (isTextString)', function () {
+  describe('User role request plain-text fields', function () {
     const textKeys = [
       'requested_by_name',
       'requestedByName',
@@ -213,23 +213,40 @@ describe('ValidateProperties test', function () {
       'documentDescription',
       'nick_name',
       'nickName',
-      'requested_by_phone',
-      'requestedByPhone',
       'approved_by_name',
       'approvedByName',
-      'approved_by_phone',
-      'approvedByPhone',
     ];
 
     textKeys.forEach(key => {
       it(`accepts text for "${key}"`, function () {
-        assertAccepts(key, 'Requester <person>@example.com');
+        assertAccepts(key, 'Requester (Review) @ example.com');
+      });
+
+      it(`rejects tags for "${key}"`, function () {
+        assertRejects(key, 'Requester <person>@example.com');
       });
 
       it(`rejects non-text for "${key}"`, function () {
         assertRejects(key, 123);
       });
     });
+  });
+
+  describe('User role request phone fields', function () {
+    for (const key of [
+      'requested_by_phone',
+      'requestedByPhone',
+      'approved_by_phone',
+      'approvedByPhone',
+    ]) {
+      it(`uses the phone-number contract for "${key}"`, function () {
+        assertAccepts(key, '(416) 555-1234');
+        assertAccepts(key, '+1 416 555 0101');
+        assertRejects(key, 'Requester <person>@example.com');
+        assertRejects(key, 'Not a phone');
+        assertRejects(key, 123);
+      });
+    }
   });
 
   describe('User role request status fields', function () {
@@ -720,14 +737,14 @@ describe('ValidateProperties test', function () {
         approvedAt: '2023-10-27T10:00:00Z',
         approved_status: 'info_needed',
         approvedStatus: 'on_hold',
-        requested_by_name: 'Requester <person>@example.com',
-        requestedByName: 'Requester <person>@example.com',
+        requested_by_name: 'Requester (Review) @ example.com',
+        requestedByName: 'Requester (Review) @ example.com',
         requested_by_email: 'requester@example.com',
         requestedByEmail: 'requester@example.com',
         requested_by_phone: '+1 416 555 0101',
         requestedByPhone: '+1 416 555 0101',
-        approved_by_name: 'Approver <person>@example.com',
-        approvedByName: 'Approver <person>@example.com',
+        approved_by_name: 'Approver (Review) @ example.com',
+        approvedByName: 'Approver (Review) @ example.com',
         approved_by_email: 'approver@example.com',
         approvedByEmail: 'approver@example.com',
         approved_by_phone: '+1 647 555 0101',

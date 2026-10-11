@@ -15,6 +15,55 @@ describe('AuthUtil test', function () {
   const user = { username: 'username' };
 
   describe('Validate function test', function () {
+    it('requires both original and normalized text characters to be allowlisted', function () {
+      for (const value of ['℡', '㏂', '㍿', 'Ŀ']) {
+        assert.equal(validatePackage.isNameString(value), false, value);
+        assert.equal(validatePackage.isFileNameString(value), false, value);
+        assert.equal(validatePackage.isTextString(value), false, value);
+        assert.equal(validatePackage.isReactionString(value), false, value);
+      }
+    });
+
+    it('preserves explicitly allowlisted compatibility punctuation', function () {
+      for (const value of ['Ａ＆Ｂ', 'Review…', 'A＿B（2）', 'A﹠B']) {
+        assert.equal(validatePackage.isNameString(value), true, value);
+        assert.equal(validatePackage.isFileNameString(value), true, value);
+        assert.equal(validatePackage.isTextString(value), true, value);
+      }
+    });
+
+    it('accepts safe reaction text and named reaction tokens through the public API', function () {
+      for (const value of [
+        '👍🏽',
+        'Reviewed',
+        '  :reviewed: ',
+        ':route-covered:',
+        ':' + 'a'.repeat(62) + ':',
+      ]) {
+        assert.equal(validatePackage.isReactionString(value), true, value);
+        assert.equal(validate.isReactionString(value), true, value);
+      }
+      for (const value of [
+        undefined,
+        null,
+        123,
+        '',
+        ' ',
+        ':',
+        ':bad token:',
+        '::reviewed::',
+        ':<tag>:',
+        ':$(id):',
+        ':reviewed:\n',
+        '\t:reviewed:',
+        '\uFEFF:reviewed:',
+        'a'.repeat(65),
+        ':' + 'a'.repeat(63) + ':',
+      ]) {
+        assert.equal(validatePackage.isReactionString(value), false, String(value));
+      }
+    });
+
     it('supports direct and legacy validator calls through the package root', function () {
       assert.strictEqual(validatePackage.isEmailString('person@example.com'), true);
       assert.strictEqual(validatePackage.validate.isEmailString('person@example.com'), true);
@@ -212,11 +261,12 @@ describe('AuthUtil test', function () {
       done();
     });
 
-    it('isTextString returns true for non-empty text without special character restrictions', function (done) {
+    it('isTextString returns true only for allowlisted visible text', function (done) {
       assert.ok(
-        validate.isTextString('Requester <tag>@example.com'),
-        'Text with punctuation should be accepted',
+        validate.isTextString('Requester (Review) @ example.com'),
+        'Allowlisted punctuation should be accepted',
       );
+      assert.ok(!validate.isTextString('Requester <tag>@example.com'), 'Tags should be rejected');
       assert.ok(!validate.isTextString(''), 'Empty text should be rejected');
       assert.ok(!validate.isTextString(123), 'Non-string text should be rejected');
       assert.ok(!validate.isTextString('a'.repeat(10001)), 'Overlong text should be rejected');
@@ -421,7 +471,7 @@ describe('AuthUtil test', function () {
     });
 
     it('isSafeString returns true if safe', function (done) {
-      const safeString_1 = '#346 Charles* st. west:-(ON) east_side [as]';
+      const safeString_1 = '346 Charles st. west-(ON) east_side';
       const unsafeString_1 = '<G1G0E3?';
 
       assert.ok(validate.isSafeString(safeString_1), 'Safe string code failing');
