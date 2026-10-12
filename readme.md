@@ -28,8 +28,8 @@ unknown or invalid values from `validateProperties`, and throws CareCard
 `BAD_INPUT` errors from `validateWhitelistProperties` when required or provided
 whitelist values do not pass validation.
 
-Use Node.js 24.20.0. The package accepts compatible Node.js releases from
-24.20.0 up to, but not including, Node.js 25.
+Use Node.js 24.21.0. The package accepts compatible Node.js releases from
+24.21.0 up to, but not including, Node.js 25.
 
 ## Development Rule
 
@@ -513,7 +513,7 @@ npm run lint
 npm run format:check
 ```
 
-CI runs on Node.js 24.20.0 and executes `npm run test:All`. Publishing to npm happens
+CI runs on Node.js 24.21.0 and executes `npm run test:All`. Publishing to npm happens
 from `main` through the `Publish to npm` GitHub workflow.
 
 ## Auth Boundary
