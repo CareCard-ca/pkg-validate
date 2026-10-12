@@ -345,7 +345,7 @@ describe('AuthUtil test', function () {
         'UPPER lower 123 !',
         'mot de passe café',
         '密碼 phrase 🔐 okay',
-        ' '.repeat(15),
+        'a '.repeat(7) + 'b',
         '🔐'.repeat(128),
       ];
 
@@ -357,16 +357,20 @@ describe('AuthUtil test', function () {
       }
     });
 
-    it('normalizes accepted passwords to NFC without trimming them', function () {
-      const password = `  cafe\u0301 ${'x'.repeat(8)}`;
+    it('trims accepted passwords and normalizes them to NFC', function () {
+      const password = `  cafe\u0301 ${'x'.repeat(10)}  `;
 
       assert.deepStrictEqual(validatePackage.validatePassword(password), {
         isValid: true,
-        value: `  café ${'x'.repeat(8)}`,
+        value: `café ${'x'.repeat(10)}`,
       });
     });
 
     it('returns stable reasons for invalid password input', function () {
+      assert.deepStrictEqual(validatePackage.validatePassword(' '.repeat(15)), {
+        isValid: false,
+        reason: 'too_short',
+      });
       assert.deepStrictEqual(validatePackage.validatePassword(123), {
         isValid: false,
         reason: 'invalid_type',

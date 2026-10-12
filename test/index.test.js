@@ -7,6 +7,7 @@ const parallelTestFiles = [
   'test/browserCompatibleEmailValidation.test.js',
   'test/emailValidation.test.js',
   'test/inputValidationSecurity.test.js',
+  'test/inputWhitespaceNormalization.test.js',
   'test/nameAndFileNameValidation.test.js',
   'test/validate.test.js',
   'test/validationEdgeCases.test.js',

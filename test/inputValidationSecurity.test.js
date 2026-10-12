@@ -306,7 +306,7 @@ describe('Field-specific input validation through the package API', () => {
   it('rejects unsafe format fields through property and whitelist boundaries', async () => {
     for (const input of [
       { street: '12 Main\nStreet' },
-      { street: '\n12 Main Street' },
+      { street: '12 Main\rStreet' },
       { website: 'https://example.com/a\nb' },
       { fileUrl: 'https://example.com/<script>' },
       { about: '{"label":"<script>"}' },
@@ -324,8 +324,9 @@ describe('Field-specific input validation through the package API', () => {
       about: ' {"label":"Data"} ',
       metadata: { label: 'Review: phase 2\nNext step' },
     };
-    assert.deepEqual(validateProperties(input), input);
-    assert.deepEqual(await validateWhitelistProperties(input, Object.keys(input)), input);
+    const expected = { ...input, about: '{"label":"Data"}' };
+    assert.deepEqual(validateProperties(input), expected);
+    assert.deepEqual(await validateWhitelistProperties(input, Object.keys(input)), expected);
   });
 
   it('rebuilds reserved-looking nested whitelist paths without changing unrelated objects', async () => {

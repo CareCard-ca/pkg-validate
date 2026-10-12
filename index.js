@@ -4,6 +4,7 @@ const validateProperties = require('./lib/validateProperties');
 const validateWhitelistProperties = require('./lib/validateWhitelistProperties');
 const validateNewUserRoleRequest = require('./lib/validateNewUserRoleRequest');
 const inputValidation = require('./lib/inputValidation');
+const inputWhitespace = require('./lib/inputWhitespace');
 
 module.exports = {
   validate: legacyValidate,
@@ -14,4 +15,5 @@ module.exports = {
   ...legacyValidate,
   ...validateProperties,
   ...inputValidation,
+  ...inputWhitespace,
 };
