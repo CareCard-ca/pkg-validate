@@ -281,6 +281,28 @@ describe('Field-specific input validation through the package API', () => {
     }
   });
 
+  it('rejects unsafe metadata even when a hostile object changes inherited properties', () => {
+    const original = Object.getOwnPropertyDescriptor(Object.prototype, 'finished');
+    const metadata = new Proxy(
+      { comment: '<script>' },
+      {
+        getPrototypeOf() {
+          Object.defineProperty(Object.prototype, 'finished', { value: true, configurable: true });
+          return Object.prototype;
+        },
+      },
+    );
+    try {
+      assert.equal(isSafeJsonValue(metadata), false);
+    } finally {
+      if (original) {
+        Object.defineProperty(Object.prototype, 'finished', original);
+      } else {
+        delete Object.prototype.finished;
+      }
+    }
+  });
+
   it('rejects unsafe format fields through property and whitelist boundaries', async () => {
     for (const input of [
       { street: '12 Main\nStreet' },
