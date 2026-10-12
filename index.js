@@ -3,6 +3,7 @@ const { validatePassword, ...legacyValidate } = validate;
 const validateProperties = require('./lib/validateProperties');
 const validateWhitelistProperties = require('./lib/validateWhitelistProperties');
 const validateNewUserRoleRequest = require('./lib/validateNewUserRoleRequest');
+const inputValidation = require('./lib/inputValidation');
 
 module.exports = {
   validate: legacyValidate,
@@ -12,4 +13,5 @@ module.exports = {
   ...validateNewUserRoleRequest,
   ...legacyValidate,
   ...validateProperties,
+  ...inputValidation,
 };
