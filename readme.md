@@ -118,8 +118,10 @@ General direct validators return `true` or `false`.
 The plain-text allowlist permits Unicode letters, combining marks, numbers,
 space separators, dashes, emoji, script/emoji joiners, and the punctuation
 `_ . , ' ’ ( ) @ &`. A value must contain a visible letter, number, or emoji.
-Validate raw input before trimming so control characters at either edge cannot
-be hidden. Compatibility normalization is checked without changing accepted
+Direct predicates validate the complete supplied text. Application and service
+contracts first use `normalizeInputWhitespace` to remove all leading and trailing
+whitespace; internal controls remain subject to the raw predicates.
+Compatibility normalization is checked without changing accepted
 names; filename output is normalized as documented above. Explicitly allowed
 compatibility punctuation includes fullwidth forms such as `Ａ＆Ｂ` and the
 ellipsis in `Review…`. Unrelated symbols such as `℡`, `㏂`, and `㍿` are rejected
@@ -181,6 +183,21 @@ flattening. Existing property rules additionally require raw single-line
 streets, safe HTTP(S) URL characters and safe nested JSON.
 
 ## `validateProperties(obj)`
+
+### Canonical whitespace
+
+`normalizeInputWhitespace(input)` copies JSON records and arrays, trimming every
+text value and own key recursively without changing internal whitespace. It
+preserves opaque values such as files and dates, and rejects accessors, cycles
+and keys that become duplicates after trimming. Reserved keys remain inert own
+data. `validateProperties`, `validateWhitelistProperties` and role-request alias
+selection apply this normalization before their existing rules. The serialized
+`about` JSON contract also trims nested keys and values.
+
+Passwords trim outer whitespace before NFC normalization, the 15–128-code-point
+length check and the exact blocklist check. Internal spaces are preserved. All
+acceptance boundaries must use the returned canonical password value. Credential
+creation and verification apply the same normalization in `@carecard/auth-util`.
 
 `validateProperties` accepts an object and returns a new object that contains
 only recognized keys whose values pass the validator assigned to that key.

@@ -129,7 +129,9 @@ describe('ValidateProperties test', function () {
   describe('Search string fields (isNameString)', function () {
     ['search_string', 'searchString'].forEach(key => {
       it(`accepts a valid safe search string for "${key}"`, function () {
-        assertAccepts(key, ' claudpsnd@yahoo.ca ');
+        assert.deepStrictEqual(validateProperties({ [key]: ' claudpsnd@yahoo.ca ' }), {
+          [key]: 'claudpsnd@yahoo.ca',
+        });
       });
 
       it(`accepts a numeric-leading search string (UUID-like) for "${key}"`, function () {

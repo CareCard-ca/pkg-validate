@@ -147,8 +147,15 @@ depend on those folders being present.
   EAI, whitespace, invalid or empty DNS labels, numeric final labels, and
   single-label domains. Callers may map its boolean to domain errors but must
   not apply another email-syntax predicate.
+- `normalizeInputWhitespace` owns contract canonicalization: copy JSON records
+  and arrays, trim every string and own key, preserve internal whitespace and
+  opaque/binary values, reject key collisions, accessors and cycles. Apply it
+  before the existing raw predicates at application and service boundaries.
+  `validateProperties`, whitelist selection and role-request alias selection
+  already apply it. Serialized `about` JSON also normalizes its nested data.
 - `validatePassword` is the sole password-policy function and sole direct
-  password export. It returns the NFC-normalized accepted value or a stable
+  password export. It trims before NFC normalization, length and blocklist
+  decisions, returning the canonical accepted value or a stable
   failure reason; do not add password predicates, aliases, failure-message
   helpers, or a nested password export.
 - `validateProperties` should return a new sanitized object and omit unknown or

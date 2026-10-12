@@ -8,6 +8,9 @@ export type ValidatePropertiesResult = Record<string, unknown>;
 export type BoolValidator = (input: unknown) => boolean;
 export type InStringArrayValidator = (stringArray: readonly string[], input: unknown) => boolean;
 
+/** Copies JSON records/arrays, trimming text values and own keys; rejects collisions, accessors and cycles. */
+export function normalizeInputWhitespace<T>(input: T): T;
+
 /** Checks raw and NFKC single-line human text characters; callers own lengths and requiredness. */
 export const isSingleLineTextString: BoolValidator;
 /** Checks the human text character allowlist with LF or CRLF line endings. */
@@ -34,7 +37,7 @@ export type PasswordValidationFailureReason =
 export type PasswordValidationResult =
   { isValid: true; value: string } | { isValid: false; reason: PasswordValidationFailureReason };
 
-/** Validates and NFC-normalizes a new password using the CareCard password policy. */
+/** Trims edge whitespace, then validates and NFC-normalizes a password using the CareCard policy. */
 export function validatePassword(input: unknown): PasswordValidationResult;
 
 /**
