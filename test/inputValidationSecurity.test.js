@@ -1,4 +1,5 @@
-'use strict';
+const { validateExampleProperties, validateExampleRequest } = require('./configuredSchema.fixture');
+('use strict');
 
 const assert = require('node:assert/strict');
 const {
@@ -12,8 +13,6 @@ const {
   isSafeJsonValue,
   isDocumentationSearchString,
   isSafeJsonString,
-  validateProperties,
-  validateWhitelistProperties,
 } = require('..');
 
 describe('Field-specific input validation through the package API', () => {
@@ -312,8 +311,8 @@ describe('Field-specific input validation through the package API', () => {
       { about: '{"label":"<script>"}' },
       { metadata: { label: '<script>' } },
     ]) {
-      assert.deepEqual(validateProperties(input), {});
-      await assert.rejects(async () => validateWhitelistProperties(input, Object.keys(input)), {
+      assert.deepEqual(validateExampleProperties(input), {});
+      await assert.rejects(async () => validateExampleRequest(input, Object.keys(input)), {
         code: 'BAD_INPUT',
       });
     }
@@ -325,8 +324,8 @@ describe('Field-specific input validation through the package API', () => {
       metadata: { label: 'Review: phase 2\nNext step' },
     };
     const expected = { ...input, about: '{"label":"Data"}' };
-    assert.deepEqual(validateProperties(input), expected);
-    assert.deepEqual(await validateWhitelistProperties(input, Object.keys(input)), expected);
+    assert.deepEqual(validateExampleProperties(input), expected);
+    assert.deepEqual(await validateExampleRequest(input, Object.keys(input)), expected);
   });
 
   it('rebuilds reserved-looking nested whitelist paths without changing unrelated objects', async () => {
@@ -334,7 +333,7 @@ describe('Field-specific input validation through the package API', () => {
     const originalName = Object.getOwnPropertyDescriptor(Object.prototype, 'name');
     const unrelated = {};
     try {
-      const output = await validateWhitelistProperties(input, ['__proto__.name']);
+      const output = await validateExampleRequest(input, ['__proto__.name']);
       assert.equal(unrelated.name, undefined);
       assert.deepEqual(JSON.parse(JSON.stringify(output)), input);
     } finally {
@@ -348,7 +347,7 @@ describe('Field-specific input validation through the package API', () => {
 
   it('preserves reserved metadata leaves during flattening', async () => {
     const metadata = JSON.parse('{"__proto__":"Data","constructor":"Value","prototype":"Example"}');
-    const output = await validateWhitelistProperties({ metadata }, ['metadata'], {
+    const output = await validateExampleRequest({ metadata }, ['metadata'], {
       flattenOutput: true,
       flattenKeyStyle: 'leaf',
     });
@@ -360,7 +359,7 @@ describe('Field-specific input validation through the package API', () => {
     const input = JSON.parse(
       '{"metadata":{"__proto__":{"unexpectedAuthority":"Data"},"note":"Example"}}',
     );
-    const output = await validateWhitelistProperties(input, ['metadata'], {
+    const output = await validateExampleRequest(input, ['metadata'], {
       convertToSnakeCase: true,
     });
     assert.equal(output.metadata.unexpected_authority, undefined);

@@ -1,19 +1,16 @@
+'use strict';
+
 const validate = require('./lib/validate');
-const { validatePassword, ...legacyValidate } = validate;
-const validateProperties = require('./lib/validateProperties');
-const validateWhitelistProperties = require('./lib/validateWhitelistProperties');
-const validateNewUserRoleRequest = require('./lib/validateNewUserRoleRequest');
-const inputValidation = require('./lib/inputValidation');
-const inputWhitespace = require('./lib/inputWhitespace');
+const { validateSchemaProperties, createValueParser } = require('./lib/schemaProperties');
+const schemaWhitelistProperties = require('./lib/schemaWhitelistProperties');
 
 module.exports = {
-  validate: legacyValidate,
-  validatePassword,
-  validateProperties,
-  validateWhitelistProperties,
-  ...validateNewUserRoleRequest,
-  ...legacyValidate,
-  ...validateProperties,
-  ...inputValidation,
-  ...inputWhitespace,
+  validate,
+  ...validate,
+  ...require('./lib/inputValidation'),
+  ...require('./lib/inputWhitespace'),
+  ...require('./lib/passwordPolicy'),
+  ...schemaWhitelistProperties,
+  validateSchemaProperties,
+  createValueParser,
 };

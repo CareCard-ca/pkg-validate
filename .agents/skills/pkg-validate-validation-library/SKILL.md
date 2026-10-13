@@ -19,6 +19,21 @@ Non-negotiable TypeScript type rule: Never use the TypeScript type `any`; always
 
 Non-negotiable code organization rule: Functions with the same or equivalent behavior must use the same or clearly corresponding descriptive names across CareCard repositories, and equivalent functionality must live in files with the same names within each repository's established architecture. No backward compatibility names, aliases, or duplicate locations are allowed.
 
+## Non-Negotiable Package Independence
+
+`pkg-*` must always be agnostic to roles and the inner workings of `ms-*` and
+`app-*`. Packages must not own business role codes, permissions, workflow
+states, domain payload schemas, database caller contexts, application routes,
+or application-specific policy defaults. Those contracts belong to their
+owning services and applications.
+
+Keep packages limited to reusable technical mechanisms. Accept explicit
+caller-supplied schemas, parsers, policy configuration, identities, and opaque
+custom claims where needed. Never import a service or application, copy its
+business catalogue into a package, infer privilege from custom claims, or add
+caller-name branches. Preserve consumer behavior in owner-local adapters and
+validate both the generic package contract and the owning public boundaries.
+
 ## Purpose
 
 CareCard validation package for deterministic validators, sanitization, whitelist validation, nested paths, error mapping, exports, and tests.
@@ -98,9 +113,9 @@ depend on those folders being present.
 - Keep TypeScript declarations in `index.d.ts` aligned with every public export
   in `index.js`.
 - Keep direct validators in `lib/validate.js`.
-- Keep key-based property sanitization in `lib/validateProperties.js`.
+- Keep key-based property sanitization in `lib/schemaProperties.js`.
 - Keep whitelist, nested-path, casing, flattening, and CareCard bad-input
-  behavior in `lib/validateWhitelistProperties.js`.
+  behavior in `lib/schemaWhitelistProperties.js`.
 - Import shared casing and bad-input behavior through the focused
   `@carecard/common-util/case-converter` and `@carecard/common-util/errors`
   entrypoints so the package root remains safe for browser bundles.
@@ -147,22 +162,16 @@ depend on those folders being present.
   EAI, whitespace, invalid or empty DNS labels, numeric final labels, and
   single-label domains. Callers may map its boolean to domain errors but must
   not apply another email-syntax predicate.
-- `normalizeInputWhitespace` owns contract canonicalization: copy JSON records
-  and arrays, trim every string and own key, preserve internal whitespace and
-  opaque/binary values, reject key collisions, accessors and cycles. Apply it
-  before the existing raw predicates at application and service boundaries.
-  `validateProperties`, whitelist selection and role-request alias selection
-  already apply it. Serialized `about` JSON also normalizes its nested data.
-- `validatePassword` is the sole password-policy function and sole direct
-  password export. It trims before NFC normalization, length and blocklist
-  decisions, returning the canonical accepted value or a stable
-  failure reason; do not add password predicates, aliases, failure-message
-  helpers, or a nested password export.
-- `validateProperties` should return a new sanitized object and omit unknown or
-  invalid fields without mutating the input.
-- `validateWhitelistProperties` should reject missing or invalid required fields
-  with CareCard `BAD_INPUT` errors through the focused
-  `@carecard/common-util/errors` entrypoint.
+- `normalizeInputWhitespace` copies JSON records and arrays, trims own keys and
+  string edges, preserves internal whitespace and opaque values, and rejects
+  key collisions, accessors, and cycles.
+- `validatePasswordAgainstPolicy` applies explicit caller-selected length and
+  blocking rules to NFC canonical text. Packages must not choose authentication
+  password lengths or automatic blocklist enforcement.
+- `validateSchemaProperties` selects and parses only an explicit caller schema.
+- `validateSchemaWhitelistProperties` requires parsers keyed by full paths;
+  missing parser configuration raises TypeError and invalid request values
+  preserve BAD_INPUT errors. Domain aliases and policies belong to owners.
 - Optional whitelist fields should be ignored when absent and rejected when
   present but invalid.
 - Preserve supported snake_case and camelCase field aliases unless a task

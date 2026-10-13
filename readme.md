@@ -1,37 +1,89 @@
 # @carecard/validate
 
-## Release 1.1.1 and production data
+Reusable format predicates, canonical input normalization, and caller-configured
+validation. Domain field schemas, allowed roles, workflow states, and password
+policy belong to the service or application that owns them. This package never
+interprets a property name or supplies a business-policy default.
 
-CareCard Release 1.1.1 is the production baseline. Seeding with
-`--seed-release-data` is complete. Production cluster data, database rows,
-and stored user files will be preserved going forward. There will be no
-complete user-data wipeout and re-creation.
+## Explicit schemas
 
-Future production changes must use data-preserving migrations. Do not replay
-the completed initialization or run reset, rollback, or seed workflows as part
-of ordinary production deployment.
+`createValueParser(predicate, transform?)` adapts a boolean predicate and optional
+value transformation. A custom parser returns `{ isValid: true, value }` or
+`{ isValid: false }`. Predicates must return exactly `true` to accept a value.
 
-The [completed seed inventory and verification record](https://github.com/CareCard-ca/plans/blob/main/cc-seed-data/production-seed-result.md)
-documents the accepted release baseline and verification limitations.
+`validateSchemaProperties(input, schema)` returns only valid own fields named in
+the caller schema. It copies and trims JSON keys and string edges before parsing,
+omits unknown or rejected fields, and does not mutate the input.
+
+`validateSchemaWhitelistProperties(input, requiredPaths, options)` requires an
+explicit `options.schema` with one parser for every full selected path. Required
+missing/invalid fields and supplied invalid optional fields produce `BAD_INPUT`.
+Missing optional fields are omitted. Array leaves are parsed element by element.
+Missing or invalid schema configuration raises `TypeError`.
+
+```js
+const {
+  createValueParser,
+  isInteger,
+  validateSchemaWhitelistProperties,
+} = require('@carecard/validate');
+
+const output = await validateSchemaWhitelistProperties(
+  { measurement: { count: 3 }, ignored: true },
+  ['measurement.count'],
+  { schema: { 'measurement.count': createValueParser(isInteger) } },
+);
+// { measurement: { count: 3 } }
+```
+
+Options also support `optionalProperties`, `convertToSnakeCase`, `flattenOutput`,
+and `flattenKeyStyle` (`path` by default or `leaf`). Snake/camel path variants
+resolve as before; mixed casing within a segment is rejected. Selection is
+bounded to five path segments and 5,000 paths per call. Public constants are
+`MAX_NESTING_DEPTH` and `MAX_KEYS_PER_CALL`.
+
+Flattened leaf collisions favor the shallower value, then the first traversal.
+Reserved-looking keys remain inert own data, and inherited paths are ignored.
+Ambiguous normalized keys, cyclic JSON input, and accessors are rejected.
+
+## Configured password validation
+
+`validatePasswordAgainstPolicy(value, { minimumLength, maximumLength, isBlocked? })`
+requires caller-selected lengths. It trims string edges, normalizes NFC, and
+counts Unicode code points. Successful results contain the canonical value.
+Failure reasons are `invalid_type`, `invalid_unicode`, `too_short`, `too_long`,
+and `blocked`. Invalid policy configuration raises `TypeError`.
+
+`isCommonPassword(value)` exposes a generic weak-password corpus lookup. It has
+no automatic effect; callers decide whether to use it as `isBlocked`.
+
+## Format predicates and normalization
+
+Direct predicates cover integers, UUIDs, dates/timestamps, email, HTTP URLs,
+MIME types, safe JSON, Unicode text, names, filename metadata, phones, and other
+reusable formats. They return booleans and do not assign domain meaning to data.
+`isInStringArray(values, input)` checks a caller-supplied case-insensitive list.
+The existing `validate` namespace contains the same generic format predicates.
+
+`normalizeInputWhitespace(input)` copies JSON records and arrays, trims own keys
+and string edges, preserves internal whitespace and opaque/binary values, and
+rejects key collisions, accessors, and cycles. Raw format predicates retain their
+character constraints. Filename callers may explicitly normalize accepted
+metadata with NFKC and trim; display names remain unchanged.
+
+The public root and focused imports stay safe for browser bundles. TypeScript
+contracts are supplied in `index.d.ts`.
+
+## Validation
+
+Run `npm run test:All`, `npm run lint`, and `npm run format:check`. Runtime
+coverage remains 100% for statements, branches, functions, and lines. Tests
+exercise public behavior with caller-owned example schemas; business policy is
+verified in its owning repository.
 
 Non-negotiable test order invariance rule: Every test must pass independently of which tests run before or after it, and the suite must pass in every execution order. Each test must establish the state it needs, isolate mutable state, and clean up state it owns; it must never rely on another test's setup, mutations, or cleanup. Default test, CI, and Husky commands must use the test framework's ordinary ordering and must not force randomized ordering. Random-order execution is an explicit diagnostic only, and every failure it exposes must be fixed at the root cause.
 
 Non-negotiable root-cause solution rule: Always identify and solve the verified root cause, use the stronger solution, and deliver a correct, durable, production-quality result. Never treat a temporary workaround, resource increase, retry, suppression, bypass, or symptom-only patch as completion. Validate the root-cause fix against the real failing workflow and prove the end state.
-
-`@carecard/validate` is a small CommonJS validation package for CareCard
-services. It exposes individual value validators, a bulk property sanitizer, and
-a whitelist validator for request-like payloads.
-
-The package returns booleans from general low-level validators, returns a
-structured result from the single `validatePassword` policy boundary, strips
-unknown or invalid values from `validateProperties`, and throws CareCard
-`BAD_INPUT` errors from `validateWhitelistProperties` when required or provided
-whitelist values do not pass validation.
-
-Use Node.js 24.21.0. The package accepts compatible Node.js releases from
-24.21.0 up to, but not including, Node.js 25.
-
-## Development Rule
 
 Non-negotiable TDD rule: Always write the failing test first, run it to confirm it fails for the intended reason, then implement the code and rerun the test until it passes. Test Driven Development is required for all coding work and must not be skipped. For documentation- or skill-only edits, run the relevant focused non-test
 validation before changing the prose; do not add automated tests that inspect
@@ -44,531 +96,3 @@ Non-negotiable error and warning rule: Never suppress, silence, hide, downgrade,
 Non-negotiable TypeScript type rule: Never use the TypeScript type `any`; always use specific domain types, generics, existing project types, or `unknown` with explicit narrowing in all TypeScript-family files (`.ts`, `.tsx`, `.mts`, `.cts`, and `.d.ts`).
 
 Non-negotiable code organization rule: Functions with the same or equivalent behavior must use the same or clearly corresponding descriptive names across CareCard repositories, and equivalent functionality must live in files with the same names within each repository's established architecture. No backward compatibility names, aliases, or duplicate locations are allowed.
-
-## Installation
-
-```sh
-npm install @carecard/validate
-```
-
-## Importing
-
-```js
-const {
-  validate,
-  validatePassword,
-  validateProperties,
-  validateWhitelistProperties,
-  isEmailString,
-  isValidUuidString,
-} = require('@carecard/validate');
-```
-
-The original validators are available both as top-level exports and under the
-deprecated `validate` namespace. New field-specific validators and
-`validatePassword` use direct exports.
-
-The package root is safe to import from browser bundles. Its whitelist and role
-request validators use the focused `@carecard/common-util/case-converter` and
-`@carecard/common-util/errors` entrypoints, so importing `isEmailString` does
-not load server-only request context or trace storage.
-
-```js
-isEmailString('jane@example.com'); // true
-validate.isEmailString('jane@example.com'); // true
-```
-
-## Direct Validators
-
-General direct validators return `true` or `false`.
-
-| Function                         | Accepted value                                                                                                                                                                                                                                                                                                           |
-| -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `isImageUrl(value)`              | Non-empty string up to 2048 chars using letters, numbers, `-`, `_`, `.`, and `/`. Intended for safe image/file paths.                                                                                                                                                                                                    |
-| `isInteger(value)`               | JavaScript integer number. String numbers are rejected.                                                                                                                                                                                                                                                                  |
-| `isValidJsonString(value)`       | Non-empty string up to 10000 chars that parses to a non-null JSON object or array. JSON primitives are rejected.                                                                                                                                                                                                         |
-| `isValidIntegerString(value)`    | Digit-only string, 1 to 20 chars. No signs or decimals.                                                                                                                                                                                                                                                                  |
-| `isValidUuidString(value)`       | Canonical UUID string in `8-4-4-4-12` format, case-insensitive.                                                                                                                                                                                                                                                          |
-| `isCharactersString(value)`      | 1 to 1000 chars containing letters, numbers, spaces, `_`, or `-`.                                                                                                                                                                                                                                                        |
-| `isStreetString(value)`          | Non-empty street-like string up to 1000 chars using letters, numbers, spaces, `,`, `.`, `/`, `#`, or `-`, and not starting with `,`, `_`, or `-`.                                                                                                                                                                        |
-| `isNameString(value)`            | Visible Unicode plain text from the allowlist below; at most 1000 original UTF-16 code units. Checks raw input and NFKC without rewriting the name.                                                                                                                                                                      |
-| `isFileNameString(value)`        | Same allowlist, with a 255-code-point limit after NFKC and trimming. Rejects paths and punctuation-only names; preserves `.hidden` and `a..b.pdf`. Never use display metadata as a storage path.                                                                                                                         |
-| `isSafeSearchString(value)`      | Checks raw input before trimming; retains the ASCII search grammar (first letter, then letters, numbers, spaces, `_`, `-`, `.`, `,`, `'`, `(`, `)`, or `@`).                                                                                                                                                             |
-| `isEmailString(value)`           | Unmodified ASCII email up to 254 chars with one dot-atom local part (max 64 chars) and a multi-label DNS/punycode domain. Quoted local parts, domain literals, Unicode EAI, whitespace, empty labels, invalid DNS labels, numeric final labels, and single-label domains are rejected.                                   |
-| `isJwtString(value)`             | Non-blank JWT-like string up to 8192 chars that starts with `eyJ` and contains only letters, numbers, `-`, `_`, and `.`.                                                                                                                                                                                                 |
-| `validatePassword(value)`        | A well-formed Unicode password from 15 to 128 code points after NFC normalization that is not an exact case-sensitive blocklist match. Returns a discriminated result with the normalized value or a stable failure reason. All Unicode characters, including spaces and emoji, are permitted without composition rules. |
-| `isUsernameString(value)`        | 1 to 200 alphanumeric chars.                                                                                                                                                                                                                                                                                             |
-| `isPhoneNumber(value)`           | North American 10-digit phone number with optional parentheses around the area code and optional space, `-`, or `.` separators.                                                                                                                                                                                          |
-| `isPhoneContactString(value)`    | National phone syntax or an international number starting with `+`, containing 7 to 15 digits and optional single space, `-`, or `.` separators.                                                                                                                                                                         |
-| `isUrlSafeString(value)`         | Non-blank string up to 2048 chars using letters, numbers, `-`, `_`, and `.`.                                                                                                                                                                                                                                             |
-| `isProvinceString(value)`        | `ON` or `QC`, case-insensitive.                                                                                                                                                                                                                                                                                          |
-| `isBoolValue(value)`             | Boolean `true`/`false` or strings `"true"`/`"false"`.                                                                                                                                                                                                                                                                    |
-| `isPostalCodeString(value)`      | Canadian postal code format, case-insensitive, with optional middle space.                                                                                                                                                                                                                                               |
-| `isSafeString(value)`            | Visible ASCII plain text, at most 10000 units, using letters, numbers, spaces, `-`, `_`, `.`, `,`, `'`, `(`, or `)`.                                                                                                                                                                                                     |
-| `isTextString(value)`            | Same Unicode plain-text allowlist as names, at most 10000 original UTF-16 code units.                                                                                                                                                                                                                                    |
-| `isInStringArray(array, value)`  | `value`, after lowercase/trim validation as a name string, is included in the supplied array.                                                                                                                                                                                                                            |
-| `isCountryCodeString(value)`     | Country dialing code in `+1` to `+999` format.                                                                                                                                                                                                                                                                           |
-| `isValidDomainName(value)`       | Domain name with at least one dot, valid DNS-like labels, and max total length 253.                                                                                                                                                                                                                                      |
-| `isValidTimestampzString(value)` | ISO 8601 timestamp with `Z` or `+/-HH:MM` timezone offset.                                                                                                                                                                                                                                                               |
-| `isValidTimestampString(value)`  | ISO 8601 timestamp without timezone offset.                                                                                                                                                                                                                                                                              |
-| `isValidDateString(value)`       | ISO date in `YYYY-MM-DD` format.                                                                                                                                                                                                                                                                                         |
-| `isValidUrl(value)`              | Absolute `http://` or `https://` URL up to 2048 chars.                                                                                                                                                                                                                                                                   |
-| `isValidArrayOfStrings(value)`   | Array where every element passes `isSafeString`.                                                                                                                                                                                                                                                                         |
-
-The plain-text allowlist permits Unicode letters, combining marks, numbers,
-space separators, dashes, emoji, script/emoji joiners, and the punctuation
-`_ . , ' ’ ( ) @ &`. A value must contain a visible letter, number, or emoji.
-Direct predicates validate the complete supplied text. Application and service
-contracts first use `normalizeInputWhitespace` to remove all leading and trailing
-whitespace; internal controls remain subject to the raw predicates.
-Compatibility normalization is checked without changing accepted
-names; filename output is normalized as documented above. Explicitly allowed
-compatibility punctuation includes fullwidth forms such as `Ａ＆Ｂ` and the
-ellipsis in `Review…`. Unrelated symbols such as `℡`, `㏂`, and `㍿` are rejected
-even when normalization would turn them into letters.
-
-`isReactionString(value)` accepts allowlisted text or an ASCII named reaction
-token such as `:reviewed:` or `:route-covered:`, up to 64 characters after
-trimming ordinary spaces. Named tokens contain only letters, digits, `_` and
-`-` between their two colons. Raw controls and unsupported syntax are rejected.
-
-| Accepted examples                                   | Rejected examples                                                             |
-| --------------------------------------------------- | ----------------------------------------------------------------------------- |
-| `José`, `李`, `محمد`, `123`, `O’Neil`, `A&B`, `👩🏽‍⚕️`  | `<Research>`, `<script>alert(1)</script>`, `$(id)`, backticks                 |
-| `A_B (Research), Inc.`, `Peter @ Singh`, `Jean–Luc` | `javascript:alert(1)`, `C++`, `Report #1.pdf`, SQL punctuation containing `;` |
-| `A&B.pdf`, `.hidden`, `a..b.pdf`, `李.pdf`          | `../secret`, `A/B`, `A\B`, `.`, `..`, controls, private-use glyphs            |
-
-Passwords, emails, URLs, JSON, addresses, phones and reaction tokens keep their own structured
-format contracts. This allowlist does not replace output encoding, parameterized
-queries, upload-content validation, or storage-path generation.
-
-### Field-specific input characters
-
-Use `isSingleLineTextString` for previously unrestricted human text and
-`isMultilineTextString` for comments that support line breaks. They check raw
-and NFKC-normalized characters before any trimming. They allow Unicode letters,
-marks, numbers, spaces, dashes, currency symbols, emoji and script/emoji joiners,
-plus `_ . , ' ’ ‘ “ ” " ( ) : ; ! ? / @ & # + % = [ ] { } *` and their
-explicitly supported compatibility forms. Both reject angle brackets,
-malformed Unicode, private-use characters, control and unwanted format
-characters. Multiline text permits LF and CRLF; standalone CR is rejected.
-Empty strings and ordinary spaces pass the lexical check so the owning field
-can retain its requiredness, nullability and length contract. Do not replace an
-existing stricter character rule with these predicates.
-
-`isHttpUrlString` checks an unmodified HTTP(S) URL, including its raw
-characters. It rejects whitespace, controls, backslashes and angle brackets
-instead of allowing a URL parser to discard or escape them. Keep the owning
-field's existing length limit. `isMimeTypeString` checks concrete registered
-type/subtype syntax and optional token or quoted parameters; see
-[RFC 6838](https://www.rfc-editor.org/rfc/rfc6838.html#section-4.2) and
-[RFC 9110](https://www.rfc-editor.org/rfc/rfc9110.html#section-8.3.1).
-
-`isIdempotencyKeyString` permits only ASCII letters, digits, `_ . : -`, at most
-128 code units. `isNonNegativeSafeInteger` accepts a safe integer number or a
-complete decimal integer string, with no signs, suffixes, hexadecimal or
-scientific notation. `isValidUuidV4String` retains version-four identifiers
-where the service contract requires them. `isDocumentationSearchString`
-permits single-line documentation queries with printable code punctuation,
-excluding angle brackets and unsafe Unicode/control characters.
-
-`isSafeJsonValue` preserves extensible JSON object/array metadata, including
-reserved-looking keys as data. It validates nested keys as single-line text,
-string values as multiline text, finite numbers, booleans, nulls, objects and
-arrays. It rejects cycles and values that JSON would silently discard, and
-retains the 10000-code-unit serialized budget. `isSafeJsonString` checks the
-same contract in an existing serialized JSON field without rewriting it.
-Whitelist output creates own data properties at every path and during
-flattening. Existing property rules additionally require raw single-line
-streets, safe HTTP(S) URL characters and safe nested JSON.
-
-## `validateProperties(obj)`
-
-### Canonical whitespace
-
-`normalizeInputWhitespace(input)` copies JSON records and arrays, trimming every
-text value and own key recursively without changing internal whitespace. It
-preserves opaque values such as files and dates, and rejects accessors, cycles
-and keys that become duplicates after trimming. Reserved keys remain inert own
-data. `validateProperties`, `validateWhitelistProperties` and role-request alias
-selection apply this normalization before their existing rules. The serialized
-`about` JSON contract also trims nested keys and values.
-
-Passwords trim outer whitespace before NFC normalization, the 15–128-code-point
-length check and the exact blocklist check. Internal spaces are preserved. All
-acceptance boundaries must use the returned canonical password value. Credential
-creation and verification apply the same normalization in `@carecard/auth-util`.
-
-`validateProperties` accepts an object and returns a new object that contains
-only recognized keys whose values pass the validator assigned to that key.
-Unknown keys and invalid values are silently omitted. `null`, `undefined`, or no
-argument returns `{}`.
-
-```js
-const input = {
-  first_name: 'Jane',
-  email: 'jane@example.com',
-  phone_number: '123',
-  unknown_key: 'ignored',
-};
-
-validateProperties(input);
-// {
-//   first_name: 'Jane',
-//   email: 'jane@example.com'
-// }
-```
-
-### Supported Property Keys
-
-Keys are matched exactly. Both snake_case and camelCase variants are listed
-where the package supports both.
-
-| Validator                                             | Keys                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
-| ----------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `isNameString`                                        | `first_name`, `firstName`, `last_name`, `lastName`, `middle_name`, `middleName`, `nick_name`, `nickName`, `requested_by_name`, `requestedByName`, `approved_by_name`, `approvedByName`, `new_status`, `newStatus`, `description`, `comment`, `status`, `name`, `title`, `brand`, `short_description`, `shortDescription`, `college_name`, `collegeName`, `campus_name`, `campusName`, `role`, `role_id`, `roleId`, `campus`, `institution_name`, `institutionName`, `program_name`, `programName`, `role_name`, `roleName`, `document_name`, `documentName`, `document_required_for_role_name`, `documentRequiredForRoleName`, `reason`, `entity_type`, `entityType`, `action_type`, `actionType`, `city`, `state`, `country`, `type`                     |
-| `isStreetString`                                      | `street`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
-| `isCharactersString`                                  | `postal_code`, `postalCode`, `period`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
-| `isBoolValue`                                         | `is_primary`, `isPrimary`, `active`, `document_optional`, `documentOptional`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
-| `isNameString` with a trimmed 101-unit limit          | `search_string`, `searchString`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
-| `isFileNameString` with NFKC/trim output              | `file_name`, `fileName`, `filename`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
-| Existing username creation grammar                    | `username`: starts with an ASCII letter, followed by the previously supported ASCII letters, digits, spaces and punctuation; up to 1000 UTF-16 units. Login-specific rules stay separate.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
-| `validatePassword`                                    | `password`, `new_password`, `newPassword`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
-| `isEmailString`                                       | `email`, `requested_by_email`, `requestedByEmail`, `approved_by_email`, `approvedByEmail`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
-| `isPhoneNumber`                                       | `phone_number`, `phoneNumber`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
-| `isCountryCodeString`                                 | `country_code`, `countryCode`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
-| `isUrlSafeString`                                     | `token`, `email_verification_token`, `emailVerificationToken`, `verification_token`, `verificationToken`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
-| `isValidUuidString`                                   | `uuid`, `item_id`, `itemId`, `user_id`, `userId`, `address_id`, `addressId`, `order_id`, `orderId`, `category_id`, `categoryId`, `parent_id`, `parentId`, `college_id`, `collegeId`, `campus_id`, `campusId`, `program_id`, `programId`, `program_term_id`, `programTermId`, `template_id`, `templateId`, `program_template_id`, `programTemplateId`, `user_item_id`, `userItemId`, `user_item_status_id`, `userItemStatusId`, `requirement_item_id`, `requirementItemId`, `program_document_id`, `programDocumentId`, `id`, `institution_id`, `institutionId`, `role_assignment_id`, `roleAssignmentId`, `user_role_id`, `userRoleId`, `phone_number_id`, `phoneNumberId`, `entity_id`, `entityId`, `changed_by`, `changedBy`, `request_id`, `requestId` |
-| `isCcIdString`                                        | `cc_id`, `ccId`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
-| `isValidIntegerString`                                | `offset_number`, `offsetNumber`, `number_of_orders`, `numberOfOrders`, `price`, `from`, `number`, `limit`, `offset`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
-| `isValidJsonString` on the raw value                  | `about`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
-| `isValidJsonString(JSON.stringify(value))`            | `weight`, `dimensions`, `permission`, `scope_data`, `scopeData`, `meta_data`, `metaData`, `metadata`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
-| `isTextString`                                        | `document_description`, `documentDescription`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
-| `isPhoneContactString`                                | `requested_by_phone`, `requestedByPhone`, `approved_by_phone`, `approvedByPhone`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
-| `isValidArrayOfStrings`                               | `aliases`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
-| `isImageUrl` or `isValidUrl`                          | `image_url`, `imageUrl`, `website`, `file_url`, `fileUrl`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
-| `isValidDomainName`                                   | `domain_name`, `domainName`, `domain`, `email_domain`, `emailDomain`, `email_domain_name`, `emailDomainName`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
-| `isValidTimestampzString` or `isValidTimestampString` | `expires_at`, `expiresAt`, `start_time`, `startTime`, `end_time`, `endTime`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
-| `isValidDateString`                                   | `effective_start_date`, `effectiveStartDate`, `effective_end_date`, `effectiveEndDate`, `valid_until_date`, `validUntilDate`, `renew_date`, `renewDate`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
-
-## `validateWhitelistProperties(inputObject, requiredProperties, options)`
-
-`validateWhitelistProperties` extracts only the required and optional property
-paths you provide, validates each leaf through `validateProperties`, and returns
-a `Promise<ValidatePropertiesResult>` with the sanitized output.
-
-```js
-const body = {
-  first_name: 'Jane',
-  email: 'jane@example.com',
-  role: 'Admin',
-  extra: '<script>',
-};
-
-const out = await validateWhitelistProperties(body, ['first_name', 'email'], {
-  optionalProperties: ['role'],
-});
-
-// {
-//   first_name: 'Jane',
-//   email: 'jane@example.com',
-//   role: 'Admin'
-// }
-```
-
-### Defaults
-
-When omitted, `requiredProperties` defaults to `[]` and `options` defaults to:
-
-```js
-{
-    optionalProperties: [],
-    convertToSnakeCase: false,
-    flattenOutput: false,
-    flattenKeyStyle: 'path',
-}
-```
-
-The default output preserves the nested shape described by whitelisted dot paths.
-`flattenKeyStyle` only changes output when `flattenOutput` is `true`.
-
-```js
-const input = {
-  user: {
-    first_name: 'Jane',
-    contact: { email: 'jane@example.com' },
-  },
-};
-
-await validateWhitelistProperties(input, ['user.first_name', 'user.contact.email']);
-// {
-//   user: {
-//     first_name: 'Jane',
-//     contact: { email: 'jane@example.com' }
-//   }
-// }
-```
-
-### Options
-
-| Option               | Default  | Behavior                                                                                                                                                                                  |
-| -------------------- | -------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `optionalProperties` | `[]`     | Additional property paths that may be present. Absent optional paths are ignored. Present optional paths must be valid.                                                                   |
-| `convertToSnakeCase` | `false`  | When `true`, converts returned keys, including nested keys, to snake_case using the browser-safe `@carecard/common-util/case-converter` entrypoint. Conversion happens before flattening. |
-| `flattenOutput`      | `false`  | When `true`, removes nested objects from the returned value so every validated leaf becomes a top-level key.                                                                              |
-| `flattenKeyStyle`    | `'path'` | Controls flattened key naming when `flattenOutput` is `true`. Use `'path'` for full dot-notation keys or `'leaf'` for direct leaf names. Invalid values throw a `BAD_INPUT` error.        |
-
-Example with only the default options:
-
-```js
-await validateWhitelistProperties({ first_name: 'Jane', email: 'jane@example.com', ignored: 'x' }, [
-  'first_name',
-]);
-// { first_name: 'Jane' }
-```
-
-Example with optional properties:
-
-```js
-await validateWhitelistProperties(
-  { first_name: 'Jane', phone_number: '4165551234' },
-  ['first_name'],
-  {
-    optionalProperties: ['phone_number'],
-  },
-);
-// { first_name: 'Jane', phone_number: '4165551234' }
-```
-
-### Required And Optional Values
-
-Required paths must exist and pass validation. Missing or invalid required paths
-throw a CareCard bad input error.
-
-```js
-await validateWhitelistProperties({ email: 'bad' }, ['email']);
-// throws/rejects with:
-// {
-//   code: 'BAD_INPUT',
-//   message: 'Bad_Input',
-//   userMessage: 'Missing or invalid property: email'
-// }
-```
-
-Optional paths are ignored when absent, but invalid when present.
-
-```js
-await validateWhitelistProperties({ first_name: 'Jane', email: 'bad' }, ['first_name'], {
-  optionalProperties: ['email'],
-});
-// userMessage: 'Invalid property value: email'
-```
-
-### Nested Paths
-
-Use dot notation for nested objects. The leaf key decides which validator is
-used.
-
-```js
-const out = await validateWhitelistProperties(
-  {
-    user: {
-      first_name: 'Jane',
-      contact: { email: 'jane@example.com', ignored: 'x' },
-    },
-  },
-  ['user.first_name', 'user.contact.email'],
-);
-
-// {
-//   user: {
-//     first_name: 'Jane',
-//     contact: { email: 'jane@example.com' }
-//   }
-// }
-```
-
-Nested paths support up to 5 segments. The combined count of required and
-optional paths must be 5000 or fewer.
-
-### Arrays
-
-If a whitelisted leaf value is an array, each element is validated as if it were
-the scalar value for that same leaf key. The array is accepted only when every
-element passes. Empty arrays are accepted.
-
-```js
-await validateWhitelistProperties({ email: ['a@example.com', 'b@example.com'] }, ['email']);
-// { email: ['a@example.com', 'b@example.com'] }
-```
-
-This array behavior is intended for repeated scalar fields such as `email` or
-`name`.
-
-### Case Conversion And Flattening
-
-```js
-const out = await validateWhitelistProperties(
-  { userInfo: { firstName: 'Jane', phoneNumber: '4165551234' } },
-  ['userInfo.firstName'],
-  {
-    optionalProperties: ['userInfo.phoneNumber'],
-    convertToSnakeCase: true,
-    flattenOutput: true,
-  },
-);
-
-// {
-//   'user_info.first_name': 'Jane',
-//   'user_info.phone_number': '4165551234'
-// }
-```
-
-With `flattenOutput: false` or no `flattenOutput` option, nested paths keep the
-nested output shape:
-
-```js
-const input = { a: { b: { c: { d: { email: 'jane@example.com' } } } } };
-await validateWhitelistProperties(input, ['a.b.c.d.email']);
-// { a: { b: { c: { d: { email: 'jane@example.com' } } } } }
-```
-
-With `flattenOutput: true`, keys are full dot paths by default:
-
-```js
-const input = { a: { b: { c: { d: { email: 'jane@example.com', name: 'Jane' } } } } };
-await validateWhitelistProperties(input, ['a.b.c.d.email', 'a.b.c.d.name'], {
-  flattenOutput: true,
-});
-// { 'a.b.c.d.email': 'jane@example.com', 'a.b.c.d.name': 'Jane' }
-```
-
-Use `flattenKeyStyle: 'leaf'` to return top-level leaf keys instead:
-
-```js
-const input = { a: { b: { c: { d: { email: 'jane@example.com', name: 'Jane' } } } } };
-await validateWhitelistProperties(input, ['a.b.c.d.email', 'a.b.c.d.name'], {
-  flattenOutput: true,
-  flattenKeyStyle: 'leaf',
-});
-// { email: 'jane@example.com', name: 'Jane' }
-```
-
-When `flattenKeyStyle: 'leaf'` produces duplicate keys at different nesting
-levels, the higher-level value is kept and the lower-level duplicate is
-discarded. Duplicate leaf keys at the same nesting depth keep the first value
-encountered:
-
-```js
-const input = {
-  name: 'Top Level Name',
-  user: { name: 'Nested Name', email: 'jane@example.com' },
-};
-
-await validateWhitelistProperties(input, ['name', 'user.name', 'user.email'], {
-  flattenOutput: true,
-  flattenKeyStyle: 'leaf',
-});
-// { name: 'Top Level Name', email: 'jane@example.com' }
-```
-
-## TypeScript
-
-The package ships `index.d.ts` and declares types for the CommonJS exports.
-
-```ts
-import {
-  validateWhitelistProperties,
-  isEmailString,
-  ValidatePropertiesResult,
-} from '@carecard/validate';
-
-const valid: boolean = isEmailString('jane@example.com');
-const output: ValidatePropertiesResult = await validateWhitelistProperties({ first_name: 'Jane' }, [
-  'first_name',
-]);
-const maxDepth: 5 = validateWhitelistProperties.MAX_NESTING_DEPTH;
-```
-
-## Project Layout
-
-```text
-index.js                         CommonJS public entry point
-index.d.ts                       TypeScript declarations
-lib/validate.js                  Direct value validators
-lib/validateProperties.js        Key-to-validator sanitizer
-lib/validateWhitelistProperties.js Required/optional whitelist validator
-test/*.test.js                   Mocha runtime tests
-test/types.test.ts               TypeScript declaration tests
-```
-
-## Development
-
-```sh
-npm ci
-npm run test
-npm run test:types
-npm run test:All
-npm run lint
-npm run format:check
-```
-
-CI runs on Node.js 24.21.0 and executes `npm run test:All`. Publishing to npm happens
-from `main` through the `Publish to npm` GitHub workflow.
-
-## Auth Boundary
-
-Validation protects request shape, not authorization. `ms-auth` owns its
-auth-table RLS contract: normal users are self-row only, JWT `roles: ["ad"]`
-is the auth super-admin signal, and public auth flows use narrow system
-contexts. Do not use validators as a replacement for service RLS or database
-context checks.
-
-Docs that mention `ms-auth` controller internals should use concise action
-names such as `loginUser`, `registerUser`, `getUserDetail`, and `renewJwt`.
-Access level is conveyed by route middleware and endpoint placement, not by
-`public`/`protected`/`admin`/`Handler` suffixes.
-
-## Fail-Closed Test Lifecycle Audit
-
-The current package tests own no HTTP listener, database pool, Kafka client,
-background timer, or child process after completion. Mocha's test timeout fails
-a stalled async test, the suites run without bail or forced exit, and npm
-preserves each command's nonzero status. Keep natural process exit as the open
-handle regression check; validation must not hide failures with retries, forced
-success, skipped tests, or output suppression.
-
-Do not add unpublished executable validation code to a `pkg-*` repository. If a
-future test owns a long-lived resource or demonstrates a post-suite hang, add a
-contract-tested process watchdog through the coordinated package version,
-publish, and consumer propagation workflow. That watchdog must return
-immediately when no helper remains, allow only a bounded 250 ms settlement
-window for already-stopping helpers, fail persistent descendants, preserve
-failures and output, use exit code `124` only for a real outer deadline, and
-remain a final guard rather than a substitute for explicit cleanup.
-
-## TDD And Validation
-
-Test Driven Development is a non-negotiable requirement.
-
-The sole purpose of automated tests is to verify observable functionality and externally visible behavior.
-Tests must validate what the system does through its public interfaces and expected outcomes.
-
-Tests must not assert, inspect, or depend on implementation details, including but not limited to:
-
-- The existence of specific lines of code, statements, functions, classes, files, or modules.
-- Specific algorithms, control flow, variable names, method calls, code snippets, or internal implementation choices.
-- Any internal structure that can change without changing externally observable behavior.
-
-A correct implementation may be completely rewritten or refactored without requiring changes to functional tests, provided its externally observable behavior remains unchanged.
-
-Any test that fails solely because the implementation changed while the externally observable behavior remained correct is incorrectly designed and must be rewritten or removed.
-
-This requirement is mandatory for all new tests and must be applied whenever existing tests are modified.
-
-### Institution request roles
-
-`isUserRoleRequestRoleString`, `validateNewUserRoleRequest`, and the exported
-`UserRoleRequestRole` type accept student, intern, volunteer, and applicant.
-Institution and campus remain required. Provider-specific eligibility is owned
-by ms-institutions; accepting applicant here does not grant assignment authority.

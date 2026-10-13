@@ -306,7 +306,7 @@ existing TypeScript style.
 ## Validation Rules
 
 - Keep request-boundary validation close to the API/controller layer.
-- Use `validateWhitelistProperties()` once per validation boundary unless there
+- Use `validateSchemaWhitelistProperties()` once per validation boundary unless there
   is a specific documented reason to validate defensively again.
 - Avoid hidden duplicate validation across controller and library layers for
   the same logical payload.

@@ -1,158 +1,59 @@
-/**
- * Runtime-compatible TypeScript declarations for the CommonJS
- * `@carecard/validate` package.
- */
-
-export type ValidatePropertiesInput = Record<string, unknown> | null | undefined;
-export type ValidatePropertiesResult = Record<string, unknown>;
+/** Generic value validation; callers own field schemas and domain policies. */
 export type BoolValidator = (input: unknown) => boolean;
-export type InStringArrayValidator = (stringArray: readonly string[], input: unknown) => boolean;
+export type InStringArrayValidator = (values: readonly string[], input: unknown) => boolean;
+export type PropertyParseResult = { isValid: true; value: unknown } | { isValid: false };
+export type PropertyParser = (input: unknown) => PropertyParseResult;
+export type PropertySchema = Readonly<Record<string, PropertyParser>>;
+export type SchemaInput = Record<string, unknown> | null | undefined;
+export type SchemaOutput = Record<string, unknown>;
 
-/** Copies JSON records/arrays, trimming text values and own keys; rejects collisions, accessors and cycles. */
 export function normalizeInputWhitespace<T>(input: T): T;
+export function createValueParser(
+  predicate: BoolValidator,
+  transform?: (input: unknown) => unknown,
+): PropertyParser;
+export function validateSchemaProperties(input: SchemaInput, schema: PropertySchema): SchemaOutput;
+export interface ValidateSchemaWhitelistOptions {
+  schema: PropertySchema;
+  optionalProperties?: readonly string[] | null;
+  convertToSnakeCase?: boolean;
+  flattenOutput?: boolean;
+  flattenKeyStyle?: 'path' | 'leaf';
+}
+export function validateSchemaWhitelistProperties(
+  input: SchemaInput,
+  required: readonly string[] | null | undefined,
+  options: ValidateSchemaWhitelistOptions,
+): Promise<SchemaOutput>;
+export const MAX_NESTING_DEPTH: 5;
+export const MAX_KEYS_PER_CALL: 5000;
 
-/** Checks raw and NFKC single-line human text characters; callers own lengths and requiredness. */
-export const isSingleLineTextString: BoolValidator;
-/** Checks the human text character allowlist with LF or CRLF line endings. */
-export const isMultilineTextString: BoolValidator;
-/** Checks an unmodified HTTP(S) URL without whitespace, controls, backslashes or angle brackets. */
-export const isHttpUrlString: BoolValidator;
-/** Checks a concrete MIME type and optional token/quoted parameters. */
-export const isMimeTypeString: BoolValidator;
-/** Checks an ASCII idempotency key of 1 through 128 code units. */
-export const isIdempotencyKeyString: BoolValidator;
-/** Checks a nonnegative safe integer number or complete decimal integer string. */
-export const isNonNegativeSafeInteger: BoolValidator;
-/** Checks a version-four UUID with an RFC variant. */
-export const isValidUuidV4String: BoolValidator;
-/** Checks an extensible JSON object/array and nested text, with a 10000-code-unit serialized budget. */
-export const isSafeJsonValue: BoolValidator;
-/** Checks serialized JSON metadata without altering its representation or original length budget. */
-export const isSafeJsonString: BoolValidator;
-/** Checks single-line documentation search text, including printable code punctuation. */
-export const isDocumentationSearchString: BoolValidator;
-
+export interface PasswordPolicy {
+  minimumLength: number;
+  maximumLength: number;
+  isBlocked?: (normalizedPassword: string) => boolean;
+}
 export type PasswordValidationFailureReason =
   'invalid_type' | 'invalid_unicode' | 'too_short' | 'too_long' | 'blocked';
 export type PasswordValidationResult =
   { isValid: true; value: string } | { isValid: false; reason: PasswordValidationFailureReason };
+export function validatePasswordAgainstPolicy(
+  input: unknown,
+  policy: PasswordPolicy,
+): PasswordValidationResult;
+export function isCommonPassword(input: unknown): boolean;
 
-/** Trims edge whitespace, then validates and NFC-normalizes a password using the CareCard policy. */
-export function validatePassword(input: unknown): PasswordValidationResult;
+export const isSingleLineTextString: BoolValidator;
+export const isMultilineTextString: BoolValidator;
+export const isHttpUrlString: BoolValidator;
+export const isMimeTypeString: BoolValidator;
+export const isIdempotencyKeyString: BoolValidator;
+export const isNonNegativeSafeInteger: BoolValidator;
+export const isValidUuidV4String: BoolValidator;
+export const isSafeJsonValue: BoolValidator;
+export const isSafeJsonString: BoolValidator;
+export const isDocumentationSearchString: BoolValidator;
 
-/**
- * Utility function to validate multiple properties of an object at once.
- */
-export function validateProperties(obj?: ValidatePropertiesInput): ValidatePropertiesResult;
-
-export type ValidateWhitelistFlattenKeyStyle = 'path' | 'leaf';
-
-/**
- * Options for {@link validateWhitelistProperties}.
- */
-export interface ValidateWhitelistPropertiesOptions {
-  /** Properties allowed in the input but not required. */
-  optionalProperties?: readonly string[] | null;
-  /** When true, the returned object's keys are converted to snake_case. */
-  convertToSnakeCase?: boolean;
-  /**
-   * When true, the returned object is flattened so that every validated leaf
-   * becomes a top-level key. No nested objects remain in the output. Applied
-   * after snake_case conversion.
-   */
-  flattenOutput?: boolean;
-  /**
-   * Controls flattened key naming when `flattenOutput` is true.
-   * - `path` uses full dot-notation paths, e.g. `{ "user.email": "Jane" }`.
-   * - `leaf` uses only leaf names, e.g. `{ email: "Jane" }`.
-   *
-   * Defaults to `path`.
-   */
-  flattenKeyStyle?: ValidateWhitelistFlattenKeyStyle;
-}
-
-export interface ValidateWhitelistPropertiesFunction {
-  /**
-   * Validates and transforms whitelisted properties from an input object.
-   *
-   * - Supports nested objects via dot-notation paths (e.g. `"address.city"`),
-   *   up to 5 levels deep. The function checks that each path resolves to an
-   *   existing leaf property and validates the leaf value by its leaf segment.
-   * - Extracts only the whitelisted (required + optional) leaf properties and
-   *   rebuilds the same nested shape in the result.
-   * - Validates values via {@link validateProperties}.
-   * - Throws a "Bad_Input" error when any required property is missing/invalid,
-   *   when a provided optional property has an invalid value, when a path
-   *   exceeds 5 levels of nesting, or when the combined count of
-   *   `requiredProperties` and `options.optionalProperties` exceeds 5000.
-   * - Array values are supported: if a leaf value is an array, the per-leaf
-   *   validator is applied to each element. The leaf is accepted only when every
-   *   element passes validation, and the returned value is an array of the
-   *   validated elements.
-   * - Optionally converts the resulting keys, including nested keys, to snake_case.
-   * - Optionally flattens the result after snake_case conversion.
-   *
-   * @param inputObject The input object, for example `req.body` or `req.params`.
-   * @param requiredProperties Leaf paths that must be present and valid. Dot notation is supported.
-   * @param options Optional additional leaf paths plus output transformation flags.
-   */
-  (
-    inputObject?: ValidatePropertiesInput,
-    requiredProperties?: readonly string[] | null,
-    options?: ValidateWhitelistPropertiesOptions | null,
-  ): Promise<ValidatePropertiesResult>;
-  validateWhitelistProperties: ValidateWhitelistPropertiesFunction;
-  MAX_NESTING_DEPTH: 5;
-  MAX_KEYS_PER_CALL: 5000;
-}
-
-export const validateWhitelistProperties: ValidateWhitelistPropertiesFunction;
-
-export type UserRoleRequestRole = 'student' | 'intern' | 'volunteer' | 'applicant';
-export type UserRoleRequestScopeRequirement =
-  boolean | typeof REQUIRE_SCOPE_WHEN_ROLE_OR_SCOPE_PRESENT;
-
-export const DEFAULT_USER_ROLE_REQUEST_ROLE: 'student';
-export const REQUIRE_SCOPE_WHEN_ROLE_OR_SCOPE_PRESENT: 'whenRoleOrScopePresent';
-
-export interface ValidateNewUserRoleRequestOptions {
-  defaultRole?: UserRoleRequestRole | undefined;
-  requireScope?: UserRoleRequestScopeRequirement;
-}
-
-export interface ValidateNewUserRoleRequestInput extends Record<string, unknown> {
-  role_name?: unknown;
-  roleName?: unknown;
-  role?: unknown;
-  institution_id?: unknown;
-  institutionId?: unknown;
-  campus_id?: unknown;
-  campusId?: unknown;
-  program_id?: unknown;
-  programId?: unknown;
-  program_term_id?: unknown;
-  programTermId?: unknown;
-}
-
-export interface ValidateNewUserRoleRequestPayload extends Record<string, unknown> {
-  role_name?: string;
-  institution_id?: string;
-  campus_id?: string;
-  program_id?: string;
-  program_term_id?: string;
-}
-
-/**
- * Normalizes and validates an institutions.new_user_role_request payload.
- * Only student, intern, volunteer, and applicant are accepted. When scope is required,
- * both institution_id and campus_id must be provided.
- */
-export function validateNewUserRoleRequestObject(
-  roleRequest?: ValidateNewUserRoleRequestInput | null,
-  options?: ValidateNewUserRoleRequestOptions | null,
-): ValidateNewUserRoleRequestPayload;
-
-/** Checks if the string is a valid image URL format. */
 export const isImageUrl: BoolValidator;
 /** Checks if the value is an integer. */
 export const isInteger: BoolValidator;
@@ -162,8 +63,6 @@ export const isValidJsonString: BoolValidator;
 export const isValidIntegerString: BoolValidator;
 /** Checks if the string is a valid UUID. */
 export const isValidUuidString: BoolValidator;
-/** Checks if the string is a valid lowercase 8-character CareCard ID. */
-export const isCcIdString: BoolValidator;
 /** Checks if the string contains only alphanumeric characters, spaces, underscores, or hyphens. */
 export const isCharactersString: BoolValidator;
 /** Checks if the string is a valid street address format. */
@@ -186,8 +85,6 @@ export const isPhoneNumber: BoolValidator;
 export const isPhoneContactString: BoolValidator;
 /** Checks if the string is URL-safe. */
 export const isUrlSafeString: BoolValidator;
-/** Checks if the string is a valid Canadian province abbreviation (ON, QC). */
-export const isProvinceString: BoolValidator;
 /** Checks if the value is a boolean. */
 export const isBoolValue: BoolValidator;
 /** Checks if the string is a valid Canadian postal code. */
@@ -200,10 +97,6 @@ export const isTextString: BoolValidator;
 export const isReactionString: BoolValidator;
 /** Checks if a string exists within a given array of strings, case-insensitive. */
 export const isInStringArray: InStringArrayValidator;
-/** Checks if the string is one of the supported user role request statuses. */
-export const isUserRoleRequestStatusString: BoolValidator;
-/** Checks if the string is a supported new user role request role. */
-export const isUserRoleRequestRoleString: BoolValidator;
 /** Checks if the string is a valid country code, for example +1. */
 export const isCountryCodeString: BoolValidator;
 /** Checks if the string is a valid domain name. */
@@ -229,7 +122,6 @@ export const validate: {
   isValidJsonString: typeof isValidJsonString;
   isValidIntegerString: typeof isValidIntegerString;
   isValidUuidString: typeof isValidUuidString;
-  isCcIdString: typeof isCcIdString;
   isCharactersString: typeof isCharactersString;
   isStreetString: typeof isStreetString;
   isNameString: typeof isNameString;
@@ -241,15 +133,12 @@ export const validate: {
   isPhoneNumber: typeof isPhoneNumber;
   isPhoneContactString: typeof isPhoneContactString;
   isUrlSafeString: typeof isUrlSafeString;
-  isProvinceString: typeof isProvinceString;
   isBoolValue: typeof isBoolValue;
   isPostalCodeString: typeof isPostalCodeString;
   isSafeString: typeof isSafeString;
   isTextString: typeof isTextString;
   isReactionString: typeof isReactionString;
   isInStringArray: typeof isInStringArray;
-  isUserRoleRequestStatusString: typeof isUserRoleRequestStatusString;
-  isUserRoleRequestRoleString: typeof isUserRoleRequestRoleString;
   isCountryCodeString: typeof isCountryCodeString;
   isValidDomainName: typeof isValidDomainName;
   isValidTimestampzString: typeof isValidTimestampzString;
