@@ -1,13 +1,12 @@
-'use strict';
+const {
+  validateExampleProperties,
+  validateExampleRequest,
+  validateExamplePassword,
+} = require('./configuredSchema.fixture');
+('use strict');
 
 const assert = require('node:assert/strict');
-const {
-  normalizeInputWhitespace,
-  validatePassword,
-  validateProperties,
-  validateWhitelistProperties,
-  validateNewUserRoleRequestObject,
-} = require('..');
+const { normalizeInputWhitespace } = require('..');
 
 describe('Canonical input whitespace through the package API', () => {
   it('trims Unicode edge whitespace in text, nested keys and array values without mutation', () => {
@@ -91,13 +90,13 @@ describe('Canonical input whitespace through the package API', () => {
       ' email ': ' user@example.ca ',
       ' metadata ': { ' label ': ' A  B ', ' values ': [' one ', ' two '] },
     };
-    assert.deepEqual(validateProperties(input), {
+    assert.deepEqual(validateExampleProperties(input), {
       first_name: 'Zoë',
       email: 'user@example.ca',
       metadata: { label: 'A  B', values: ['one', 'two'] },
     });
     assert.deepEqual(
-      await validateWhitelistProperties({ ' user ': input }, [
+      await validateExampleRequest({ ' user ': input }, [
         'user.first_name',
         'user.email',
         'user.metadata',
@@ -111,57 +110,48 @@ describe('Canonical input whitespace through the package API', () => {
       },
     );
     assert.equal(
-      Object.hasOwn(validateProperties({ first_name: ' \t<script> \n' }), 'first_name'),
+      Object.hasOwn(validateExampleProperties({ first_name: ' \t<script> \n' }), 'first_name'),
       false,
     );
-    assert.equal(Object.hasOwn(validateProperties({ first_name: ' A\nB ' }), 'first_name'), false);
-    assert.throws(() => validateProperties({ name: 'A', ' name ': 'B' }), /ambiguous/i);
+    assert.equal(
+      Object.hasOwn(validateExampleProperties({ first_name: ' A\nB ' }), 'first_name'),
+      false,
+    );
+    assert.throws(() => validateExampleProperties({ name: 'A', ' name ': 'B' }), /ambiguous/i);
     await assert.rejects(async () =>
-      validateWhitelistProperties({ email: 'safe@example.ca', ' email ': 'other@example.ca' }, [
+      validateExampleRequest({ email: 'safe@example.ca', ' email ': 'other@example.ca' }, [
         'email',
       ]),
     );
   });
 
   it('trims before password length and blocklist checks and preserves internal spaces', () => {
-    assert.deepEqual(validatePassword('\t Valid password phrase 🔐 \n'), {
+    assert.deepEqual(validateExamplePassword('\t Valid password phrase 🔐 \n'), {
       isValid: true,
       value: 'Valid password phrase 🔐',
     });
-    assert.deepEqual(validatePassword('  12345678901234  '), {
+    assert.deepEqual(validateExamplePassword('  12345678901234  '), {
       isValid: false,
       reason: 'too_short',
     });
-    assert.deepEqual(validatePassword('  films+pic+galeries  '), {
+    assert.deepEqual(validateExamplePassword('  films+pic+galeries  '), {
       isValid: false,
       reason: 'blocked',
     });
-    assert.deepEqual(validatePassword(' valid  password phrase '), {
+    assert.deepEqual(validateExamplePassword(' valid  password phrase '), {
       isValid: true,
       value: 'valid  password phrase',
     });
   });
 
   it('normalizes the keys and values inside explicitly serialized JSON fields', () => {
-    assert.deepEqual(validateProperties({ about: ' {" label ":" Value "," list ":[" A "]} ' }), {
-      about: '{"label":"Value","list":["A"]}',
-    });
-    assert.deepEqual(validateProperties({ about: '{"name":"A"," name ":"B"}' }), {});
-    assert.deepEqual(validateProperties({ about: 42 }), {});
-  });
-
-  it('normalizes role-request aliases and scoped identifiers before selection', () => {
     assert.deepEqual(
-      validateNewUserRoleRequestObject({
-        ' role ': ' student ',
-        ' institutionId ': ' abc ',
-        ' campusId ': ' def ',
-      }),
+      validateExampleProperties({ about: ' {" label ":" Value "," list ":[" A "]} ' }),
       {
-        role_name: 'student',
-        institution_id: 'abc',
-        campus_id: 'def',
+        about: '{"label":"Value","list":["A"]}',
       },
     );
+    assert.deepEqual(validateExampleProperties({ about: '{"name":"A"," name ":"B"}' }), {});
+    assert.deepEqual(validateExampleProperties({ about: 42 }), {});
   });
 });

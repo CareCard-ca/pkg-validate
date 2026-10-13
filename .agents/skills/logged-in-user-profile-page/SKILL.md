@@ -29,7 +29,7 @@ Relevant profile/settings fields:
 
 ## Requirements
 
-- Keep `validateProperties` aliases in sync with `validateWhitelistProperties`
+- Keep owner-local API schema aliases in sync with `validateSchemaWhitelistProperties`
   consumers in services such as `ms-auth`.
 - Preserve both snake_case and camelCase aliases unless a task explicitly
   removes one.

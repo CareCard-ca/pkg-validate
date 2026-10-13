@@ -1,250 +1,43 @@
-/**
- * Compile-time type tests for `@carecard/validate`.
- *
- * Each `expectType<T>(value)` call asserts that the inferred type of `value`
- * is assignable to the explicit type parameter `T`. If the public type surface
- * declared in `index.d.ts` changes in a backwards-incompatible way, this file
- * will fail to compile, and `npm run test:types` (`tsc --noEmit`) will fail.
- *
- * This file is intentionally a pure type-level test — it has no runtime
- * assertions and is not executed by Mocha. It is type-checked via the
- * `include` glob in `tsconfig.json` (`test/**\/*.ts`).
- */
-
-import validateCommonJs = require('@carecard/validate');
-import * as validatePackage from '@carecard/validate';
-import {
-  DEFAULT_USER_ROLE_REQUEST_ROLE,
-  REQUIRE_SCOPE_WHEN_ROLE_OR_SCOPE_PRESENT,
-  ValidateNewUserRoleRequestOptions,
-  ValidateNewUserRoleRequestPayload,
-  ValidatePropertiesInput,
-  ValidatePropertiesResult,
-  PasswordValidationResult,
-  ValidateWhitelistPropertiesFunction,
-  isBoolValue,
-  isCcIdString,
-  isCharactersString,
-  isCountryCodeString,
-  isEmailString,
-  isImageUrl,
-  isInStringArray,
-  isInteger,
-  isJwtString,
-  isNameString,
-  isPhoneNumber,
-  isPostalCodeString,
-  isProvinceString,
-  isSafeSearchString,
-  isSafeString,
-  isStreetString,
-  isUrlSafeString,
-  isUsernameString,
-  isValidArrayOfStrings,
-  isValidDomainName,
-  isValidIntegerString,
-  isValidJsonString,
-  isValidDateString,
-  isValidTimestampString,
-  isValidTimestampzString,
-  isValidUrl,
-  isValidUuidString,
-  isTextString,
-  isUserRoleRequestRoleString,
-  isUserRoleRequestStatusString,
-  validate,
-  validatePassword,
-  validateNewUserRoleRequestObject,
-  validateProperties,
-  validateWhitelistProperties,
-  ValidateWhitelistPropertiesOptions,
-} from '@carecard/validate';
-
-/**
- * Compile-time helper. Forces TypeScript to check that `value` is assignable
- * to the explicit generic type parameter `T`. It is a no-op at runtime.
- */
-function expectType<T>(_value: T): void {
-  /* no-op */
-}
-
-expectType<boolean>(validateCommonJs.isEmailString('person@example.com'));
-expectType<boolean>(validatePackage.isInteger(1));
-
-// ---------------------------------------------------------------------------
-// validateWhitelistProperties + options interface
-// ---------------------------------------------------------------------------
-
-// Signature: (ValidatePropertiesInput, string[]?, ValidateWhitelistPropertiesOptions?) => Promise<ValidatePropertiesResult>
-expectType<ValidateWhitelistPropertiesFunction>(validateWhitelistProperties);
-expectType<5>(validateWhitelistProperties.MAX_NESTING_DEPTH);
-expectType<5000>(validateWhitelistProperties.MAX_KEYS_PER_CALL);
-expectType<typeof validateWhitelistProperties>(
-  validateWhitelistProperties.validateWhitelistProperties,
+import * as validation from '@carecard/validate';
+import type { PropertySchema, SchemaOutput, PasswordValidationResult } from '@carecard/validate';
+function expectType<T>(_value: T): void {}
+const schema: PropertySchema = { arbitrary: validation.createValueParser(validation.isInteger) };
+expectType<SchemaOutput>(validation.validateSchemaProperties({ arbitrary: 1 }, schema));
+expectType<Promise<SchemaOutput>>(
+  validation.validateSchemaWhitelistProperties({ arbitrary: 1 }, ['arbitrary'], { schema }),
 );
-
-// Return type is a Promise of an object.
-expectType<Promise<ValidatePropertiesResult>>(validateWhitelistProperties({ a: 1 }));
-expectType<Promise<ValidatePropertiesResult>>(validateWhitelistProperties({ a: 1 }, ['a']));
-expectType<Promise<ValidatePropertiesResult>>(
-  validateWhitelistProperties({ a: 1 }, ['a'], {
-    optionalProperties: ['b'],
-    convertToSnakeCase: true,
+expectType<Promise<SchemaOutput>>(
+  validation.validateSchemaWhitelistProperties(null, null, {
+    schema,
+    optionalProperties: ['arbitrary'],
     flattenOutput: true,
-    flattenKeyStyle: 'path',
+    flattenKeyStyle: 'leaf',
+    convertToSnakeCase: true,
   }),
 );
-
-// Options interface: all fields optional.
-const optsEmpty: ValidateWhitelistPropertiesOptions = {};
-const optsPartial: ValidateWhitelistPropertiesOptions = { optionalProperties: ['x'] };
-const optsFull: ValidateWhitelistPropertiesOptions = {
-  optionalProperties: ['x', 'y'],
-  convertToSnakeCase: false,
-  flattenOutput: true,
-  flattenKeyStyle: 'leaf',
-};
-expectType<ValidateWhitelistPropertiesOptions>(optsEmpty);
-expectType<ValidateWhitelistPropertiesOptions>(optsPartial);
-expectType<ValidateWhitelistPropertiesOptions>(optsFull);
-expectType<readonly string[] | null | undefined>(optsFull.optionalProperties);
-expectType<boolean | undefined>(optsFull.convertToSnakeCase);
-expectType<boolean | undefined>(optsFull.flattenOutput);
-expectType<'path' | 'leaf' | undefined>(optsFull.flattenKeyStyle);
-
-// ---------------------------------------------------------------------------
-// validateProperties
-// ---------------------------------------------------------------------------
-
-expectType<(obj?: ValidatePropertiesInput) => ValidatePropertiesResult>(validateProperties);
-expectType<ValidatePropertiesResult>(validateProperties());
-expectType<ValidatePropertiesResult>(validateProperties({ first_name: 'Jane' }));
-expectType<ValidatePropertiesResult>(validateProperties(null));
-
-// ---------------------------------------------------------------------------
-// Boolean-returning validators: (unknown) => boolean
-// ---------------------------------------------------------------------------
-
-type BoolValidator = (input: unknown) => boolean;
-
-expectType<BoolValidator>(isImageUrl);
-expectType<BoolValidator>(isInteger);
-expectType<BoolValidator>(isValidJsonString);
-expectType<BoolValidator>(isValidIntegerString);
-expectType<BoolValidator>(isValidUuidString);
-expectType<BoolValidator>(isCcIdString);
-expectType<BoolValidator>(isCharactersString);
-expectType<BoolValidator>(isStreetString);
-expectType<BoolValidator>(isNameString);
-expectType<BoolValidator>(isSafeSearchString);
-expectType<BoolValidator>(isEmailString);
-expectType<BoolValidator>(isJwtString);
-expectType<BoolValidator>(isUsernameString);
-expectType<BoolValidator>(isPhoneNumber);
-expectType<BoolValidator>(isUrlSafeString);
-expectType<BoolValidator>(isProvinceString);
-expectType<BoolValidator>(isBoolValue);
-expectType<BoolValidator>(isPostalCodeString);
-expectType<BoolValidator>(isSafeString);
-expectType<BoolValidator>(isTextString);
-expectType<BoolValidator>(isCountryCodeString);
-expectType<BoolValidator>(isUserRoleRequestRoleString);
-expectType<BoolValidator>(isUserRoleRequestStatusString);
-expectType<BoolValidator>(isValidDomainName);
-expectType<BoolValidator>(isValidDateString);
-expectType<BoolValidator>(isValidTimestampzString);
-expectType<BoolValidator>(isValidTimestampString);
-expectType<BoolValidator>(isValidUrl);
-expectType<BoolValidator>(isValidArrayOfStrings);
-
-// Confirm returns are actually `boolean`, not `any`.
-expectType<boolean>(isEmailString('a@b.com'));
-expectType<boolean>(isInteger(1));
-expectType<boolean>(isValidUuidString('x'));
-expectType<boolean>(isCcIdString('a1b2c3d4'));
-expectType<boolean>(isStreetString('103 Main Street'));
-expectType<boolean>(isTextString('free text'));
-expectType<boolean>(isUserRoleRequestRoleString('student'));
-expectType<boolean>(isUserRoleRequestStatusString('pending'));
-expectType<boolean>(isBoolValue(true));
-expectType<boolean>(isValidDateString('2026-06-08'));
-expectType<boolean>(isValidArrayOfStrings(['a']));
-
-// ---------------------------------------------------------------------------
-// Password validation result
-// ---------------------------------------------------------------------------
-
-expectType<(password: unknown) => PasswordValidationResult>(validatePassword);
-expectType<PasswordValidationResult>(validateCommonJs.validatePassword('a password value'));
-const passwordResult = validatePassword('a password value');
-if (passwordResult.isValid) {
-  expectType<string>(passwordResult.value);
-} else {
-  expectType<'invalid_type' | 'invalid_unicode' | 'too_short' | 'too_long' | 'blocked'>(
-    passwordResult.reason,
-  );
-}
-
-// ---------------------------------------------------------------------------
-// Two-argument validator: isInStringArray
-// ---------------------------------------------------------------------------
-
-expectType<(arr: string[], input: unknown) => boolean>(isInStringArray);
-expectType<boolean>(isInStringArray(['ON', 'QC'], 'on'));
-
-// ---------------------------------------------------------------------------
-// New user-role request helper exports
-// ---------------------------------------------------------------------------
-
-expectType<'student'>(DEFAULT_USER_ROLE_REQUEST_ROLE);
-expectType<'whenRoleOrScopePresent'>(REQUIRE_SCOPE_WHEN_ROLE_OR_SCOPE_PRESENT);
-expectType<ValidateNewUserRoleRequestOptions>({});
-expectType<ValidateNewUserRoleRequestOptions>({ defaultRole: 'student' });
-expectType<ValidateNewUserRoleRequestOptions>({ defaultRole: undefined, requireScope: false });
-expectType<ValidateNewUserRoleRequestOptions>({
-  requireScope: REQUIRE_SCOPE_WHEN_ROLE_OR_SCOPE_PRESENT,
+expectType<PasswordValidationResult>(
+  validation.validatePasswordAgainstPolicy('word', {
+    minimumLength: 3,
+    maximumLength: 9,
+    isBlocked: validation.isCommonPassword,
+  }),
+);
+expectType<boolean>(validation.isInStringArray(['arbitrary'], 'arbitrary'));
+expectType<boolean>(validation.validate.isNameString('name'));
+expectType<5>(validation.MAX_NESTING_DEPTH);
+expectType<5000>(validation.MAX_KEYS_PER_CALL);
+// @ts-expect-error A caller schema is required.
+validation.validateSchemaProperties({ arbitrary: 1 });
+// @ts-expect-error A selected path requires explicit parser configuration.
+validation.validateSchemaWhitelistProperties({ arbitrary: 1 }, ['arbitrary'], {});
+// @ts-expect-error Password length policy belongs to the caller.
+validation.validatePasswordAgainstPolicy('word');
+const result = validation.validatePasswordAgainstPolicy('word', {
+  minimumLength: 1,
+  maximumLength: 9,
 });
-expectType<ValidateNewUserRoleRequestPayload>(
-  validateNewUserRoleRequestObject({
-    roleName: 'student',
-    institutionId: '11111111-1111-4111-8111-111111111111',
-    campusId: '22222222-2222-4222-8222-222222222222',
-    programId: '33333333-3333-4333-8333-333333333333',
-    programTermId: '44444444-4444-4444-8444-444444444444',
-  }),
-);
-
-// ---------------------------------------------------------------------------
-// `validate` namespace (deprecated). Every key must still be present and have
-// the same callable type as its top-level counterpart.
-// ---------------------------------------------------------------------------
-
-expectType<typeof isImageUrl>(validate.isImageUrl);
-expectType<typeof isInteger>(validate.isInteger);
-expectType<typeof isValidJsonString>(validate.isValidJsonString);
-expectType<typeof isValidIntegerString>(validate.isValidIntegerString);
-expectType<typeof isValidUuidString>(validate.isValidUuidString);
-expectType<typeof isCcIdString>(validate.isCcIdString);
-expectType<typeof isCharactersString>(validate.isCharactersString);
-expectType<typeof isStreetString>(validate.isStreetString);
-expectType<typeof isNameString>(validate.isNameString);
-expectType<typeof isSafeSearchString>(validate.isSafeSearchString);
-expectType<typeof isEmailString>(validate.isEmailString);
-expectType<typeof isJwtString>(validate.isJwtString);
-expectType<typeof isUsernameString>(validate.isUsernameString);
-expectType<typeof isPhoneNumber>(validate.isPhoneNumber);
-expectType<typeof isUrlSafeString>(validate.isUrlSafeString);
-expectType<typeof isProvinceString>(validate.isProvinceString);
-expectType<typeof isBoolValue>(validate.isBoolValue);
-expectType<typeof isPostalCodeString>(validate.isPostalCodeString);
-expectType<typeof isSafeString>(validate.isSafeString);
-expectType<typeof isTextString>(validate.isTextString);
-expectType<typeof isInStringArray>(validate.isInStringArray);
-expectType<typeof isUserRoleRequestStatusString>(validate.isUserRoleRequestStatusString);
-expectType<typeof isUserRoleRequestRoleString>(validate.isUserRoleRequestRoleString);
-expectType<typeof isCountryCodeString>(validate.isCountryCodeString);
-expectType<typeof isValidDomainName>(validate.isValidDomainName);
-expectType<typeof isValidTimestampzString>(validate.isValidTimestampzString);
-expectType<typeof isValidTimestampString>(validate.isValidTimestampString);
-expectType<typeof isValidUrl>(validate.isValidUrl);
-expectType<typeof isValidArrayOfStrings>(validate.isValidArrayOfStrings);
+if (result.isValid) {
+  expectType<string>(result.value);
+} else {
+  expectType<validation.PasswordValidationFailureReason>(result.reason);
+}

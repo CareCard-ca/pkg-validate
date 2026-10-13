@@ -1,3 +1,4 @@
+const { validateExampleProperties, validateExampleRequest } = require('./configuredSchema.fixture');
 const assert = require('node:assert/strict');
 const {
   isNameString,
@@ -7,8 +8,6 @@ const {
   isSafeSearchString,
   isPhoneContactString,
   validate,
-  validateProperties,
-  validateWhitelistProperties,
 } = require('..');
 
 describe('Unicode name and filename validation through the package API', () => {
@@ -159,7 +158,7 @@ describe('Unicode name and filename validation through the package API', () => {
         assert.equal(predicate(value), false);
       }
       assert.deepEqual(
-        validateProperties({ name: value, fileName: value, documentDescription: value }),
+        validateExampleProperties({ name: value, fileName: value, documentDescription: value }),
         {},
       );
     });
@@ -213,26 +212,21 @@ describe('Unicode name and filename validation through the package API', () => {
 
   it('rejects invalid required and present optional text at the whitelist boundary', async () => {
     for (const key of ['name', 'fileName', 'documentDescription']) {
+      await assert.rejects(async () => validateExampleRequest({ [key]: '<Research>' }, [key]), {
+        code: 'BAD_INPUT',
+      });
       await assert.rejects(
-        async () => validateWhitelistProperties({ [key]: '<Research>' }, [key]),
+        async () => validateExampleRequest({ [key]: '$(id)' }, [], { optionalProperties: [key] }),
         { code: 'BAD_INPUT' },
       );
-      await assert.rejects(
-        async () =>
-          validateWhitelistProperties({ [key]: '$(id)' }, [], { optionalProperties: [key] }),
-        { code: 'BAD_INPUT' },
-      );
-      assert.deepEqual(
-        await validateWhitelistProperties({}, [], { optionalProperties: [key] }),
-        {},
-      );
+      assert.deepEqual(await validateExampleRequest({}, [], { optionalProperties: [key] }), {});
     }
     const input = {
       name: 'École & Agreements',
       fileName: '  Ａ＆Ｂ.pdf  ',
       documentDescription: 'Needs & review',
     };
-    assert.deepEqual(await validateWhitelistProperties(input, Object.keys(input)), {
+    assert.deepEqual(await validateExampleRequest(input, Object.keys(input)), {
       ...input,
       fileName: 'A&B.pdf',
     });
@@ -283,20 +277,26 @@ describe('Unicode name and filename validation through the package API', () => {
       search_string: '123',
       searchString: '李',
     };
-    assert.deepEqual(validateProperties(input), input);
+    assert.deepEqual(validateExampleProperties(input), input);
     assert.deepEqual(
-      validateProperties({ middle_name: '\n', fileName: '../a', searchString: 'a'.repeat(102) }),
+      validateExampleProperties({
+        middle_name: '\n',
+        fileName: '../a',
+        searchString: 'a'.repeat(102),
+      }),
       {},
     );
-    assert.deepEqual(validateProperties({ searchString: 'a'.repeat(101) }), {
+    assert.deepEqual(validateExampleProperties({ searchString: 'a'.repeat(101) }), {
       searchString: 'a'.repeat(101),
     });
   });
 
   it('retains the existing username property rules independently of display names', () => {
-    assert.deepEqual(validateProperties({ username: "Peter-0_'()" }), { username: "Peter-0_'()" });
+    assert.deepEqual(validateExampleProperties({ username: "Peter-0_'()" }), {
+      username: "Peter-0_'()",
+    });
     for (const username of ['123', '3Peter', 'A', 'Peter@', '李', 'A'.repeat(1001)]) {
-      assert.deepEqual(validateProperties({ username }), {});
+      assert.deepEqual(validateExampleProperties({ username }), {});
     }
   });
 });

@@ -1,13 +1,11 @@
+const {
+  validateExampleProperties,
+  validateExamplePassword,
+} = require('./configuredSchema.fixture');
 const assert = require('assert').strict;
 const { describe, it } = require('mocha');
 const validatePackage = require('../index');
-const {
-  DEFAULT_USER_ROLE_REQUEST_ROLE,
-  REQUIRE_SCOPE_WHEN_ROLE_OR_SCOPE_PRESENT,
-  isUserRoleRequestRoleString,
-  validate,
-  validateNewUserRoleRequestObject,
-} = validatePackage;
+const { validate } = validatePackage;
 
 describe('AuthUtil test', function () {
   const goodString = 'I am a good person';
@@ -67,12 +65,9 @@ describe('AuthUtil test', function () {
     it('supports direct and legacy validator calls through the package root', function () {
       assert.strictEqual(validatePackage.isEmailString('person@example.com'), true);
       assert.strictEqual(validatePackage.validate.isEmailString('person@example.com'), true);
-      assert.deepStrictEqual(
-        validatePackage.validateProperties({ first_name: 'Jane', unexpected: true }),
-        {
-          first_name: 'Jane',
-        },
-      );
+      assert.deepStrictEqual(validateExampleProperties({ first_name: 'Jane', unexpected: true }), {
+        first_name: 'Jane',
+      });
     });
 
     it('isImageUrl returns true if safe image url, false otherwise', function (done) {
@@ -155,20 +150,6 @@ describe('AuthUtil test', function () {
       assert.ok(!validate.isValidUuidString(''), 'Empty string test failed');
       assert.ok(!validate.isValidUuidString(badUuid), 'Bad string test failed');
       assert.ok(validate.isValidUuidString(goodUuid), 'Good string test failed');
-      done();
-    });
-
-    it('isCcIdString returns true for exactly eight lowercase alphanumeric characters only', function (done) {
-      assert.ok(validate.isCcIdString('a1b2c3d4'), 'Good ccId test failed');
-      assert.ok(validate.isCcIdString('12345678'), 'Numeric ccId test failed');
-      assert.ok(validate.isCcIdString('abcdefgh'), 'Alpha ccId test failed');
-      assert.ok(!validate.isCcIdString('A1B2C3D4'), 'Uppercase ccId test failed');
-      assert.ok(!validate.isCcIdString('a1b2c3d'), 'Short ccId test failed');
-      assert.ok(!validate.isCcIdString('a1b2c3d45'), 'Long ccId test failed');
-      assert.ok(!validate.isCcIdString('a1b2-c3d'), 'Punctuation ccId test failed');
-      assert.ok(!validate.isCcIdString(''), 'Empty ccId test failed');
-      assert.ok(!validate.isCcIdString(undefined), 'Undefined ccId test failed');
-      assert.ok(!validate.isCcIdString(null), 'Null ccId test failed');
       done();
     });
 
@@ -273,26 +254,6 @@ describe('AuthUtil test', function () {
       done();
     });
 
-    it('isUserRoleRequestStatusString returns true only for user role request statuses', function (done) {
-      assert.ok(
-        validate.isUserRoleRequestStatusString('pending'),
-        'pending status should be valid',
-      );
-      assert.ok(
-        validate.isUserRoleRequestStatusString('on_hold'),
-        'on_hold status should be valid',
-      );
-      assert.ok(
-        !validate.isUserRoleRequestStatusString('not_a_status'),
-        'Unknown status should be rejected',
-      );
-      assert.ok(
-        !validate.isUserRoleRequestStatusString(123),
-        'Non-string status should be rejected',
-      );
-      done();
-    });
-
     it('isSafeSearchString returns true if input is character false otherwise', function (done) {
       assert.ok(validate.isSafeSearchString('Peter @ Singh'), 'Bad name');
       assert.ok(!validate.isSafeSearchString('3Peter'), 'Bad name');
@@ -350,7 +311,7 @@ describe('AuthUtil test', function () {
       ];
 
       for (const password of acceptedPasswords) {
-        assert.deepStrictEqual(validatePackage.validatePassword(password), {
+        assert.deepStrictEqual(validateExamplePassword(password), {
           isValid: true,
           value: password,
         });
@@ -360,41 +321,41 @@ describe('AuthUtil test', function () {
     it('trims accepted passwords and normalizes them to NFC', function () {
       const password = `  cafe\u0301 ${'x'.repeat(10)}  `;
 
-      assert.deepStrictEqual(validatePackage.validatePassword(password), {
+      assert.deepStrictEqual(validateExamplePassword(password), {
         isValid: true,
         value: `café ${'x'.repeat(10)}`,
       });
     });
 
     it('returns stable reasons for invalid password input', function () {
-      assert.deepStrictEqual(validatePackage.validatePassword(' '.repeat(15)), {
+      assert.deepStrictEqual(validateExamplePassword(' '.repeat(15)), {
         isValid: false,
         reason: 'too_short',
       });
-      assert.deepStrictEqual(validatePackage.validatePassword(123), {
+      assert.deepStrictEqual(validateExamplePassword(123), {
         isValid: false,
         reason: 'invalid_type',
       });
-      assert.deepStrictEqual(validatePackage.validatePassword('\ud800valid password'), {
+      assert.deepStrictEqual(validateExamplePassword('\ud800valid password'), {
         isValid: false,
         reason: 'invalid_unicode',
       });
-      assert.deepStrictEqual(validatePackage.validatePassword('🔐'.repeat(14)), {
+      assert.deepStrictEqual(validateExamplePassword('🔐'.repeat(14)), {
         isValid: false,
         reason: 'too_short',
       });
-      assert.deepStrictEqual(validatePackage.validatePassword('🔐'.repeat(129)), {
+      assert.deepStrictEqual(validateExamplePassword('🔐'.repeat(129)), {
         isValid: false,
         reason: 'too_long',
       });
     });
 
     it('blocks exact compromised passwords after NFC normalization', function () {
-      assert.deepStrictEqual(validatePackage.validatePassword('films+pic+galeries'), {
+      assert.deepStrictEqual(validateExamplePassword('films+pic+galeries'), {
         isValid: false,
         reason: 'blocked',
       });
-      assert.deepStrictEqual(validatePackage.validatePassword('Films+pic+galeries'), {
+      assert.deepStrictEqual(validateExamplePassword('Films+pic+galeries'), {
         isValid: true,
         value: 'Films+pic+galeries',
       });
@@ -432,18 +393,6 @@ describe('AuthUtil test', function () {
 
       assert.ok(!validate.isUrlSafeString(urlUnSafeString), 'Url unsafe test failed');
       assert.ok(validate.isUrlSafeString(urlSafeString), 'Url safe test failed');
-      done();
-    });
-
-    it('isProvinceString returns true if input is two letter province code', function (done) {
-      const ontario = 'ON';
-      const quebec = 'QC';
-      const bad = 'IamBad';
-
-      assert.ok(validate.isProvinceString(ontario), 'Good province code failing');
-      assert.ok(validate.isProvinceString(quebec), 'Good province code failing');
-      assert.ok(!validate.isProvinceString(bad), 'Bad province code failing');
-      assert.ok(!validate.isProvinceString(123), 'Non-string province code failing');
       done();
     });
 
@@ -598,120 +547,6 @@ describe('AuthUtil test', function () {
       assert.ok(
         !validate.isValidArrayOfStrings(['a'.repeat(10001)]),
         'array with long string should fail',
-      );
-      done();
-    });
-
-    it('isUserRoleRequestRoleString returns true only for student, intern, and volunteer', function (done) {
-      assert.ok(isUserRoleRequestRoleString('student'), 'student should be valid');
-      assert.ok(isUserRoleRequestRoleString('intern'), 'intern should be valid');
-      assert.ok(isUserRoleRequestRoleString('volunteer'), 'volunteer should be valid');
-      assert.ok(!isUserRoleRequestRoleString('user'), 'user should be invalid');
-      assert.ok(!isUserRoleRequestRoleString('cc_admin'), 'cc_admin should be invalid');
-      assert.ok(!isUserRoleRequestRoleString('students'), 'students should be invalid');
-      assert.ok(!isUserRoleRequestRoleString(undefined), 'undefined should be invalid');
-      done();
-    });
-
-    it('validateNewUserRoleRequestObject defaults role and requires institution and campus', function (done) {
-      const roleRequest = validateNewUserRoleRequestObject({
-        user_id: '1c76ea46-a212-4cc5-9031-a9a28d927c4c',
-        institution_id: '2c76ea46-a212-4cc5-9031-a9a28d927c4c',
-        campus_id: '3c76ea46-a212-4cc5-9031-a9a28d927c4c',
-      });
-
-      assert.strictEqual(DEFAULT_USER_ROLE_REQUEST_ROLE, 'student');
-      assert.strictEqual(roleRequest.role_name, 'student');
-      assert.strictEqual(roleRequest.institution_id, '2c76ea46-a212-4cc5-9031-a9a28d927c4c');
-      assert.strictEqual(roleRequest.campus_id, '3c76ea46-a212-4cc5-9031-a9a28d927c4c');
-      done();
-    });
-
-    it('validateNewUserRoleRequestObject rejects an empty request with default create rules', function (done) {
-      assert.throws(
-        () => validateNewUserRoleRequestObject(),
-        err =>
-          err.message === 'Bad_Input' && err.userMessage === 'Missing property: role.institutionId',
-      );
-      done();
-    });
-
-    it('validateNewUserRoleRequestObject maps role aliases to role_name', function (done) {
-      const roleRequest = validateNewUserRoleRequestObject({
-        userId: '1c76ea46-a212-4cc5-9031-a9a28d927c4c',
-        role: 'intern',
-        institutionId: '2c76ea46-a212-4cc5-9031-a9a28d927c4c',
-        campusId: '3c76ea46-a212-4cc5-9031-a9a28d927c4c',
-        programId: '4c76ea46-a212-4cc5-9031-a9a28d927c4c',
-        programTermId: '5c76ea46-a212-4cc5-9031-a9a28d927c4c',
-      });
-
-      assert.strictEqual(roleRequest.role_name, 'intern');
-      assert.strictEqual(roleRequest.institution_id, '2c76ea46-a212-4cc5-9031-a9a28d927c4c');
-      assert.strictEqual(roleRequest.campus_id, '3c76ea46-a212-4cc5-9031-a9a28d927c4c');
-      assert.strictEqual(roleRequest.program_id, '4c76ea46-a212-4cc5-9031-a9a28d927c4c');
-      assert.strictEqual(roleRequest.program_term_id, '5c76ea46-a212-4cc5-9031-a9a28d927c4c');
-      assert.strictEqual(roleRequest.role, undefined);
-      assert.strictEqual(roleRequest.programId, undefined);
-      assert.strictEqual(roleRequest.programTermId, undefined);
-      done();
-    });
-
-    it('validateNewUserRoleRequestObject rejects invalid roles', function (done) {
-      assert.throws(
-        () =>
-          validateNewUserRoleRequestObject({
-            role_name: 'cc_admin',
-            institution_id: '2c76ea46-a212-4cc5-9031-a9a28d927c4c',
-            campus_id: '3c76ea46-a212-4cc5-9031-a9a28d927c4c',
-          }),
-        err => err.message === 'Bad_Input' && err.userMessage === 'Invalid property: role.role',
-      );
-      done();
-    });
-
-    it('validateNewUserRoleRequestObject rejects missing scope when scope is required', function (done) {
-      assert.throws(
-        () =>
-          validateNewUserRoleRequestObject({
-            role_name: 'volunteer',
-            institution_id: '2c76ea46-a212-4cc5-9031-a9a28d927c4c',
-          }),
-        err => err.message === 'Bad_Input' && err.userMessage === 'Missing property: role.campusId',
-      );
-      done();
-    });
-
-    it('validateNewUserRoleRequestObject can disable scope requirements for non-create validation', function (done) {
-      assert.deepStrictEqual(
-        validateNewUserRoleRequestObject(
-          { role_name: 'student' },
-          {
-            defaultRole: undefined,
-            requireScope: false,
-          },
-        ),
-        { role_name: 'student' },
-      );
-      done();
-    });
-
-    it('validateNewUserRoleRequestObject can require scope only when role or scope fields are present', function (done) {
-      assert.deepStrictEqual(
-        validateNewUserRoleRequestObject(
-          { approved_status: 'on_hold' },
-          { defaultRole: undefined, requireScope: REQUIRE_SCOPE_WHEN_ROLE_OR_SCOPE_PRESENT },
-        ),
-        { approved_status: 'on_hold' },
-      );
-      assert.throws(
-        () =>
-          validateNewUserRoleRequestObject(
-            { role_name: 'student' },
-            { defaultRole: undefined, requireScope: REQUIRE_SCOPE_WHEN_ROLE_OR_SCOPE_PRESENT },
-          ),
-        err =>
-          err.message === 'Bad_Input' && err.userMessage === 'Missing property: role.institutionId',
       );
       done();
     });

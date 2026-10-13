@@ -1,7 +1,8 @@
-'use strict';
+const { validateExampleProperties } = require('./configuredSchema.fixture');
+('use strict');
 
 const assert = require('node:assert');
-const { isEmailString, validateProperties } = require('..');
+const { isEmailString } = require('..');
 
 describe('public email validation', function () {
   const acceptedEmails = [
@@ -55,8 +56,8 @@ describe('public email validation', function () {
     'approvedByEmail',
   ]) {
     it(`uses the email contract for ${key}`, function () {
-      assert.deepStrictEqual(validateProperties({ [key]: 'invalid' }), {});
-      assert.deepStrictEqual(validateProperties({ [key]: 'person@example.com' }), {
+      assert.deepStrictEqual(validateExampleProperties({ [key]: 'invalid' }), {});
+      assert.deepStrictEqual(validateExampleProperties({ [key]: 'person@example.com' }), {
         [key]: 'person@example.com',
       });
     });
