@@ -1,6 +1,6 @@
 {
   "name": "@carecard/validate",
-  "version": "3.44.0",
+  "version": "3.45.0",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/CareCard-ca/pkg-validate.git"
@@ -64,9 +64,9 @@
   "overrides": {
     "brace-expansion": "5.0.12",
     "diff": "9.0.0",
-    "glob": "13.0.6",
-    "minimatch": "10.2.6",
-    "serialize-javascript": "7.1.2",
+    "glob": "14.0.2",
+    "minimatch": "11.0.1",
+    "serialize-javascript": "7.1.3",
     "js-yaml": "5.4.3"
   }
 }
