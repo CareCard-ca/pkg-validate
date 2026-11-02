@@ -36,6 +36,11 @@ validate both the generic package contract and the owning public boundaries.
 
 ## Purpose
 
+The coordinated 3.45.0 dependency refresh is documented in
+[the security review](../../../docs/dependency-security-2026-11-01.md). Keep
+dependency inventory checks as audits and validate public behavior and types
+through the existing native suite.
+
 CareCard validation package for deterministic validators, sanitization, whitelist validation, nested paths, error mapping, exports, and tests.
 
 ## When To Use
