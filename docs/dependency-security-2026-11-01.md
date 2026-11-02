@@ -28,3 +28,7 @@ contained within that repository. Tests and Husky scripts must not import,
 require, read, execute, or otherwise depend on sibling repositories or paths
 outside the repository root. app-e2e-tests is the only exception because
 cross-repository end-to-end testing is its explicit responsibility.
+
+The direct `@carecard/common-util` dependency selects 3.45.0 from the verified
+coordinated registry release. Preserve the generic public contract and the
+full native validation gates when consuming this dependency.
